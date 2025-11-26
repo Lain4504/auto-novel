@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 import { PlusOutlined } from '@vicons/material';
 import type { FormInst, FormItemRule, FormRules } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 import { doAction } from '@/pages/util';
 import { FavoredRepo } from '@/stores';
+
+const { t } = useI18n();
 
 const message = useMessage();
 
@@ -21,12 +24,12 @@ const formRules: FormRules = {
   title: [
     {
       validator: (_rule: FormItemRule, value: string) => value.length > 0,
-      message: '收藏夹标题不能为空',
+      message: t('bookshelf.menu.titleRequired'),
       trigger: 'input',
     },
     {
       validator: (_rule: FormItemRule, value: string) => value.length <= 20,
-      message: '收藏夹标题至多为20个字符',
+      message: t('bookshelf.menu.titleMaxLength'),
       trigger: 'input',
     },
   ],
@@ -44,16 +47,16 @@ const addFavorite = async () => {
     FavoredRepo.createFavored(type, title).then(() => {
       showAddModal.value = false;
     }),
-    '收藏夹创建',
+    t('bookshelf.menu.createAction'),
     message,
   );
 };
 </script>
 
 <template>
-  <c-button label="新建" :icon="PlusOutlined" @action="showAddModal = true" />
+  <c-button :label="t('bookshelf.menu.create')" :icon="PlusOutlined" @action="showAddModal = true" />
 
-  <c-modal title="新建收藏夹" v-model:show="showAddModal">
+  <c-modal :title="t('bookshelf.menu.createTitle')" v-model:show="showAddModal">
     <n-form
       ref="form"
       :model="formValue"
@@ -61,21 +64,21 @@ const addFavorite = async () => {
       label-placement="left"
       label-width="auto"
     >
-      <n-form-item-row label="标题" path="title">
+      <n-form-item-row :label="t('bookshelf.menu.title')" path="title">
         <n-input
           v-model:value="formValue.title"
-          placeholder="收藏夹标题"
+          :placeholder="t('bookshelf.menu.titlePlaceholder')"
           :input-props="{ spellcheck: false }"
         />
       </n-form-item-row>
 
-      <n-form-item-row label="类型">
+      <n-form-item-row :label="t('bookshelf.menu.type')">
         <c-radio-group
           v-model:value="formValue.type"
           :options="[
-            { label: '网页小说', value: 'web' },
-            { label: '文库小说', value: 'wenku' },
-            { label: '本地小说', value: 'local' },
+            { label: t('bookshelf.menu.typeWeb'), value: 'web' },
+            { label: t('bookshelf.menu.typeWenku'), value: 'wenku' },
+            { label: t('bookshelf.menu.typeLocal'), value: 'local' },
           ]"
         />
       </n-form-item-row>
@@ -83,7 +86,7 @@ const addFavorite = async () => {
 
     <template #action>
       <c-button
-        label="确定"
+        :label="t('bookshelf.menu.confirm')"
         require-login
         type="primary"
         @action="addFavorite"

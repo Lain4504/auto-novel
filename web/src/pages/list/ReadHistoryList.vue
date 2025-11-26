@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import { DeleteOutlineOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import { ReadHistoryApi } from '@/api';
 import { WebNovelRepo } from '@/repos';
 import router from '@/router';
 import { useReadHistoryStore } from '@/stores';
 import { doAction } from '../util';
+
+const { t } = useI18n();
 
 const route = useRoute();
 
@@ -36,7 +39,7 @@ const clearHistory = () =>
     ReadHistoryApi.clearReadHistoryWeb().then(() => {
       window.location.reload();
     }),
-    '清空',
+    t('list.readHistory.clear'),
     message,
   );
 
@@ -45,36 +48,36 @@ const deleteHistory = (providerId: string, novelId: string) =>
     ReadHistoryApi.deleteReadHistoryWeb(providerId, novelId).then(() => {
       window.location.reload();
     }),
-    '删除',
+    t('list.readHistory.delete'),
     message,
   );
 </script>
 
 <template>
   <div class="layout-content">
-    <n-h1>阅读历史</n-h1>
+    <n-h1>{{ t('list.readHistory.title') }}</n-h1>
 
     <n-flex style="margin-bottom: 24px">
       <c-button-confirm
-        hint="真的要清空记录吗？"
-        label="清空记录"
+        :hint="t('list.readHistory.clearConfirm')"
+        :label="t('list.readHistory.clear')"
         :icon="DeleteOutlineOutlined"
         @action="clearHistory()"
       />
       <c-button
         v-if="readHistoryPaused"
-        label="继续记录历史"
+        :label="t('list.readHistory.continueRecording')"
         @action="readHistoryStore.resumeReadHistory()"
       />
       <c-button
         v-else
-        label="暂停记录历史"
+        :label="t('list.readHistory.pauseRecording')"
         @action="readHistoryStore.pauseReadHistory()"
       />
     </n-flex>
 
     <n-text v-if="readHistoryPaused" type="warning">
-      注意：历史功能已暂停
+      {{ t('list.readHistory.pausedWarning') }}
     </n-text>
 
     <CPage
@@ -88,17 +91,17 @@ const deleteHistory = (providerId: string, novelId: string) =>
           <template #action="item">
             <c-button
               size="tiny"
-              label="删除"
+              :label="t('list.readHistory.delete')"
               style="margin-top: 2px"
               @action="deleteHistory(item.providerId, item.novelId)"
             />
           </template>
         </NovelListWeb>
-        <n-empty v-if="novelPage.items.length === 0" description="空列表" />
+        <n-empty v-if="novelPage.items.length === 0" :description="t('list.readHistory.empty')" />
         <n-divider />
       </template>
 
-      <CResultX v-else :error="error" title="加载错误" />
+      <CResultX v-else :error="error" :title="t('list.readHistory.loadError')" />
     </CPage>
   </div>
 </template>

@@ -1,7 +1,11 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import { ArticleRepo } from '@/repos';
 import { doAction } from '@/pages//util';
 import { useBlacklistStore, useWhoamiStore } from '@/stores';
+
+const { t } = useI18n();
 
 const { articleId } = defineProps<{ articleId: string }>();
 
@@ -29,7 +33,7 @@ const blockUserComment = async (username: string) =>
     (async () => {
       blacklistStore.add(username);
     })(),
-    '屏蔽用户',
+    t('forum.article.blockUser'),
     message,
   );
 
@@ -38,7 +42,7 @@ const unblockUserComment = async (username: string) =>
     (async () => {
       blacklistStore.remove(username);
     })(),
-    '解除屏蔽用户',
+    t('forum.article.unblockUser'),
     message,
   );
 </script>
@@ -47,15 +51,15 @@ const unblockUserComment = async (username: string) =>
   <div class="layout-content">
     <template v-if="article">
       <n-h1 prefix="bar">{{ article.title }}</n-h1>
-      <n-text v-if="article.hidden" depth="3">[隐藏]</n-text>
+      <n-text v-if="article.hidden" depth="3">{{ t('forum.status.hidden') }}</n-text>
       <n-p>
-        {{ article.updateAt === article.createAt ? '发布' : '更新' }}于
+        {{ article.updateAt === article.createAt ? t('forum.status.published') : t('forum.status.updated') }} {{ t('forum.status.at') }}
         <n-time :time="article.updateAt * 1000" type="relative" />
-        by {{ article.user.username }}
+        {{ t('forum.status.by') }} {{ article.user.username }}
         <template v-if="whoami.isMe(article.user.username) || whoami.asAdmin">
           /
           <c-a :to="`/forum-edit/${article.id}?category=${article.category}`">
-            编辑
+            {{ t('forum.article.edit') }}
           </c-a>
         </template>
         <n-button
@@ -64,7 +68,7 @@ const unblockUserComment = async (username: string) =>
           type="primary"
           @click="unblockUserComment(article.user.username)"
         >
-          解除屏蔽
+          {{ t('forum.article.unblockUser') }}
         </n-button>
         <n-button
           v-else
@@ -72,7 +76,7 @@ const unblockUserComment = async (username: string) =>
           type="primary"
           @click="blockUserComment(article.user.username)"
         >
-          屏蔽
+          {{ t('forum.article.blockUser') }}
         </n-button>
       </n-p>
       <n-divider />
@@ -85,7 +89,7 @@ const unblockUserComment = async (username: string) =>
     <n-result
       v-else-if="error"
       status="error"
-      title="加载错误"
+      :title="t('forum.loadError')"
       :description="error.message"
     />
   </div>

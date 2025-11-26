@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { DeleteOutlineOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import { GenericNovelId } from '@/model/Common';
 
@@ -11,11 +12,16 @@ defineEmits<{
 }>();
 
 const message = useMessage();
+const { t } = useI18n();
 
 const store = useBookshelfLocalStore();
 
 const deleteVolume = (volumeId: string) =>
-  doAction(store.deleteVolume(volumeId), '删除', message);
+  doAction(
+    store.deleteVolume(volumeId),
+    t('workspace.localVolume.deleteAction'),
+    message,
+  );
 </script>
 
 <template>
@@ -25,13 +31,15 @@ const deleteVolume = (volumeId: string) =>
         <n-text>{{ volume.id }}</n-text>
 
         <n-text depth="3">
-          <n-time :time="volume.createAt" type="relative" /> / 总计
+          <n-time :time="volume.createAt" type="relative" />
+          /
+          {{ t('workspace.localVolume.total') }}
           {{ volume.toc.length }}
         </n-text>
 
         <n-flex :size="8">
           <c-button
-            label="载入"
+            :label="t('workspace.localVolume.load')"
             size="tiny"
             secondary
             @action="$emit('volumeLoaded', volume.id)"
@@ -47,7 +55,7 @@ const deleteVolume = (volumeId: string) =>
           <div style="flex: 1" />
 
           <c-button-confirm
-            :hint="`真的要删除《${volume.id}》吗？`"
+            :hint="t('workspace.localVolume.deleteHint', { title: volume.id })"
             :icon="DeleteOutlineOutlined"
             size="tiny"
             secondary

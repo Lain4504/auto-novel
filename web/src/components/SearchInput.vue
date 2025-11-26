@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { SearchOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 const value = defineModel<{
   query: string;
@@ -9,6 +10,7 @@ const value = defineModel<{
 });
 
 const attrs = useAttrs();
+const { t } = useI18n();
 </script>
 <template>
   <n-input
@@ -21,5 +23,8 @@ const attrs = useAttrs();
     <template #suffix><n-icon :component="SearchOutlined" /></template>
   </n-input>
 
-  <tag-button label="正则" v-model:checked="value.enableRegexMode" />
+  <tag-button
+    :label="t('components.searchInput.regex')"
+    v-model:checked="value.enableRegexMode"
+  />
 </template>

@@ -1,3 +1,4 @@
+import { i18nGlobal } from '@/locales';
 import { parseFile } from '@/util/file';
 
 import { EpubParserV1 } from './EpubParser';
@@ -25,11 +26,13 @@ export const getTranslationFile = async (
   ].join('.');
 
   const metadata = await dao.getMetadata(id);
-  if (metadata === undefined) throw Error('小说不存在');
+  if (metadata === undefined)
+    throw Error(i18nGlobal.t('stores.translationFile.novelMissing'));
 
   const getZhLinesList = async (chapterId: string) => {
     const chapter = await dao.getChapter(id, chapterId);
-    if (chapter === undefined) throw Error('章节不存在');
+    if (chapter === undefined)
+      throw Error(i18nGlobal.t('stores.translationFile.chapterMissing'));
 
     const jpLines = chapter.paragraphs;
     const zhLinesList: Array<Array<string>> = [];
@@ -47,7 +50,8 @@ export const getTranslationFile = async (
   };
 
   const file = await dao.getFile(id);
-  if (file === undefined) throw Error('原始文件不存在');
+  if (file === undefined)
+    throw Error(i18nGlobal.t('stores.translationFile.originalMissing'));
 
   const myFile = await parseFile(file.file);
 
@@ -57,7 +61,7 @@ export const getTranslationFile = async (
       const { jpLines, zhLinesList } = await getZhLinesList(chapterId);
 
       if (zhLinesList.length === 0) {
-        buffer.push('// 该分段翻译缺失。');
+        buffer.push(i18nGlobal.t('stores.translationFile.missingSegment'));
       } else {
         const combinedLinesList = zhLinesList;
         if (mode === 'jp-zh') {

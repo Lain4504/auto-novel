@@ -1,48 +1,48 @@
-# 贡献代码
+# Đóng góp mã nguồn
 
-感谢您有兴趣为这个项目做出贡献！为了高效协作，请遵循以下规范。
+Cảm ơn bạn đã quan tâm đóng góp cho dự án! Để hợp tác hiệu quả, hãy tuân theo các quy tắc sau.
 
-- 在编写代码前，请先通过 Issue 或群组讨论你的变更计划，确保与现有开发方向一致。
-- 提交 Pull Request 时，请保持内容精简，每次聚焦一个独立的修改点，以便快速检视和合入。
-- 如果对当前代码设计有疑问，可以在群组里 @FishHawk 提问。
-- 如果使用 AI 辅助编写，请务必自己检视一遍。
+- Trước khi viết code, hãy mô tả kế hoạch thay đổi qua Issue hoặc nhóm thảo luận để bảo đảm thống nhất với định hướng hiện tại.
+- Khi gửi Pull Request, giữ nội dung gọn gàng, tập trung vào một thay đổi độc lập để tiện review và merge.
+- Nếu thắc mắc về thiết kế hiện tại, cứ @FishHawk trong nhóm.
+- Dù có dùng AI hỗ trợ, bạn vẫn phải tự mình rà soát lại.
 
-## 如何参与前端开发
+## Cách tham gia phát triển front-end
 
-网站基于 Vue3 + TypeScript + Vite + [Naive ui](https://www.naiveui.com/zh-CN) 开发。
+Website được xây dựng bằng Vue3 + TypeScript + Vite + [Naive UI](https://www.naiveui.com/zh-CN).
 
-首先准备开发环境：
+Chuẩn bị môi trường:
 
 ```bash
 git clone git@github.com:auto-novel/auto-novel.git
 cd web
-pnpm install --frozen-lockfile # 安装依赖
-pnpm prepare                   # 设置Git钩子
+pnpm install --frozen-lockfile # cài phụ thuộc
+pnpm prepare                   # thiết lập Git hook
 ```
 
-然后根据你的需要，选择合适的方式启动开发服务器：
+Sau đó chọn cách chạy dev server phù hợp:
 
 ```bash
-pnpm dev        # 启动开发服务器，连接到机翻站 生产环境 后端服务器
-pnpm dev:local  # 启动开发服务器，连接到 本地启动 的后端服务器，http://localhost:8081
-pnpm dev --host # 启动开发服务器，连接到机翻站 生产环境 后端服务器，同时允许局域网访问，支持使用手机访问调试
+pnpm dev        # dev server nối tới backend production của site dịch máy
+pnpm dev:local  # dev server nối tới backend chạy local, http://localhost:8081
+pnpm dev --host # như pnpm dev nhưng mở LAN, tiện debug trên điện thoại
 ```
 
-注意，如果开发服务器连接到机翻站**生产环境**后端，请避免在开发过程中污染网站数据库。出于安全考虑，开发环境中屏蔽了上传章节翻译请求。
+Lưu ý: nếu dev server nối tới backend **production** của site dịch máy, hãy tránh làm bẩn dữ liệu thật. Vì lý do an toàn, môi trường dev đã chặn upload bản dịch chương.
 
-## 如何参与后端开发
+## Cách tham gia phát triển back-end
 
-后端基于 JVM17 + Kotlin + Ktor 开发，推荐使用 IntelliJ IDEA 打开项目。
+Backend dùng JVM17 + Kotlin + Ktor, nên mở dự án bằng IntelliJ IDEA.
 
-如果你的修改涉及数据库，你需要自己[部署数据库](https://github.com/auto-novel/auto-novel/blob/main/README.md#部署)并设置环境变量：
+Nếu thay đổi liên quan tới DB, bạn cần tự [triển khai DB](https://github.com/auto-novel/auto-novel/blob/main/README.md#部署) và đặt biến môi trường:
 
 ```bash
-DB_HOST_TEST=127.0.0.1 # 数据库 IP 地址
+DB_HOST_TEST=127.0.0.1 # địa chỉ IP của DB
 ```
 
-如果你的修改不涉及 Http API，可以使用 kotest 编写单元测试调试，推荐安装 kotest 插件。
+Nếu thay đổi không đụng đến Http API, hãy dùng kotest viết unit test để debug; nên cài plugin kotest.
 
-如果你的修改涉及 Http API，你可以使用 `pnpm dev:local` 启动开发服务器，参考「如何参与前端开发」一节。
+Nếu cần thao tác Http API, chạy `pnpm dev:local` theo hướng dẫn phần front-end.
 
 > [!NOTE]
-> NixOS 开发环境配置可以参见 [flake.nix](https://gist.github.com/kurikomoe/9dd60f9613e0b8f75c137779d223da4f)。由于使用了 devenv，因此需要 `--impure`。
+> Hướng dẫn cấu hình môi trường NixOS xem tại [flake.nix](https://gist.github.com/kurikomoe/9dd60f9613e0b8f75c137779d223da4f). Vì dùng devenv nên cần `--impure`.

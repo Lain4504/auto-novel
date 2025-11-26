@@ -1,26 +1,32 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
 import SoundAllTaskCompleted from '@/sound/all_task_completed.mp3';
 import {
   Setting,
   useSettingStore,
   useWebSearchHistoryStore,
   useWenkuSearchHistoryStore,
+  useLocaleStore,
 } from '@/stores';
 import { InfoOutlined } from '@vicons/material';
 
 const message = useMessage();
+const { t } = useI18n();
 
 const settingStore = useSettingStore();
 const { setting } = storeToRefs(settingStore);
 
+const localeStore = useLocaleStore();
+const { locale: uiLocale } = storeToRefs(localeStore);
+
 const clearWebSearchHistory = () => {
   useWebSearchHistoryStore().clear();
-  message.success('清空成功');
+  message.success(t('setting.clearSuccess'));
 };
 
 const clearWenkuSearchHistory = () => {
   useWenkuSearchHistoryStore().clear();
-  message.success('清空成功');
+  message.success(t('setting.clearSuccess'));
 };
 
 const playSound = (source: string) => {
@@ -30,12 +36,12 @@ const playSound = (source: string) => {
 
 <template>
   <div class="layout-content">
-    <n-h1>设置</n-h1>
+    <n-h1>{{ t('setting.title') }}</n-h1>
 
     <n-list bordered>
       <n-list-item>
         <n-flex vertical>
-          <b>主题</b>
+          <b>{{ t('setting.theme') }}</b>
           <c-radio-group
             v-model:value="setting.theme"
             :options="Setting.themeOptions"
@@ -46,66 +52,62 @@ const playSound = (source: string) => {
 
       <n-list-item>
         <n-flex vertical>
-          <b>快捷键说明</b>
+          <b>{{ t('setting.shortcuts') }}</b>
           <n-ul>
-            <n-li>列表页面，可以使用左右方向键翻页。</n-li>
-            <n-li>GPT/Sakura排队按钮，按住Ctrl键点击，会将任务自动置顶。</n-li>
-            <n-li>阅读页面，可以使用左右方向键跳转上/下一章。</n-li>
-            <n-li>阅读页面，可以使用数字键1～4快速切换翻译。</n-li>
+            <n-li>{{ t('setting.shortcutListPage') }}</n-li>
+            <n-li>{{ t('setting.shortcutQueueButton') }}</n-li>
+            <n-li>{{ t('setting.shortcutReaderNav') }}</n-li>
+            <n-li>{{ t('setting.shortcutReaderTranslate') }}</n-li>
           </n-ul>
         </n-flex>
       </n-list-item>
 
       <n-list-item>
         <n-flex vertical>
-          <b>网络小说目录</b>
+          <b>{{ t('setting.webNovelToc') }}</b>
           <n-checkbox v-model:checked="setting.tocCollapseInNarrowScreen">
-            目录折叠在侧边栏 (移动端)
+            {{ t('setting.tocCollapseInNarrowScreen') }}
           </n-checkbox>
           <n-checkbox v-model:checked="setting.tocExpandAll">
-            目录默认展开所有章节
+            {{ t('setting.tocExpandAll') }}
             <n-tooltip trigger="hover" placement="top" style="max-width: 400px">
               <template #trigger>
                 <n-button text @click.stop>
                   <n-icon depth="4" :component="InfoOutlined" size="12" />
                 </n-button>
               </template>
-              开启：默认展开所有章节（可能导致性能问题）
-              <br />
-              关闭：只展开上次阅读的章节（如无记录则展开第一个章节）
-              <br />
-              不影响无分章的网络小说
+              {{ t('setting.tocExpandAllTooltip') }}
             </n-tooltip>
           </n-checkbox>
-          <b>评论</b>
+          <b>{{ t('setting.comments') }}</b>
           <n-checkbox v-model:checked="setting.hideCommmentWebNovel">
-            隐藏网络小说评论
+            {{ t('setting.hideCommentWebNovel') }}
           </n-checkbox>
           <n-checkbox v-model:checked="setting.hideCommmentWenkuNovel">
-            隐藏文库小说评论
+            {{ t('setting.hideCommentWenkuNovel') }}
           </n-checkbox>
-          <b>收藏夹</b>
+          <b>{{ t('setting.favorites') }}</b>
           <n-checkbox v-model:checked="setting.showTagInWebFavored">
-            显示收藏夹里网络小说的标签
+            {{ t('setting.showTagInWebFavored') }}
           </n-checkbox>
           <n-checkbox v-model:checked="setting.favoriteCreateTimeFirst">
-            收藏时间排序优先
+            {{ t('setting.favoriteCreateTimeFirst') }}
           </n-checkbox>
         </n-flex>
       </n-list-item>
 
       <n-list-item>
         <n-flex vertical>
-          <b>工作区</b>
+          <b>{{ t('setting.workspace') }}</b>
           <n-checkbox v-model:checked="setting.autoTopJobWhenAddTask">
-            工作区添加时自动置顶
+            {{ t('setting.autoTopJobWhenAddTask') }}
           </n-checkbox>
         </n-flex>
       </n-list-item>
 
       <n-list-item>
         <n-flex vertical>
-          <b>列表分页方式</b>
+          <b>{{ t('setting.paginationMode') }}</b>
           <c-radio-group
             v-model:value="setting.paginationMode"
             :options="Setting.paginationModeOptions"
@@ -116,7 +118,7 @@ const playSound = (source: string) => {
 
       <n-list-item>
         <n-flex vertical>
-          <b>显示的翻译按钮</b>
+          <b>{{ t('setting.enabledTranslator') }}</b>
           <translator-check
             v-model:value="setting.enabledTranslator"
             size="small"
@@ -126,15 +128,15 @@ const playSound = (source: string) => {
 
       <n-list-item>
         <n-flex vertical>
-          <b>工作区语音提醒</b>
+          <b>{{ t('setting.workspaceSound') }}</b>
           <n-flex :wrap="false" :size="0">
             <n-checkbox v-model:checked="setting.workspaceSound">
-              任务全部完成
+              {{ t('setting.workspaceSoundAllCompleted') }}
             </n-checkbox>
 
             [
             <c-button
-              label="点击播放"
+              :label="t('setting.clickPlay')"
               text
               type="primary"
               @action="playSound(SoundAllTaskCompleted)"
@@ -146,15 +148,15 @@ const playSound = (source: string) => {
 
       <n-list-item>
         <n-flex vertical align="start">
-          <b>清空搜索历史</b>
+          <b>{{ t('setting.clearSearchHistory') }}</b>
           <n-flex>
             <c-button
-              label="清空网络搜索历史"
+              :label="t('setting.clearWebSearchHistory')"
               size="small"
               @action="clearWebSearchHistory"
             />
             <c-button
-              label="清空文库搜索历史"
+              :label="t('setting.clearWenkuSearchHistory')"
               size="small"
               @action="clearWenkuSearchHistory"
             />
@@ -164,25 +166,25 @@ const playSound = (source: string) => {
 
       <n-list-item>
         <n-flex vertical>
-          <b>黑名单</b>
+          <b>{{ t('setting.blacklist') }}</b>
           <n-flex>
             <user-block-button />
           </n-flex>
         </n-flex>
       </n-list-item>
 
+
       <n-list-item>
         <n-flex vertical>
-          <b>语言</b>
-          简繁转换目前只覆盖web章节内容。
+          <b>{{ t('stores.setting.uiLanguage.title') }}</b>
           <c-radio-group
-            v-model:value="setting.locale"
-            :options="Setting.localeOptions"
+            v-model:value="uiLocale"
+            :options="[
+              { label: t('stores.setting.uiLanguage.vi'), value: 'vi' },
+              { label: t('stores.setting.uiLanguage.zh'), value: 'zh' }
+            ]"
             size="small"
           />
-          <n-checkbox v-model:checked="setting.searchLocaleAware">
-            支持繁体搜索（不稳定）
-          </n-checkbox>
         </n-flex>
       </n-list-item>
     </n-list>

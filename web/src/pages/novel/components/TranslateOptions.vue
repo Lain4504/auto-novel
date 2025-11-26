@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import { InfoOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import type { GenericNovelId } from '@/model/Common';
 import type { Glossary } from '@/model/Glossary';
 import type { TranslateTaskParams } from '@/model/Translator';
 import { useIsWideScreen } from '@/pages/util';
 import { Setting, useSettingStore } from '@/stores';
+
+const { t } = useI18n();
 
 const probs = defineProps<{
   gnid: GenericNovelId;
@@ -40,50 +43,50 @@ const showDownloadModal = ref(false);
 
 <template>
   <n-flex vertical>
-    <c-action-wrapper title="选项">
+    <c-action-wrapper :title="t('novel.translateOptions.title')">
       <n-flex size="small">
         <n-tooltip trigger="hover" style="max-width: 200px">
           <template #trigger>
             <n-flex :size="0" :wrap="false">
               <tag-button
-                label="常规"
+                :label="t('novel.translateOptions.normal')"
                 :checked="translateLevel === 'normal'"
                 @update:checked="translateLevel = 'normal'"
               />
               <tag-button
-                label="过期"
+                :label="t('novel.translateOptions.expire')"
                 :checked="translateLevel === 'expire'"
                 @update:checked="translateLevel = 'expire'"
               />
               <tag-button
-                label="重翻"
+                :label="t('novel.translateOptions.retranslate')"
                 type="warning"
                 :checked="translateLevel === 'all'"
                 @update:checked="translateLevel = 'all'"
               />
               <tag-button
                 v-if="gnid.type === 'web'"
-                label="源站同步"
+                :label="t('novel.translateOptions.sync')"
                 type="warning"
                 :checked="translateLevel === 'sync'"
                 @update:checked="translateLevel = 'sync'"
               />
             </n-flex>
           </template>
-          常规：只翻译未翻译的章节
+          {{ t('novel.translateOptions.normalDesc') }}
           <br />
-          过期：翻译术语表过期的章节
+          {{ t('novel.translateOptions.expireDesc') }}
           <br />
-          重翻：重翻全部章节
+          {{ t('novel.translateOptions.retranslateDesc') }}
           <br />
           <template v-if="gnid.type === 'web'">
-            源站同步：用于原作者修改了原文的情况导致不一致的情况，可能清空现有翻译，慎用！!
+            {{ t('novel.translateOptions.syncDesc') }}
           </template>
         </n-tooltip>
 
         <tag-button
           v-if="gnid.type === 'web'"
-          label="重翻目录"
+          :label="t('novel.translateOptions.retranslateMetadata')"
           v-model:checked="forceMetadata"
         />
 
@@ -92,19 +95,19 @@ const showDownloadModal = ref(false);
           type="warning"
           style="font-size: 12px; flex-basis: 100%"
         >
-          <b>* 请确保你知道自己在干啥，不要随便使用危险功能</b>
+          <b>{{ t('novel.translateOptions.warning') }}</b>
         </n-text>
       </n-flex>
     </c-action-wrapper>
 
     <c-action-wrapper
       v-if="gnid.type === 'web' || gnid.type === 'local'"
-      title="范围"
+      :title="t('novel.translateOptions.range')"
     >
       <n-flex style="text-align: center">
         <div>
           <n-input-group>
-            <n-input-group-label size="small">从</n-input-group-label>
+            <n-input-group-label size="small">{{ t('novel.translateOptions.from') }}</n-input-group-label>
             <n-input-number
               size="small"
               v-model:value="startIndex"
@@ -113,7 +116,7 @@ const showDownloadModal = ref(false);
               :min="0"
               style="width: 60px"
             />
-            <n-input-group-label size="small">到</n-input-group-label>
+            <n-input-group-label size="small">{{ t('novel.translateOptions.to') }}</n-input-group-label>
             <n-input-number
               size="small"
               v-model:value="endIndex"
@@ -125,7 +128,7 @@ const showDownloadModal = ref(false);
         </div>
         <div>
           <n-input-group>
-            <n-input-group-label size="small">均分</n-input-group-label>
+            <n-input-group-label size="small">{{ t('novel.translateOptions.split') }}</n-input-group-label>
             <n-input-number
               size="small"
               v-model:value="taskNumber"
@@ -134,7 +137,7 @@ const showDownloadModal = ref(false);
               :max="gnid.type === 'local' ? 65536 : 10"
               style="width: 40px"
             />
-            <n-input-group-label size="small">个任务</n-input-group-label>
+            <n-input-group-label size="small">{{ t('novel.translateOptions.tasks') }}</n-input-group-label>
           </n-input-group>
         </div>
 
@@ -144,15 +147,15 @@ const showDownloadModal = ref(false);
               <n-icon depth="4" :component="InfoOutlined" />
             </n-button>
           </template>
-          章节序号看下面目录方括号里的数字。“从0到10”表示从第0章到第9章，不包含第10章。均分任务只对排队生效，最大为10。
+          {{ t('novel.translateOptions.rangeHint') }}
         </n-tooltip>
       </n-flex>
     </c-action-wrapper>
 
-    <c-action-wrapper v-if="gnid.type !== 'local'" title="操作">
+    <c-action-wrapper v-if="gnid.type !== 'local'" :title="t('novel.translateOptions.actions')">
       <n-button-group size="small">
         <c-button
-          label="下载设置"
+          :label="t('novel.translateOptions.downloadSettings')"
           :round="false"
           @action="showDownloadModal = true"
         />
@@ -160,16 +163,16 @@ const showDownloadModal = ref(false);
       </n-button-group>
     </c-action-wrapper>
 
-    <c-modal title="下载设置" v-model:show="showDownloadModal">
+    <c-modal :title="t('novel.translateOptions.downloadSettingsTitle')" v-model:show="showDownloadModal">
       <n-flex vertical size="large">
-        <c-action-wrapper title="语言">
+        <c-action-wrapper :title="t('novel.translateOptions.language')">
           <c-radio-group
             v-model:value="setting.downloadFormat.mode"
             :options="Setting.downloadModeOptions"
           />
         </c-action-wrapper>
 
-        <c-action-wrapper title="翻译">
+        <c-action-wrapper :title="t('novel.translateOptions.translation')">
           <n-flex>
             <c-radio-group
               v-model:value="setting.downloadFormat.translationsMode"
@@ -183,7 +186,7 @@ const showDownloadModal = ref(false);
           </n-flex>
         </c-action-wrapper>
 
-        <c-action-wrapper v-if="gnid.type === 'web'" title="文件">
+        <c-action-wrapper v-if="gnid.type === 'web'" :title="t('novel.translateOptions.file')">
           <c-radio-group
             v-model:value="setting.downloadFormat.type"
             :options="Setting.downloadTypeOptions"
@@ -192,7 +195,7 @@ const showDownloadModal = ref(false);
 
         <c-action-wrapper
           v-if="gnid.type === 'web'"
-          title="中文文件名"
+          :title="t('novel.translateOptions.chineseFilename')"
           align="center"
         >
           <n-switch
@@ -205,7 +208,7 @@ const showDownloadModal = ref(false);
         </c-action-wrapper>
 
         <n-text depth="3" style="font-size: 12px">
-          # 某些EPUB阅读器无法正确显示日文段落的浅色字体
+          {{ t('novel.translateOptions.epubNote') }}
         </n-text>
       </n-flex>
     </c-modal>

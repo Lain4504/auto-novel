@@ -1,22 +1,22 @@
-# Rslib project
+# Dự án Rslib
 
-## Setup
+## Thiết lập
 
-Install the dependencies:
+Cài đặt phụ thuộc:
 
 ```bash
 pnpm install
 ```
 
-## Get started
+## Bắt đầu
 
-Build the library:
+Build thư viện:
 
 ```bash
 pnpm build
 ```
 
-Build the library in watch mode:
+Build thư viện ở chế độ watch:
 
 ```bash
 pnpm dev

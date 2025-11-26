@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core';
+import { useI18n } from 'vue-i18n';
 
 import { useDraftStore } from '@/stores';
 import { useIsWideScreen } from '@/pages/util';
@@ -16,11 +17,12 @@ const props = defineProps<{
 }>();
 
 const value = defineModel<string>('value', { required: true });
+const { t } = useI18n();
 
 useEventListener(window, 'beforeunload', (e) => {
   if (value.value.trim()) {
     e.preventDefault();
-    return '有未保存的编辑，确定要离开吗？';
+    return t('components.markdownEditor.leaveConfirm');
   }
 });
 
@@ -76,7 +78,11 @@ const elEditor = useTemplateRef('editor');
           @clear-draft="clearDraft"
         />
       </template>
-      <n-tab-pane tab="编辑" :name="0" display-directive="show">
+      <n-tab-pane
+        :tab="t('components.markdownEditor.tabEdit')"
+        :name="0"
+        display-directive="show"
+      >
         <n-flex
           v-if="!isWideScreen"
           :size="0"
@@ -103,11 +109,13 @@ const elEditor = useTemplateRef('editor');
           />
         </div>
       </n-tab-pane>
-      <n-tab-pane tab="预览" :name="1">
+      <n-tab-pane :tab="t('components.markdownEditor.tabPreview')" :name="1">
         <div style="padding: 0px 16px">
           <MarkdownView
             :mode="mode"
-            :source="(value as string) || '没有可预览的内容'"
+            :source="
+              (value as string) || t('components.markdownEditor.emptyPreview')
+            "
           />
         </div>
       </n-tab-pane>

@@ -1,26 +1,26 @@
-# 轻小说机翻机器人
+# Robot dịch máy Light Novel
 
 [![GPL-3.0](https://img.shields.io/github/license/auto-novel/auto-novel)](https://github.com/auto-novel/auto-novel#license)
 [![cd-web](https://github.com/auto-novel/auto-novel/actions/workflows/cd-web.yml/badge.svg)](https://github.com/auto-novel/auto-novel/actions/workflows/cd-web.yml)
 [![cd-api](https://github.com/auto-novel/auto-novel/actions/workflows/cd-api.yml/badge.svg)](https://github.com/auto-novel/auto-novel/actions/workflows/cd-api.yml)
 
-> 重建巴别塔！！
+> Xây lại Tháp Babel!!
 
-[轻小说机翻机器人](https://books.fishhawk.top/)是一个自动生成轻小说机翻并分享的网站。在这里，你可以浏览日文网络小说/文库小说，或者上传你自己的 EPUB/TXT 文件，然后生成机翻版本。
+[Robot dịch máy Light Novel](https://books.fishhawk.top/) là một trang web tự động tạo bản dịch máy cho light novel và chia sẻ chúng. Tại đây bạn có thể duyệt các web novel/light novel tiếng Nhật, hoặc tải lên EPUB/TXT của riêng mình rồi tạo bản dịch máy.
 
-## 功能
+## Tính năng
 
-- 浏览日本网络小说，支持的网站有：[Kakuyomu](https://kakuyomu.jp/)、[小説家になろう](https://syosetu.com/)、[Novelup](https://novelup.plus/)、[Hameln](https://syosetu.org/)、[Pixiv](https://www.pixiv.net/)、[Alphapolis](https://www.alphapolis.co.jp/)。
-- 生成多种机翻，支持的翻译器有：百度、有道、OpenAI-like API（例如 DeepSeek API）、[Sakura](https://huggingface.co/SakuraLLM/Sakura-14B-Qwen2.5-v1.0-GGUF)。
-- 支持术语表。
-- 支持多种格式，包括日文、中文以及中日对比。
-- 支持生成 EPUB 和 TXT 文件。
-- 支持翻译 EPUB 和 TXT 文件。
-- 支持在线阅读。
+- Duyệt novel Nhật với các nguồn: [Kakuyomu](https://kakuyomu.jp/), [Syosetu](https://syosetu.com/), [Novelup](https://novelup.plus/), [Hameln](https://syosetu.org/), [Pixiv](https://www.pixiv.net/), [Alphapolis](https://www.alphapolis.co.jp/).
+- Tạo bản dịch máy bằng nhiều dịch vụ: Baidu, Youdao, API kiểu OpenAI (ví dụ DeepSeek API), [Sakura](https://huggingface.co/SakuraLLM/Sakura-14B-Qwen2.5-v1.0-GGUF).
+- Hỗ trợ bảng thuật ngữ.
+- Hỗ trợ nhiều định dạng: nguyên gốc tiếng Nhật, tiếng Trung hoặc song song Nhật-Trung.
+- Sinh file EPUB và TXT.
+- Dịch file EPUB và TXT.
+- Đọc trực tuyến ngay trên web.
 
-## 贡献
+## Đóng góp
 
-请参考 [CONTRIBUTING.md](https://github.com/auto-novel/auto-novel/blob/main/CONTRIBUTING.md)
+Vui lòng xem [CONTRIBUTING.md](https://github.com/auto-novel/auto-novel/blob/main/CONTRIBUTING.md)
 
 <a href="https://next.ossinsight.io/widgets/official/compose-recent-top-contributors?repo_id=559577341" target="_blank" style="display: block" align="left">
   <picture>
@@ -29,28 +29,28 @@
   </picture>
 </a>
 
-## 部署
+## Triển khai
 
 > [!WARNING]
-> 注意：本项目并不是为了个人部署设计的，不保证所有功能可用和前向兼容。
+> Lưu ý: dự án này không được thiết kế cho việc tự triển khai, không đảm bảo mọi tính năng hoạt động hoặc tương thích về sau.
 
-下载项目：
+Tải mã nguồn:
 
 ```bash
 > git clone https://github.com/auto-novel/auto-novel.git
 > cd auto-novel
 ```
 
-创建并编辑 `.env` 文件，内容如下:
+Tạo rồi chỉnh sửa tệp `.env` với nội dung:
 
 ```bash
-DATA_PATH=./data                      # 数据的存储位置
-HTTPS_PROXY=https://127.0.0.1:7890    # web 小说代理，可以为空
-PIXIV_COOKIE_PHPSESSID=               # Pixiv cookies，不使用 Pixiv 可以不填
+DATA_PATH=./data                      # thư mục lưu trữ dữ liệu
+HTTPS_PROXY=https://127.0.0.1:7890    # proxy cho web novel, có thể để trống
+PIXIV_COOKIE_PHPSESSID=               # cookie Pixiv, bỏ trống nếu không dùng Pixiv
 ```
 
-打开 `docker-compose.yml` 文件，酌情修改。
+Mở `docker-compose.yml` và chỉnh sửa nếu cần.
 
-运行 `docker compose up [-d]` (`-d` 为后台运行)。
+Chạy `docker compose up [-d]` (`-d` để chạy nền).
 
-访问 `http://localhost` 即可。
+Truy cập `http://localhost` để sử dụng.

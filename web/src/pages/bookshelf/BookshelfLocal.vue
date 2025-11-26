@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { ChecklistOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import { useIsWideScreen } from '@/pages/util';
+
+const { t } = useI18n();
 
 defineProps<{
   favoredId: string;
@@ -18,7 +21,7 @@ const bookshelfListRef = useTemplateRef('bookshelfList');
   <bookshelf-layout :menu-key="`local/${favoredId}`">
     <n-flex style="margin-bottom: 24px">
       <c-button
-        label="选择"
+        :label="t('bookshelf.local.select')"
         :icon="ChecklistOutlined"
         @action="showControlPanel = !showControlPanel"
       />

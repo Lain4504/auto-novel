@@ -1,8 +1,12 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import { GenericNovelId } from '@/model/Common';
 import type { LocalVolumeMetadata } from '@/model/LocalVolume';
 import type { TranslatorId } from '@/model/Translator';
 import { useSettingStore } from '@/stores';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   volume: LocalVolumeMetadata;
@@ -44,21 +48,20 @@ const startTranslateTask = (translatorId: 'baidu' | 'youdao') =>
     <n-text v-else>{{ volume.id }}</n-text>
 
     <n-text depth="3">
-      总计 {{ volume.toc.length }} / 百度 {{ baidu }} / 有道 {{ youdao }} / GPT
-      {{ gpt }} / Sakura {{ sakura }}
+      {{ t('bookshelf.local.stats', { total: volume.toc.length, baidu, youdao, gpt, sakura }) }}
     </n-text>
 
     <n-flex :size="8">
       <c-button
         v-if="setting.enabledTranslator.includes('baidu')"
-        label="更新百度"
+        :label="t('bookshelf.local.updateBaidu')"
         size="tiny"
         secondary
         @action="startTranslateTask('baidu')"
       />
       <c-button
         v-if="setting.enabledTranslator.includes('youdao')"
-        label="更新有道"
+        :label="t('bookshelf.local.updateYoudao')"
         size="tiny"
         secondary
         @action="startTranslateTask('youdao')"

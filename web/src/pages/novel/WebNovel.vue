@@ -3,6 +3,9 @@ import { formatError } from '@/api';
 import { WebNovelRepo } from '@/repos';
 import { useIsWideScreen } from '@/pages/util';
 import { computedAsync } from '@vueuse/core';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const { providerId, novelId } = defineProps<{
   providerId: string;
@@ -27,8 +30,9 @@ const formatedError = computedAsync(async () => {
 });
 
 watch(formatedError, async (error) => {
-  if (error.includes('小说ID不合适，应当使用：')) {
-    const targetNovelPath = error.split('小说ID不合适，应当使用：')[1];
+  const invalidIdMessage = t('novel.webNovel.invalidIdMessage');
+  if (error.includes(invalidIdMessage)) {
+    const targetNovelPath = error.split(invalidIdMessage)[1];
     router.push({ path: `/novel${targetNovelPath}` });
   }
 });
@@ -54,7 +58,7 @@ watch(formatedError, async (error) => {
     <n-result
       v-else-if="error"
       status="error"
-      title="加载错误"
+      :title="t('novel.webNovel.loadError')"
       :description="formatedError"
     />
   </div>

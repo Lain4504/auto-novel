@@ -1,10 +1,13 @@
 <script lang="ts" setup>
 import { LockOutlined, PlusOutlined, PushPinOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import { ArticleRepo } from '@/repos';
 import type { ArticleCategory, ArticleSimplified } from '@/model/Article';
 import { doAction } from '@/pages/util';
 import { useBlacklistStore, useWhoamiStore } from '@/stores';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   page: number;
@@ -20,11 +23,11 @@ const { whoami } = storeToRefs(whoamiStore);
 
 const blacklistStore = useBlacklistStore();
 
-const articleCategoryOptions = [
-  { value: 'General', label: '小说交流' },
-  { value: 'Guide', label: '使用指南' },
-  { value: 'Support', label: '反馈与建议' },
-];
+const articleCategoryOptions = computed(() => [
+  { value: 'General', label: t('forum.categories.general') },
+  { value: 'Guide', label: t('forum.categories.guide') },
+  { value: 'Support', label: t('forum.categories.support') },
+]);
 
 const onUpdatePage = (page: number) => {
   const query = { ...route.query, page };
@@ -44,62 +47,62 @@ const { data: articlePage, error } = ArticleRepo.useArticleList(
 const lockArticle = (article: ArticleSimplified) =>
   doAction(
     ArticleRepo.lockArticle(article.id).then(() => (article.locked = true)),
-    '锁定',
+    t('forum.actions.lockAction'),
     message,
   );
 
 const unlockArticle = (article: ArticleSimplified) =>
   doAction(
     ArticleRepo.unlockArticle(article.id).then(() => (article.locked = false)),
-    '解除锁定',
+    t('forum.actions.unlockAction'),
     message,
   );
 
 const pinArticle = (article: ArticleSimplified) =>
   doAction(
     ArticleRepo.pinArticle(article.id).then(() => (article.pinned = true)),
-    '置顶',
+    t('forum.actions.pinAction'),
     message,
   );
 
 const unpinArticle = (article: ArticleSimplified) =>
   doAction(
     ArticleRepo.unpinArticle(article.id).then(() => (article.pinned = false)),
-    '解除置顶',
+    t('forum.actions.unpinAction'),
     message,
   );
 
 const hideArticle = (article: ArticleSimplified) =>
   doAction(
     ArticleRepo.hideArticle(article.id).then(() => (article.hidden = true)),
-    '隐藏',
+    t('forum.actions.hideAction'),
     message,
   );
 
 const unhideArticle = (article: ArticleSimplified) =>
   doAction(
     ArticleRepo.unhideArticle(article.id).then(() => (article.hidden = false)),
-    '解除隐藏',
+    t('forum.actions.unhideAction'),
     message,
   );
 
 const deleteArticle = (article: ArticleSimplified) =>
-  doAction(ArticleRepo.deleteArticle(article.id), '删除', message);
+  doAction(ArticleRepo.deleteArticle(article.id), t('forum.actions.deleteAction'), message);
 </script>
 
 <template>
   <div class="layout-content">
-    <n-h1>论坛</n-h1>
+    <n-h1>{{ t('forum.title') }}</n-h1>
 
     <router-link to="/forum-edit">
       <c-button
-        label="发布文章"
+        :label="t('forum.publishArticle')"
         :icon="PlusOutlined"
         style="margin-bottom: 16px"
       />
     </router-link>
 
-    <c-action-wrapper title="版块" style="margin-bottom: 20px">
+    <c-action-wrapper :title="t('forum.section')" style="margin-bottom: 20px">
       <c-radio-group
         :value="category"
         @update-value="onUpdateCategory"
@@ -119,8 +122,8 @@ const deleteArticle = (article: ArticleSimplified) =>
       >
         <thead>
           <tr>
-            <th><b>标题</b></th>
-            <th class="article-number"><b>查看/回复</b></th>
+            <th><b>{{ t('forum.table.title') }}</b></th>
+            <th class="article-number"><b>{{ t('forum.table.viewsReplies') }}</b></th>
           </tr>
         </thead>
         <tbody>
@@ -138,20 +141,20 @@ const deleteArticle = (article: ArticleSimplified) =>
                   :component="LockOutlined"
                 />
                 <c-a :to="`/forum/${article.id}`">
-                  <n-text v-if="article.hidden" depth="3">[隐藏]</n-text>
+                  <n-text v-if="article.hidden" depth="3">{{ t('forum.status.hidden') }}</n-text>
                   <n-text
                     v-else-if="blacklistStore.isBlocked(article.user.username)"
                     depth="3"
                   >
-                    [屏蔽]
+                    {{ t('forum.status.blocked') }}
                   </n-text>
                   <b v-else>{{ article.title }}</b>
                 </c-a>
               </n-flex>
               <n-text style="font-size: 12px">
-                {{ article.updateAt === article.createAt ? '发布' : '更新' }}于
+                {{ article.updateAt === article.createAt ? t('forum.status.published') : t('forum.status.updated') }} {{ t('forum.status.at') }}
                 <n-time :time="article.updateAt * 1000" type="relative" />
-                by {{ article.user.username }}
+                {{ t('forum.status.by') }} {{ article.user.username }}
               </n-text>
 
               <n-flex v-if="whoami.asAdmin" style="margin-top: 4px">
@@ -159,12 +162,12 @@ const deleteArticle = (article: ArticleSimplified) =>
                   v-if="article.locked"
                   size="tiny"
                   secondary
-                  label="解除锁定"
+                  :label="t('forum.actions.unlock')"
                   @action="unlockArticle(article)"
                 />
                 <c-button
                   v-else
-                  label="锁定"
+                  :label="t('forum.actions.lock')"
                   size="tiny"
                   secondary
                   @action="lockArticle(article)"
@@ -172,14 +175,14 @@ const deleteArticle = (article: ArticleSimplified) =>
 
                 <c-button
                   v-if="article.pinned"
-                  label="解除置顶"
+                  :label="t('forum.actions.unpin')"
                   size="tiny"
                   secondary
                   @action="unpinArticle(article)"
                 />
                 <c-button
                   v-else
-                  label="置顶"
+                  :label="t('forum.actions.pin')"
                   size="tiny"
                   secondary
                   @action="pinArticle(article)"
@@ -187,14 +190,14 @@ const deleteArticle = (article: ArticleSimplified) =>
 
                 <c-button
                   v-if="article.hidden"
-                  label="解除隐藏"
+                  :label="t('forum.actions.unhide')"
                   secondary
                   size="tiny"
                   @action="unhideArticle(article)"
                 />
                 <c-button
                   v-else
-                  label="隐藏"
+                  :label="t('forum.actions.hide')"
                   secondary
                   size="tiny"
                   @action="hideArticle(article)"
@@ -203,7 +206,7 @@ const deleteArticle = (article: ArticleSimplified) =>
                 <c-button
                   size="tiny"
                   secondary
-                  label="删除"
+                  :label="t('forum.actions.delete')"
                   type="error"
                   @action="deleteArticle(article)"
                 />
@@ -216,7 +219,7 @@ const deleteArticle = (article: ArticleSimplified) =>
         </tbody>
       </n-table>
 
-      <CResultX v-else :error="error" title="加载错误" />
+      <CResultX v-else :error="error" :title="t('forum.loadError')" />
     </CPage>
   </div>
 </template>

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { DeleteOutlineOutlined } from '@vicons/material';
 import { useKeyModifier } from '@vueuse/core';
+import { useI18n } from 'vue-i18n';
 
 import { GenericNovelId } from '@/model/Common';
 import type { LocalVolumeMetadata } from '@/model/LocalVolume';
@@ -16,6 +17,7 @@ const props = defineProps<{
 }>();
 
 const message = useMessage();
+const { t } = useI18n();
 
 const settingStore = useSettingStore();
 const { setting } = storeToRefs(settingStore);
@@ -23,7 +25,11 @@ const { setting } = storeToRefs(settingStore);
 const store = useBookshelfLocalStore();
 
 const deleteVolume = (volumeId: string) =>
-  doAction(store.deleteVolume(volumeId), '删除', message);
+  doAction(
+    store.deleteVolume(volumeId),
+    t('workspace.localVolume.deleteAction'),
+    message,
+  );
 
 const calculateFinished = (volume: LocalVolumeMetadata) =>
   volume.toc.filter((it) => {
@@ -56,7 +62,7 @@ const queueAllVolumes = (volumes: LocalVolumeMetadata[]) => {
     type: props.type,
     shouldTop: shouldTopJob.value ?? false,
   });
-  message.info(`${success}本小说已排队，${failed}本失败`);
+  message.info(t('workspace.specific.queueResult', { success, failed }));
 };
 
 const shouldTopJob = useKeyModifier('Control');
@@ -74,9 +80,9 @@ const queueVolume = (volumeId: string, total: number = 65536) => {
     total: total,
   });
   if (success) {
-    message.success('排队成功');
+    message.success(t('workspace.specific.queueSuccess'));
   } else {
-    message.error('排队失败：翻译任务已经存在');
+    message.error(t('workspace.specific.queueExists'));
   }
 };
 
@@ -93,16 +99,18 @@ const downloadVolume = async (volumeId: string) => {
     });
     downloadFile(filename, blob);
   } catch (error) {
-    message.error(`文件生成错误：${error}`);
+    message.error(
+      t('workspace.specific.downloadError', { error: String(error) }),
+    );
   }
 };
 
 const progressFilter = ref<'all' | 'finished' | 'unfinished'>('all');
-const progressFilterOptions = [
-  { value: 'all', label: '全部' },
-  { value: 'finished', label: '已完成' },
-  { value: 'unfinished', label: '未完成' },
-];
+const progressFilterOptions = computed(() => [
+  { value: 'all', label: t('workspace.specific.filterAll') },
+  { value: 'finished', label: t('workspace.specific.filterFinished') },
+  { value: 'unfinished', label: t('workspace.specific.filterUnfinished') },
+]);
 const progressFilterFunc = computed(() => {
   if (progressFilter.value === 'finished') {
     return (volume: LocalVolumeMetadata) => {
@@ -121,7 +129,7 @@ const progressFilterFunc = computed(() => {
 <template>
   <local-volume-list
     :filter="progressFilterFunc"
-    :options="{ 全部排队: queueAllVolumes }"
+    :options="{ [t('workspace.specific.queueAll')]: queueAllVolumes }"
     @volume-add="queueVolume($event.name)"
   >
     <template #extra>
@@ -131,7 +139,7 @@ const progressFilterFunc = computed(() => {
         :glossary="{}"
       />
       <n-divider style="margin: 12px 0" />
-      <c-action-wrapper title="状态">
+      <c-action-wrapper :title="t('workspace.specific.statusTitle')">
         <c-radio-group
           v-model:value="progressFilter"
           :options="progressFilterOptions"
@@ -139,7 +147,7 @@ const progressFilterFunc = computed(() => {
         />
       </c-action-wrapper>
 
-      <c-action-wrapper title="语言">
+      <c-action-wrapper :title="t('workspace.specific.languageTitle')">
         <c-radio-group
           v-model:value="setting.downloadFormat.mode"
           :options="Setting.downloadModeOptions"
@@ -154,14 +162,16 @@ const progressFilterFunc = computed(() => {
 
         <n-text depth="3">
           <n-time :time="volume.createAt" type="relative" />
-          / 总计 {{ volume.toc.length }} / 完成
-          {{ calculateFinished(volume) }} / 过期
+          / {{ t('workspace.specific.stats.total') }} {{ volume.toc.length }} /
+          {{ t('workspace.specific.stats.finished') }}
+          {{ calculateFinished(volume) }} /
+          {{ t('workspace.specific.stats.expired') }}
           {{ calculateExpired(volume) }}
         </n-text>
 
         <n-flex :size="8">
           <c-button
-            label="排队"
+            :label="t('workspace.specific.buttons.queue')"
             size="tiny"
             secondary
             @action="queueVolume(volume.id, volume.toc.length)"
@@ -172,11 +182,15 @@ const progressFilterFunc = computed(() => {
             :to="`/workspace/reader/${encodeURIComponent(volume.id)}/0`"
             target="_blank"
           >
-            <c-button label="阅读" size="tiny" secondary />
+            <c-button
+              :label="t('workspace.specific.buttons.read')"
+              size="tiny"
+              secondary
+            />
           </router-link>
 
           <c-button
-            label="下载"
+            :label="t('workspace.specific.buttons.download')"
             size="tiny"
             secondary
             @action="downloadVolume(volume.id)"
@@ -192,7 +206,7 @@ const progressFilterFunc = computed(() => {
           <div style="flex: 1" />
 
           <c-button-confirm
-            :hint="`真的要删除《${volume.id}》吗？`"
+            :hint="t('workspace.localVolume.deleteHint', { title: volume.id })"
             :icon="DeleteOutlineOutlined"
             size="tiny"
             secondary

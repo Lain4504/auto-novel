@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useKeyModifier } from '@vueuse/core';
+import { useI18n } from 'vue-i18n';
 
 import { useIsWideScreen } from '@/pages/util';
 import {
@@ -9,6 +10,8 @@ import {
   useSettingStore,
 } from '@/stores';
 import { useBookshelfLocalStore } from '../BookshelfLocalStore';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   selectedIds: string[];
@@ -33,7 +36,7 @@ const showDeleteModal = ref(false);
 const openDeleteModal = () => {
   const ids = props.selectedIds;
   if (ids.length === 0) {
-    message.info('没有选中小说');
+    message.info(t('workspace.localVolume.noneSelected'));
     return;
   }
   showDeleteModal.value = true;
@@ -42,7 +45,7 @@ const openDeleteModal = () => {
 const deleteSelected = async () => {
   const ids = props.selectedIds;
   const { success, failed } = await store.deleteVolumes(ids);
-  message.info(`${success}本小说被删除，${failed}本失败`);
+  message.info(t('workspace.localVolume.deleteResult', { success, failed }));
 };
 
 // 下载小说
@@ -51,21 +54,21 @@ const showDownloadModal = ref(false);
 const downloadSelected = async () => {
   const ids = props.selectedIds;
   if (ids.length === 0) {
-    message.info('没有选中小说');
+    message.info(t('workspace.localVolume.noneSelected'));
     return;
   }
   const { success, failed } = await store.downloadVolumes(ids);
-  message.info(`${success}本小说机翻被打包，${failed}本失败`);
+  message.info(t('workspace.localVolume.downloadResult', { success, failed }));
 };
 
 const downloadRawSelected = async () => {
   const ids = props.selectedIds;
   if (ids.length === 0) {
-    message.info('没有选中小说');
+    message.info(t('workspace.localVolume.noneSelected'));
     return;
   }
   const { success, failed } = await store.downloadRawVolumes(ids);
-  message.info(`${success}本小说原文被打包，${failed}本失败`);
+  message.info(t('workspace.localVolume.downloadResult', { success, failed }));
 };
 
 // 移动小说
@@ -77,12 +80,12 @@ const targetFavoredId = ref(props.favoredId);
 const moveToFavored = async () => {
   const novels = props.selectedIds;
   if (novels.length === 0) {
-    message.info('没有选中小说');
+    message.info(t('workspace.localVolume.noneSelected'));
     return;
   }
 
   if (targetFavoredId.value === props.favoredId) {
-    message.info('无需移动');
+    message.info(t('bookshelf.local.moveDisabled'));
     return;
   }
 
@@ -101,7 +104,7 @@ const moveToFavored = async () => {
   }
   const success = novels.length - failed;
 
-  message.info(`${success}本小说已移动，${failed}本失败`);
+  message.info(t('workspace.localVolume.deleteResult', { success, failed }));
   await store.loadVolumes();
 };
 
@@ -113,7 +116,7 @@ const shouldTopJob = useKeyModifier('Control');
 const queueJobs = (type: 'gpt' | 'sakura') => {
   let ids = props.selectedIds;
   if (ids.length === 0) {
-    message.info('没有选中小说');
+    message.info(t('workspace.localVolume.noneSelected'));
     return;
   }
 
@@ -126,7 +129,7 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
     type,
     shouldTop: shouldTopJob.value ?? false,
   });
-  message.info(`${success}本小说已排队，${failed}本失败`);
+  message.info(t('workspace.specific.queueResult', { success, failed }));
 };
 </script>
 
@@ -137,12 +140,12 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
         <n-flex align="baseline">
           <n-button-group size="small">
             <c-button
-              label="全选"
+              :label="t('bookshelf.local.selectAll')"
               :round="false"
               @action="$emit('selectAll')"
             />
             <c-button
-              label="反选"
+              :label="t('bookshelf.local.invertSelection')"
               :round="false"
               @action="$emit('invertSelection')"
             />
@@ -150,24 +153,24 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
 
           <n-button-group size="small">
             <c-button
-              label="下载原文"
+              :label="t('bookshelf.local.downloadOriginal')"
               :round="false"
               @action="downloadRawSelected"
             />
             <c-button
-              label="下载机翻"
+              :label="t('bookshelf.local.downloadMachine')"
               :round="false"
               @action="downloadSelected"
             />
             <c-button
-              label="下载设置"
+              :label="t('bookshelf.local.downloadSettings')"
               :round="false"
               @action="showDownloadModal = true"
             />
           </n-button-group>
 
           <c-button
-            label="删除"
+            :label="t('bookshelf.local.delete')"
             secondary
             :round="false"
             size="small"
@@ -175,32 +178,30 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
             @click="openDeleteModal"
           />
           <c-modal
-            :title="`确定删除 ${
-              selectedIds.length === 1
-                ? selectedIds[0]
-                : `${selectedIds.length}本小说`
-            }？`"
+            :title="selectedIds.length === 1
+              ? t('bookshelf.local.deleteConfirmSingle', { name: selectedIds[0] })
+              : t('bookshelf.local.deleteConfirmMultiple', { count: selectedIds.length })"
             v-model:show="showDeleteModal"
           >
             <template #action>
-              <c-button label="确定" type="primary" @action="deleteSelected" />
+              <c-button :label="t('bookshelf.local.confirm')" type="primary" @action="deleteSelected" />
             </template>
           </c-modal>
         </n-flex>
 
-        <n-text depth="3">已选择{{ selectedIds.length }}本小说</n-text>
+        <n-text depth="3">{{ t('bookshelf.local.selected', { count: selectedIds.length }) }}</n-text>
       </n-flex>
     </n-list-item>
 
     <n-list-item v-if="favoreds.local.length > 1">
-      <n-p>移动小说功能暂时关闭</n-p>
+      <n-p>{{ t('bookshelf.local.moveDisabled') }}</n-p>
       <n-flex v-if="false" vertical>
-        <b>移动小说</b>
+        <b>{{ t('bookshelf.local.moveTitle') }}</b>
 
         <n-radio-group v-model:value="targetFavoredId">
           <n-flex align="center">
             <c-button
-              label="移动"
+              :label="t('bookshelf.local.move')"
               size="small"
               :round="false"
               @action="moveToFavored"
@@ -225,47 +226,47 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
       "
     >
       <n-flex vertical>
-        <b>生成翻译任务</b>
+        <b>{{ t('bookshelf.local.generateTask') }}</b>
 
-        <c-action-wrapper title="选项">
+        <c-action-wrapper :title="t('bookshelf.local.options')">
           <n-flex size="small">
             <n-tooltip trigger="hover">
               <template #trigger>
                 <n-flex :size="0" :wrap="false">
                   <tag-button
-                    label="过期"
+                    :label="t('bookshelf.local.expire')"
                     :checked="translateLevel === 'expire'"
                     @update:checked="translateLevel = 'expire'"
                   />
                   <tag-button
-                    label="重翻"
+                    :label="t('bookshelf.local.retranslate')"
                     type="warning"
                     :checked="translateLevel === 'all'"
                     @update:checked="translateLevel = 'all'"
                   />
                 </n-flex>
               </template>
-              过期：翻译术语表过期的章节
+              {{ t('novel.translateOptions.expireDesc') }}
               <br />
-              重翻：重翻全部章节
+              {{ t('novel.translateOptions.retranslateDesc') }}
               <br />
             </n-tooltip>
 
-            <tag-button label="倒序添加" v-model:checked="reverseOrder" />
+            <tag-button :label="t('bookshelf.local.reverseOrder')" v-model:checked="reverseOrder" />
           </n-flex>
         </c-action-wrapper>
 
-        <c-action-wrapper title="操作">
+        <c-action-wrapper :title="t('bookshelf.local.actions')">
           <n-button-group size="small">
             <c-button
               v-if="setting.enabledTranslator.includes('gpt')"
-              label="排队GPT"
+              :label="t('bookshelf.local.queueGpt')"
               :round="false"
               @action="queueJobs('gpt')"
             />
             <c-button
               v-if="setting.enabledTranslator.includes('sakura')"
-              label="排队Sakura"
+              :label="t('bookshelf.local.queueSakura')"
               :round="false"
               @action="queueJobs('sakura')"
             />
@@ -275,16 +276,16 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
     </n-list-item>
   </n-list>
 
-  <c-modal title="下载设置" v-model:show="showDownloadModal">
+  <c-modal :title="t('bookshelf.local.downloadSettings')" v-model:show="showDownloadModal">
     <n-flex vertical size="large">
-      <c-action-wrapper title="语言">
+      <c-action-wrapper :title="t('bookshelf.local.language')">
         <c-radio-group
           v-model:value="setting.downloadFormat.mode"
           :options="Setting.downloadModeOptions"
         />
       </c-action-wrapper>
 
-      <c-action-wrapper title="翻译">
+      <c-action-wrapper :title="t('bookshelf.local.translation')">
         <n-flex>
           <c-radio-group
             v-model:value="setting.downloadFormat.translationsMode"
@@ -299,7 +300,7 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
       </c-action-wrapper>
 
       <n-text depth="3" style="font-size: 12px">
-        # 某些EPUB阅读器无法正确显示日文段落的浅色字体
+        {{ t('novel.translateOptions.epubNote') }}
       </n-text>
     </n-flex>
   </c-modal>

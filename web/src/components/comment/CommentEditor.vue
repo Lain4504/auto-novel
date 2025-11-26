@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import { CommentRepo } from '@/repos';
 import { doAction } from '@/pages/util';
 
@@ -15,12 +17,13 @@ const emit = defineEmits<{
 }>();
 
 const message = useMessage();
+const { t } = useI18n();
 
 const content = ref('');
 
 const reply = async () => {
   if (content.value.length === 0) {
-    message.info('回复内容不能为空');
+    message.info(t('components.commentEditor.empty'));
     return;
   }
 
@@ -33,7 +36,7 @@ const reply = async () => {
       content.value = '';
       emit('replied');
     }),
-    '回复发布',
+    t('components.commentEditor.publishAction'),
     message,
   );
 };
@@ -51,13 +54,17 @@ const reply = async () => {
     />
     <n-flex style="margin-top: 10px">
       <c-button
-        label="发布"
+        :label="t('components.commentEditor.submit')"
         require-login
         :round="false"
         type="primary"
         @action="reply()"
       />
-      <c-button label="取消" :round="false" @action="emit('cancel')" />
+      <c-button
+        :label="t('components.commentEditor.cancel')"
+        :round="false"
+        @action="emit('cancel')"
+      />
     </n-flex>
   </div>
 </template>

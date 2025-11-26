@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import { CommentRepo } from '@/repos';
 import type { Comment1 } from '@/model/Comment';
 import { useDraftStore } from '@/stores';
@@ -34,6 +36,7 @@ function onReplied() {
   draftStore.cancelAddDraft();
   draftStore.removeDraft(draftId);
 }
+const { t } = useI18n();
 const showInput = ref(false);
 </script>
 
@@ -50,7 +53,11 @@ const showInput = ref(false);
     :site="site"
     :draft-id="draftId"
     :parent="comment.id"
-    :placeholder="`回复${comment.user.username}`"
+    :placeholder="
+      t('components.commentThread.replyPlaceholder', {
+        username: comment.user.username,
+      })
+    "
     style="padding-top: 8px"
     @replied="onReplied()"
     @cancel="showInput = false"
@@ -75,7 +82,11 @@ const showInput = ref(false);
           />
         </div>
       </template>
-      <CResultX v-else :error="error" title="加载错误" />
+      <CResultX
+        v-else
+        :error="error"
+        :title="t('components.commentThread.loadError')"
+      />
     </CPage>
   </div>
 </template>

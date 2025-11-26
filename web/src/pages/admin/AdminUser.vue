@@ -1,9 +1,13 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import { AdminRepo } from '@/repos';
 import { UserRole } from '@/model/User';
 import type { UserListValue } from './option';
 import { getUserListOptions } from './option';
 import { onUpdateListValue, onUpdatePage } from './option';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   page: number;
@@ -72,18 +76,18 @@ const { data: userPage, error } = AdminRepo.useUserList(
             </n-flex>
 
             <n-text depth="3" style="font-size: 12px">
-              创建于
+              {{ t('admin.user.createdAt') }}
               <n-time :time="user.createdAt" type="relative" />
-              ，上次登录
+              {{ t('admin.user.lastLogin') }}
               <n-time :time="user.lastLogin" type="relative" />
             </n-text>
           </n-flex>
         </n-list-item>
       </n-list>
-      <n-empty v-if="userPage.items.length === 0" description="空列表" />
+      <n-empty v-if="userPage.items.length === 0" :description="t('admin.user.emptyList')" />
       <n-divider />
     </template>
 
-    <CResultX v-else :error="error" title="加载错误" />
+    <CResultX v-else :error="error" :title="t('admin.user.loadError')" />
   </CPage>
 </template>

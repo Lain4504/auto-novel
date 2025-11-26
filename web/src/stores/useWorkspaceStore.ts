@@ -4,7 +4,9 @@ import type {
   TranslateJobRecord,
 } from '@/model/Translator';
 import { TranslateJob } from '@/model/Translator';
+import { i18nGlobal } from '@/locales';
 import { lazy, useLocalStorage } from '@/util';
+import { watch } from 'vue';
 
 import { LSKey } from './key';
 
@@ -136,12 +138,18 @@ const createGptWorkspaceStore = () =>
     });
   });
 
-const createSakuraWorkspaceStore = () =>
-  createWorkspaceStore<SakuraWorker>(
+const createSakuraWorkspaceStore = () => {
+  const store = createWorkspaceStore<SakuraWorker>(
     LSKey.WorkspaceSakura,
     [
-      { id: '共享', endpoint: 'https://sakura-share.one' },
-      { id: '本机', endpoint: 'http://127.0.0.1:8080' },
+      {
+        id: i18nGlobal.t('stores.workspace.shared'),
+        endpoint: 'https://sakura-share.one',
+      },
+      {
+        id: i18nGlobal.t('stores.workspace.local'),
+        endpoint: 'http://127.0.0.1:8080',
+      },
       { id: 'AutoDL', endpoint: 'http://127.0.0.1:6006' },
     ],
     (workspace) => {
@@ -163,12 +171,36 @@ const createSakuraWorkspaceStore = () =>
         ) === undefined
       ) {
         workspace.value.workers.unshift({
-          id: '共享',
+          id: i18nGlobal.t('stores.workspace.shared'),
           endpoint: 'https://sakura-share.one',
         });
       }
     },
   );
+
+  const syncWorkerLabels = () => {
+    const locale = i18nGlobal.locale.value;
+    // Only sync if locale is valid
+    if (locale !== 'vi' && locale !== 'zh') {
+      return;
+    }
+
+    const labelMap: Record<string, string> = {
+      'https://sakura-share.one': i18nGlobal.t('stores.workspace.shared'),
+      'http://127.0.0.1:8080': i18nGlobal.t('stores.workspace.local'),
+    };
+    store.ref.value.workers.forEach((worker) => {
+      const label = labelMap[worker.endpoint];
+      if (label) {
+        worker.id = label;
+      }
+    });
+  };
+
+  watch(() => i18nGlobal.locale.value, syncWorkerLabels, { immediate: true });
+
+  return store;
+};
 
 export const useGptWorkspaceStore = lazy(createGptWorkspaceStore);
 export const useSakuraWorkspaceStore = lazy(createSakuraWorkspaceStore);

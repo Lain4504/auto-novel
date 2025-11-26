@@ -1,53 +1,29 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import avaterUrl from '@/image/avater.jpg';
 
-const guides = [
-  `
-# 一级标题
-## 二级标题
-### 三级标题`,
+const { t, tm } = useI18n();
 
-  `
-**粗体**
-*斜体*
-~~删除线~~
-[链接](https://www.esjzone.cc/)`,
-
-  `
-- 无序列表
-- 无序列表
-  - 加空格可以缩进
-  - 加空格可以缩进
-- 无序列表`,
-
-  `
-1. 有序列表
-1. 有序列表
-1. 有序列表`,
-
-  `
-下面是分隔线，和文本要用空行隔开
-
----`,
-  `
-| 左对齐 | 居中 | 右对齐 |
-| :- | :-: | -: |
-| 文本 | 文本 | 文本 |
-| 文本 | 文本 | 文本 |`,
-
-  `
-![](${avaterUrl})`,
-];
+const guides = computed(() =>
+  (tm('components.markdownGuide.guides') as string[]).map((guide) =>
+    guide.replace('{image}', avaterUrl),
+  ),
+);
 </script>
 
 <template>
-  <c-modal title="格式教程">
-    <n-p>评论不支持标题、表格、图片等高级功能。</n-p>
+  <c-modal :title="t('components.markdownGuide.title')">
+    <n-p>{{ t('components.markdownGuide.unsupported') }}</n-p>
     <n-table :bordered="false" style="table-layout: fixed; width: 100%">
       <thead>
         <tr>
-          <th><b>语法</b></th>
-          <th><b>预览</b></th>
+          <th>
+            <b>{{ t('components.markdownGuide.syntax') }}</b>
+          </th>
+          <th>
+            <b>{{ t('components.markdownGuide.preview') }}</b>
+          </th>
         </tr>
       </thead>
       <tbody>

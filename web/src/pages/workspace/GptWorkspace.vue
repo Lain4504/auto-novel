@@ -5,6 +5,7 @@ import {
   PlusOutlined,
 } from '@vicons/material';
 import { VueDraggable } from 'vue-draggable-plus';
+import { useI18n } from 'vue-i18n';
 
 import { TranslationCacheRepo } from '@/repos';
 import type { TranslateJob } from '@/model/Translator';
@@ -12,6 +13,7 @@ import { doAction } from '@/pages/util';
 import { useGptWorkspaceStore } from '@/stores';
 
 const message = useMessage();
+const { t } = useI18n();
 
 const workspace = useGptWorkspaceStore();
 const workspaceRef = workspace.ref;
@@ -37,7 +39,7 @@ const getNextJob = () => {
 
 const deleteJob = (task: string) => {
   if (processedJobs.value.has(task)) {
-    message.error('任务被翻译器占用');
+    message.error(t('workspace.gptWorkspace.taskLocked'));
     return;
   }
   workspace.deleteJob(task);
@@ -75,38 +77,44 @@ const onProgressUpdated = (
 };
 
 const clearCache = async () =>
-  doAction(TranslationCacheRepo.clear('gpt-seg-cache'), '缓存清除', message);
+  doAction(
+    TranslationCacheRepo.clear('gpt-seg-cache'),
+    t('workspace.gptWorkspace.clearCacheAction'),
+    message,
+  );
 </script>
 
 <template>
   <div class="layout-content">
-    <n-h1>GPT工作区</n-h1>
+    <n-h1>{{ t('workspace.gptWorkspace.title') }}</n-h1>
 
     <bulletin>
       <n-flex>
-        <c-a to="/forum/64f3d63f794cbb1321145c07" target="_blank">使用教程</c-a>
+        <c-a to="/forum/64f3d63f794cbb1321145c07" target="_blank">
+          {{ t('workspace.gptWorkspace.docs.guide') }}
+        </c-a>
         /
         <n-a href="https://chat.deepseek.com" target="_blank">
-          DeepSeek Chat
+          {{ t('workspace.gptWorkspace.docs.chat') }}
         </n-a>
         /
         <n-a href="https://platform.deepseek.com/usage" target="_blank">
-          DeepSeek API
+          {{ t('workspace.gptWorkspace.docs.api') }}
         </n-a>
       </n-flex>
-      <n-p>不再支持GPT web，推荐使用deepseek API，价格很低。</n-p>
-      <n-p>本地小说支持韩语等其他语种，网络小说/文库小说暂时只允许日语。</n-p>
+      <n-p>{{ t('workspace.gptWorkspace.noticeLegacy') }}</n-p>
+      <n-p>{{ t('workspace.gptWorkspace.noticeLang') }}</n-p>
     </bulletin>
 
-    <section-header title="翻译器">
+    <section-header :title="t('workspace.gptWorkspace.translatorSection')">
       <c-button
-        label="添加翻译器"
+        :label="t('workspace.gptWorkspace.addWorker')"
         :icon="PlusOutlined"
         @action="showCreateWorkerModal = true"
       />
       <c-button-confirm
-        hint="真的要清空缓存吗？"
-        label="清空缓存"
+        :hint="t('workspace.gptWorkspace.clearCacheHint')"
+        :label="t('workspace.gptWorkspace.clearCache')"
         :icon="DeleteOutlineOutlined"
         @action="clearCache"
       />
@@ -114,7 +122,7 @@ const clearCache = async () =>
 
     <n-empty
       v-if="workspaceRef.workers.length === 0"
-      description="没有翻译器"
+      :description="t('workspace.gptWorkspace.noWorkers')"
     />
     <n-list>
       <vue-draggable
@@ -132,20 +140,23 @@ const clearCache = async () =>
       </vue-draggable>
     </n-list>
 
-    <section-header title="任务队列">
+    <section-header :title="t('workspace.gptWorkspace.queueSection')">
       <c-button
-        label="本地书架"
+        :label="t('workspace.gptWorkspace.localShelf')"
         :icon="BookOutlined"
         @action="showLocalVolumeDrawer = true"
       />
       <c-button-confirm
-        hint="真的要清空队列吗？"
-        label="清空队列"
+        :hint="t('workspace.gptWorkspace.clearQueueHint')"
+        :label="t('workspace.gptWorkspace.clearQueue')"
         :icon="DeleteOutlineOutlined"
         @action="deleteAllJobs"
       />
     </section-header>
-    <n-empty v-if="workspaceRef.jobs.length === 0" description="没有任务" />
+    <n-empty
+      v-if="workspaceRef.jobs.length === 0"
+      :description="t('workspace.gptWorkspace.emptyQueue')"
+    />
     <n-list>
       <vue-draggable
         v-model="workspaceRef.jobs"

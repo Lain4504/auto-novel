@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useKeyModifier } from '@vueuse/core';
 import ky from 'ky';
+import { useI18n } from 'vue-i18n';
 
 import { WebNovelApi } from '@/api';
 import { GenericNovelId } from '@/model/Common';
@@ -11,6 +12,8 @@ import {
   useWhoamiStore,
   useWorkspaceStore,
 } from '@/stores';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   providerId: string;
@@ -89,8 +92,8 @@ const importToWorkspace = async () => {
   await repo
     .createVolume(file, 'default')
     .then(() => repo.updateGlossary(file.name, toRaw(props.glossary)))
-    .then(() => message.success('导入成功'))
-    .catch((error) => message.error(`导入失败:${error}`));
+    .then(() => message.success(t('webTranslate.importSuccess')))
+    .catch((error) => message.error(t('webTranslate.importFailed', { error })));
 };
 
 const pressControl = useKeyModifier('Control');
@@ -100,7 +103,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
   const taskNumber = translateOptions.value!.getTaskNumber();
 
   if (endIndex <= startIndex || startIndex >= total) {
-    message.error('排队失败：没有选中章节');
+    message.error(t('webTranslate.queueFailedNoChapters'));
     return;
   }
 
@@ -147,17 +150,17 @@ const submitJob = (id: 'gpt' | 'sakura') => {
     return success;
   });
   if (results.length === 1 && !results[0]) {
-    message.error('排队失败：翻译任务已经存在');
+    message.error(t('workspace.specific.queueExists'));
   } else {
-    message.success('排队成功');
+    message.success(t('workspace.specific.queueSuccess'));
   }
 };
 </script>
 
 <template>
-  <n-text v-if="!whoami.isSignedIn">游客无法使用翻译功能，请先登录。</n-text>
+  <n-text v-if="!whoami.isSignedIn">{{ t('webTranslate.guestMessage') }}</n-text>
   <n-text v-else-if="setting.enabledTranslator.length === 0">
-    没有翻译器启用。
+    {{ t('webTranslate.noTranslator') }}
   </n-text>
   <TranslateOptions
     v-else
@@ -168,33 +171,33 @@ const submitJob = (id: 'gpt' | 'sakura') => {
 
   <n-flex vertical style="margin-top: 16px">
     <n-text>
-      总计 {{ total }} / 百度 {{ baidu }} / 有道 {{ youdao }} / GPT {{ gpt }} /
-      Sakura {{ sakura }}
+      {{ t('home.panelTotal') }} {{ total }} / {{ t('home.panelBaidu') }} {{ baidu }} / {{ t('home.panelYoudao') }} {{ youdao }} / {{ t('home.panelGpt') }} {{ gpt }} /
+      {{ t('home.panelSakura') }} {{ sakura }}
     </n-text>
 
     <template v-if="whoami.isSignedIn && setting.enabledTranslator.length > 0">
       <n-button-group>
         <c-button
           v-if="setting.enabledTranslator.includes('baidu')"
-          label="更新百度"
+          :label="t('novel.translate.updateBaidu')"
           :round="false"
           @action="startTranslateTask('baidu')"
         />
         <c-button
           v-if="setting.enabledTranslator.includes('youdao')"
-          label="更新有道"
+          :label="t('novel.translate.updateYoudao')"
           :round="false"
           @action="startTranslateTask('youdao')"
         />
         <c-button
           v-if="setting.enabledTranslator.includes('gpt')"
-          label="排队GPT"
+          :label="t('novel.translate.queueGpt')"
           :round="false"
           @action="submitJob('gpt')"
         />
         <c-button
           v-if="setting.enabledTranslator.includes('sakura')"
-          label="排队Sakura"
+          :label="t('novel.translate.queueSakura')"
           :round="false"
           @action="submitJob('sakura')"
         />
@@ -203,7 +206,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
 
     <n-button-group>
       <c-button
-        label="下载原文"
+        :label="t('novel.translate.downloadOriginal')"
         :round="false"
         tag="a"
         :href="files.jp.url"
@@ -211,7 +214,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
         target="_blank"
       />
       <c-button
-        label="下载机翻"
+        :label="t('novel.translate.downloadMachine')"
         :round="false"
         tag="a"
         :href="files.zh.url"
@@ -219,7 +222,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
         target="_blank"
       />
       <c-button
-        label="导入日文至工作区"
+        :label="t('novel.translate.importToWorkspace')"
         :round="false"
         @action="importToWorkspace"
       />

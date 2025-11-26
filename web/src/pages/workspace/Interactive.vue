@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import type { TranslatorConfig } from '@/domain/translate';
 import { Translator } from '@/domain/translate';
 import type { Glossary } from '@/model/Glossary';
@@ -6,17 +8,20 @@ import type { GptWorker, SakuraWorker, TranslatorId } from '@/model/Translator';
 import { useGptWorkspaceStore, useSakuraWorkspaceStore } from '@/stores';
 
 const message = useMessage();
+const { t } = useI18n();
 
 const textJp = ref('');
 const textZh = ref('');
 
 const translatorId = ref<TranslatorId>('sakura');
-const translationOptions: { label: string; value: TranslatorId }[] = [
-  { label: '百度', value: 'baidu' },
-  { label: '有道', value: 'youdao' },
-  { label: 'GPT', value: 'gpt' },
-  { label: 'Sakura', value: 'sakura' },
-];
+const translationOptions = computed<{ label: string; value: TranslatorId }[]>(
+  () => [
+    { label: t('workspace.interactive.translators.baidu'), value: 'baidu' },
+    { label: t('workspace.interactive.translators.youdao'), value: 'youdao' },
+    { label: t('workspace.interactive.translators.gpt'), value: 'gpt' },
+    { label: t('workspace.interactive.translators.sakura'), value: 'sakura' },
+  ],
+);
 
 watch(textJp, () => {
   textZh.value = '';
@@ -51,7 +56,7 @@ const translate = async () => {
       (it) => it.id === selectedGptWorkerId.value,
     );
     if (worker === undefined) {
-      message.error('未选择GPT翻译器');
+      message.error(t('workspace.interactive.missingGpt'));
       return;
     }
     selectedWorker = worker;
@@ -67,7 +72,7 @@ const translate = async () => {
       (it) => it.id === selectedSakuraWorkerId.value,
     );
     if (worker === undefined) {
-      message.error('未选择Sakura翻译器');
+      message.error(t('workspace.interactive.missingSakura'));
       return;
     }
     selectedWorker = worker;
@@ -91,7 +96,9 @@ const translate = async () => {
     });
     textZh.value = linesZh.join('\n');
   } catch (e: unknown) {
-    message.error(`翻译器错误：${e}`);
+    message.error(
+      t('workspace.interactive.translatorError', { error: String(e) }),
+    );
   }
 
   savedTranslation.value.push({
@@ -108,7 +115,7 @@ const clearTranslation = () => {
 };
 const copyToClipboard = () => {
   navigator.clipboard.writeText(textZh.value);
-  message.info('已经将翻译结果复制到剪切板');
+  message.info(t('workspace.interactive.copySuccess'));
 };
 const clearSavedTranslation = () => {
   savedTranslation.value = [];
@@ -117,10 +124,10 @@ const clearSavedTranslation = () => {
 
 <template>
   <div class="layout-content">
-    <n-h1>交互翻译</n-h1>
+    <n-h1>{{ t('workspace.interactive.title') }}</n-h1>
 
     <n-flex vertical>
-      <c-action-wrapper title="翻译">
+      <c-action-wrapper :title="t('workspace.interactive.translationTitle')">
         <n-flex vertical>
           <c-radio-group
             v-model:value="translatorId"
@@ -168,17 +175,25 @@ const clearSavedTranslation = () => {
         </n-flex>
       </c-action-wrapper>
 
-      <c-action-wrapper title="操作">
+      <c-action-wrapper :title="t('workspace.interactive.actionTitle')">
         <n-flex style="margin-bottom: 16px">
           <n-button-group size="small">
-            <c-button label="翻译" :round="false" @action="translate" />
-            <c-button label="清空" :round="false" @action="clearTranslation" />
+            <c-button
+              :label="t('workspace.interactive.translate')"
+              :round="false"
+              @action="translate"
+            />
+            <c-button
+              :label="t('workspace.interactive.clear')"
+              :round="false"
+              @action="clearTranslation"
+            />
           </n-button-group>
 
           <glossary-button :value="glossary" :round="false" size="small" />
 
           <c-button
-            label="复制到剪贴板"
+            :label="t('workspace.interactive.copy')"
             :round="false"
             size="small"
             @action="copyToClipboard"
@@ -190,7 +205,7 @@ const clearSavedTranslation = () => {
     <n-input-group>
       <n-input
         v-model:value="textJp"
-        placeholder="输入需要翻译的文本"
+        :placeholder="t('workspace.interactive.inputPlaceholder')"
         type="textarea"
         :autosize="{ minRows: 15 }"
         show-count
@@ -202,7 +217,7 @@ const clearSavedTranslation = () => {
       <n-input
         v-model:value="textZh"
         readonly
-        placeholder="翻译结果"
+        :placeholder="t('workspace.interactive.outputPlaceholder')"
         type="textarea"
         :autosize="{ minRows: 15 }"
         show-count
@@ -211,11 +226,17 @@ const clearSavedTranslation = () => {
       />
     </n-input-group>
 
-    <section-header title="翻译历史">
-      <c-button label="清空" @action="clearSavedTranslation" />
+    <section-header :title="t('workspace.interactive.historyTitle')">
+      <c-button
+        :label="t('workspace.interactive.clear')"
+        @action="clearSavedTranslation"
+      />
     </section-header>
 
-    <n-empty v-if="savedTranslation.length === 0" description="没有翻译历史" />
+    <n-empty
+      v-if="savedTranslation.length === 0"
+      :description="t('workspace.interactive.historyEmpty')"
+    />
     <n-list>
       <n-list-item v-for="t of savedTranslation" :key="t.id">
         <n-thing content-indented>
@@ -237,13 +258,13 @@ const clearSavedTranslation = () => {
 
           <template #description>
             <n-collapse style="margin-top: 16px">
-              <n-collapse-item title="日文">
+              <n-collapse-item :title="t('workspace.interactive.historyJp')">
                 <template v-for="line of t.jp.split('\n')" :key="line">
                   {{ line }}
                   <br />
                 </template>
               </n-collapse-item>
-              <n-collapse-item title="中文">
+              <n-collapse-item :title="t('workspace.interactive.historyZh')">
                 <template v-for="line of t.zh.split('\n')" :key="line">
                   {{ line }}
                   <br />

@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 import { PlusOutlined } from '@vicons/material';
 import type { UploadCustomRequestOptions, UploadFileInfo } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 import { useBookshelfLocalStore } from '../BookshelfLocalStore';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   favoredId?: string;
@@ -27,11 +30,11 @@ const beforeUpload = ({ file }: { file: UploadFileInfo }) => {
       file.name.endsWith('.epub')
     )
   ) {
-    message.error(`上传失败:文件类型不允许\n文件名： ${file.name}`);
+    message.error(t('bookshelf.localAddButton.uploadFailedType', { filename: file.name }));
     return false;
   }
   if (file.file?.size && file.file.size > 1024 * 1024 * 100) {
-    message.error(`上传失败:文件大小不能超过100MB\n文件名: ${file.name}`);
+    message.error(t('bookshelf.localAddButton.uploadFailedSize', { filename: file.name }));
     return false;
   }
 };
@@ -45,7 +48,7 @@ const customRequest = ({
     .addVolume(file.file!, props.favoredId ?? 'default')
     .then(onFinish)
     .catch((error) => {
-      message.error(`上传失败:${error}\n文件名: ${file.name}`);
+      message.error(t('bookshelf.localAddButton.uploadFailed', { error, filename: file.name }));
       onError();
     });
 };
@@ -63,11 +66,9 @@ const customRequest = ({
   >
     <n-tooltip trigger="hover">
       <template #trigger>
-        <c-button label="添加" :icon="PlusOutlined" />
+        <c-button :label="t('bookshelf.localAddButton.add')" :icon="PlusOutlined" />
       </template>
-      支持拖拽上传Epub/Txt/Srt文件
-      <br />
-      百度/有道/GPT支持韩语/英语小说
+      {{ t('bookshelf.localAddButton.uploadTip') }}
     </n-tooltip>
   </n-upload>
   <DropZone
@@ -78,6 +79,6 @@ const customRequest = ({
     :custom-request="customRequest"
     @before-upload="beforeUpload"
   >
-    拖拽文件到这里上传
+    {{ t('bookshelf.localAddButton.dragHere') }}
   </DropZone>
 </template>

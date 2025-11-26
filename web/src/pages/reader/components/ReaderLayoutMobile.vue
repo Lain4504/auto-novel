@@ -6,9 +6,12 @@ import {
   LibraryBooksOutlined,
   TuneOutlined,
 } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import type { WebNovelChapterDto } from '@/model/WebNovel';
 import { useReaderSettingStore } from '@/stores';
+
+const { t } = useI18n();
 
 defineProps<{
   novelUrl?: string;
@@ -85,7 +88,7 @@ const onGlobalClick = (event: MouseEvent) => {
         <side-button
           quaternary
           :disabled="!chapter.prevId"
-          text="上一章"
+          :text="t('reader.prevChapter')"
           :icon="ArrowBackIosOutlined"
           @click="emit('nav', chapter.prevId!)"
           style="width: 100%"
@@ -94,7 +97,7 @@ const onGlobalClick = (event: MouseEvent) => {
       <router-link v-if="novelUrl" :to="novelUrl" style="flex: 1">
         <side-button
           quaternary
-          text="详情"
+          :text="t('reader.details')"
           :icon="LibraryBooksOutlined"
           style="width: 100%"
         />
@@ -102,7 +105,7 @@ const onGlobalClick = (event: MouseEvent) => {
       <div style="flex: 1 1 0px">
         <side-button
           quaternary
-          text="目录"
+          :text="t('reader.catalog')"
           :icon="FormatListBulletedOutlined"
           @click="emit('requireCatalogModal')"
           style="width: 100%"
@@ -111,7 +114,7 @@ const onGlobalClick = (event: MouseEvent) => {
       <div style="flex: 1 1 0px">
         <side-button
           quaternary
-          text="设置"
+          :text="t('reader.settings')"
           :icon="TuneOutlined"
           @click="emit('requireSettingModal')"
           style="width: 100%"
@@ -121,7 +124,7 @@ const onGlobalClick = (event: MouseEvent) => {
         <side-button
           quaternary
           :disabled="!chapter.nextId"
-          text="下一章"
+          :text="t('reader.nextChapter')"
           :icon="ArrowForwardIosOutlined"
           @click="emit('nav', chapter.nextId!)"
           style="width: 100%"

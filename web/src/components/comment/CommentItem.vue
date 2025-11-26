@@ -4,6 +4,7 @@ import {
   DeleteOutlined,
   MoreVertOutlined,
 } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import type { Comment1 } from '@/model/Comment';
 import { useBlacklistStore, useWhoamiStore } from '@/stores';
@@ -28,19 +29,35 @@ const { whoami } = storeToRefs(whoamiStore);
 const blacklistStore = useBlacklistStore();
 const { blacklist } = storeToRefs(blacklistStore);
 
+const { t } = useI18n();
+
 const options = computed(() => {
-  const options = [{ label: '复制', key: 'copy' }];
+  const options = [
+    { label: t('components.commentItem.options.copy'), key: 'copy' },
+  ];
   if (whoami.value.asAdmin) {
     if (props.comment.hidden) {
-      options.push({ label: '解除隐藏', key: 'unhide' });
+      options.push({
+        label: t('components.commentItem.options.unhide'),
+        key: 'unhide',
+      });
     } else {
-      options.push({ label: '隐藏', key: 'hide' });
+      options.push({
+        label: t('components.commentItem.options.hide'),
+        key: 'hide',
+      });
     }
   }
   if (blacklist.value.usernames.includes(props.comment.user.username)) {
-    options.push({ label: '解除屏蔽', key: 'unblock' });
+    options.push({
+      label: t('components.commentItem.options.unblock'),
+      key: 'unblock',
+    });
   } else {
-    options.push({ label: '屏蔽用户', key: 'block' });
+    options.push({
+      label: t('components.commentItem.options.block'),
+      key: 'block',
+    });
   }
   return options;
 });
@@ -62,19 +79,23 @@ const handleSelect = (key: string) => {
 function deleteComment() {
   doAction(
     CommentRepo.deleteComment(props.comment.id, props.site, props.parentId),
-    '删除',
+    t('components.commentItem.actions.delete'),
     message,
   );
 }
 
 function copyComment(comment: Comment1) {
-  doAction(copyToClipBoard(comment.content), '复制', message);
+  doAction(
+    copyToClipBoard(comment.content),
+    t('components.commentItem.actions.copy'),
+    message,
+  );
 }
 
 function hideComment(comment: Comment1) {
   doAction(
     CommentRepo.hideComment(comment.id).then(() => (comment.hidden = true)),
-    '隐藏',
+    t('components.commentItem.actions.hide'),
     message,
   );
 }
@@ -82,7 +103,7 @@ function hideComment(comment: Comment1) {
 function unhideComment(comment: Comment1) {
   doAction(
     CommentRepo.unhideComment(comment.id).then(() => (comment.hidden = false)),
-    '解除隐藏',
+    t('components.commentItem.actions.unhide'),
     message,
   );
 }
@@ -92,7 +113,7 @@ function blockUser(comment: Comment1) {
     (async () => {
       blacklistStore.add(comment.user.username);
     })(),
-    '屏蔽用户',
+    t('components.commentItem.actions.block'),
     message,
   );
 }
@@ -102,7 +123,7 @@ function unblockUser(comment: Comment1) {
     (async () => {
       blacklistStore.remove(comment.user.username);
     })(),
-    '解除屏蔽用户',
+    t('components.commentItem.actions.unblock'),
     message,
   );
 }
@@ -133,7 +154,7 @@ const isBlocked = computed(() => {
 
     <c-button
       v-if="parentId === undefined && whoami.allowAdvancedFeatures"
-      label="回复"
+      :label="t('components.commentItem.reply')"
       :icon="CommentOutlined"
       require-login
       quaternary
@@ -145,8 +166,8 @@ const isBlocked = computed(() => {
 
     <c-button-confirm
       v-if="isDeletable"
-      hint="真的要删除评论吗？"
-      label="删除"
+      :hint="t('components.commentItem.deleteHint')"
+      :label="t('components.commentItem.delete')"
       :icon="DeleteOutlined"
       require-login
       quaternary
@@ -164,8 +185,12 @@ const isBlocked = computed(() => {
   </n-flex>
 
   <n-card embedded :bordered="false" size="small" style="margin-top: 2px">
-    <n-text v-if="comment.hidden" depth="3">[隐藏]</n-text>
-    <n-text v-else-if="isBlocked" depth="3">[屏蔽]</n-text>
+    <n-text v-if="comment.hidden" depth="3">
+      {{ t('components.commentItem.hiddenTag') }}
+    </n-text>
+    <n-text v-else-if="isBlocked" depth="3">
+      {{ t('components.commentItem.blockedTag') }}
+    </n-text>
     <MarkdownView
       v-else
       mode="comment"

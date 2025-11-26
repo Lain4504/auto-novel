@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 import { DeleteOutlineOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import { copyToClipBoard } from '@/pages/util';
 import { useBlacklistStore } from '@/stores';
+
+const { t } = useI18n();
 
 const blacklistStore = useBlacklistStore();
 const { blacklist } = storeToRefs(blacklistStore);
@@ -38,7 +41,7 @@ const submitTable = () => {
     usernames: [...blockedUsers.value],
   };
   showModal.value = false;
-  message.success('黑名单更新成功');
+  message.success(t('userBlock.updateSuccess'));
 };
 
 const exportUserBlockList = async (ev: MouseEvent) => {
@@ -47,9 +50,9 @@ const exportUserBlockList = async (ev: MouseEvent) => {
     ev.target as HTMLElement,
   );
   if (isSuccess) {
-    message.success('导出成功：已复制到剪贴板');
+    message.success(t('userBlock.exportSuccess'));
   } else {
-    message.success('导出失败');
+    message.success(t('userBlock.exportFailed'));
   }
 };
 
@@ -85,8 +88,8 @@ const importUserBlockList = () => {
 </script>
 
 <template>
-  <c-button label="管理黑名单" size="small" @action="toggleModal" />
-  <c-modal title="管理黑名单" v-model:show="showModal" :extraheight="120">
+  <c-button :label="t('userBlock.manageBlacklist')" size="small" @action="toggleModal" />
+  <c-modal :title="t('userBlock.manageBlacklistTitle')" v-model:show="showModal" :extraheight="120">
     <template #header-extra>
       <n-flex
         vertical
@@ -97,11 +100,11 @@ const importUserBlockList = () => {
           <n-input
             v-model:value="userToAdd"
             size="small"
-            placeholder="用户名"
+            :placeholder="t('userBlock.username')"
             :input-props="{ spellcheck: false }"
           />
           <c-button
-            label="添加"
+            :label="t('userBlock.add')"
             :round="false"
             size="small"
             @action="addUser"
@@ -111,20 +114,20 @@ const importUserBlockList = () => {
           v-model:value="importListRaw"
           type="textarea"
           size="small"
-          placeholder="批量导入"
+          :placeholder="t('userBlock.bulkImport')"
           :input-props="{ spellcheck: false }"
           :rows="1"
         />
 
         <n-flex align="center" :wrap="false">
           <c-button
-            label="导出"
+            :label="t('userBlock.export')"
             :round="false"
             size="small"
             @action="exportUserBlockList"
           />
           <c-button
-            label="导入"
+            :label="t('userBlock.import')"
             :round="false"
             size="small"
             @action="importUserBlockList"
@@ -152,7 +155,7 @@ const importUserBlockList = () => {
       </tr>
     </n-table>
     <template #action>
-      <c-button label="提交" type="primary" @action="submitTable()" />
+      <c-button :label="t('userBlock.submit')" type="primary" @action="submitTable()" />
     </template>
   </c-modal>
 </template>

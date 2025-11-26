@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import type { ListOptions, ListValue } from '@/components/list/types';
 import { WebNovelRepo } from '@/repos';
 import {
@@ -7,6 +9,8 @@ import {
   onUpdatePage,
   parseRankListValue,
 } from './option';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   providerId: string;
@@ -62,11 +66,11 @@ const { data: novelPage, error } = WebNovelRepo.useWebNovelRankList(
       <template v-if="novelPage">
         <n-divider />
         <NovelListWeb :items="novelPage.items" />
-        <n-empty v-if="novelPage.items.length === 0" description="空列表" />
+        <n-empty v-if="novelPage.items.length === 0" :description="t('list.webNovelRank.empty')" />
         <n-divider />
       </template>
 
-      <CResultX v-else :error="error" title="加载错误" />
+      <CResultX v-else :error="error" :title="t('list.webNovelRank.loadError')" />
     </CPage>
   </div>
 </template>

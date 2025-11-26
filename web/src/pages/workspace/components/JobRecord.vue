@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { DeleteOutlineOutlined, RefreshOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import type { TranslateJobRecord } from '@/model/Translator';
 import { TranslateJob } from '@/model/Translator';
@@ -11,6 +12,7 @@ const emit = defineEmits<{
   retryJob: [];
   deleteJob: [];
 }>();
+const { t } = useI18n();
 const isFinished = computed(() => TranslateJob.isFinished(props.job));
 </script>
 
@@ -23,13 +25,13 @@ const isFinished = computed(() => TranslateJob.isFinished(props.job));
       <n-flex :size="6" :wrap="false">
         <c-icon-button
           v-if="!isFinished"
-          tooltip="重试"
+          :tooltip="t('workspace.jobRecord.retry')"
           :icon="RefreshOutlined"
           @action="emit('retryJob')"
         />
 
         <c-icon-button
-          tooltip="删除"
+          :tooltip="t('workspace.jobRecord.delete')"
           :icon="DeleteOutlineOutlined"
           type="error"
           @action="emit('deleteJob')"
@@ -42,14 +44,19 @@ const isFinished = computed(() => TranslateJob.isFinished(props.job));
       <br />
       <n-text depth="3">
         <template v-if="!isFinished">
-          未完成
+          {{ t('workspace.jobRecord.unfinished') }}
           <template v-if="job.progress !== undefined">
-            总共 {{ job.progress?.total }} / 成功 {{ job.progress?.finished }} /
-            失败 {{ job.progress?.error }}
+            {{
+              t('workspace.jobRecord.progress', {
+                total: job.progress?.total,
+                finished: job.progress?.finished,
+                error: job.progress?.error,
+              })
+            }}
           </template>
         </template>
         <template v-else>
-          已完成
+          {{ t('workspace.jobRecord.finished') }}
           <n-time v-if="job?.finishAt" :time="job?.finishAt" type="datetime" />
         </template>
       </n-text>
