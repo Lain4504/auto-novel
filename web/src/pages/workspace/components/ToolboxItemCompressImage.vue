@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ImgComparisonSlider } from '@img-comparison-slider/vue';
+import { useI18n } from 'vue-i18n';
 
 import { Humanize } from '@/util';
 import type { Epub, ParsedFile } from '@/util/file';
@@ -11,17 +12,18 @@ const props = defineProps<{
 }>();
 
 const message = useMessage();
+const { t } = useI18n();
 
 const quality = ref(0.8);
 const scaleRatio = ref(1.0);
 
 const imageFormat = ref('image/webp');
-const imageFormatOptions = [
-  { label: '不改变图片格式', value: '' },
-  { label: 'PNG', value: 'image/png' },
-  { label: 'JPEG', value: 'image/jpeg' },
-  { label: 'WEBP', value: 'image/webp' },
-];
+const imageFormatOptions = computed(() => [
+  { label: t('workspace.compress.formatKeep'), value: '' },
+  { label: t('workspace.compress.formatPng'), value: 'image/png' },
+  { label: t('workspace.compress.formatJpeg'), value: 'image/jpeg' },
+  { label: t('workspace.compress.formatWebp'), value: 'image/webp' },
+]);
 
 const compressImage = async (blob: Blob) => {
   const canvas = document.createElement('canvas');
@@ -52,7 +54,12 @@ const compressImagesForEpub = async (epub: Epub) => {
   for await (const item of epub.iterImage()) {
     const newBlob = await compressImage(item.blob);
     if (!newBlob)
-      throw new Error(`压缩失败\n文件:${epub.name}\n图片:${item.href}`);
+      throw new Error(
+        t('workspace.compress.compressFailed', {
+          file: epub.name,
+          image: item.href,
+        }),
+      );
     epub.updateImage(item.id, newBlob);
   }
 };
@@ -61,7 +68,7 @@ const compressImages = () =>
   Toolbox.modifyFiles(
     props.files.filter((file) => file.type === 'epub'),
     compressImagesForEpub,
-    (e) => message.error(`发生错误：${e}`),
+    (e) => message.error(t('workspace.compress.error', { error: String(e) })),
   );
 
 interface EpubImage {
@@ -134,7 +141,7 @@ const showPreview = (image: EpubImage) => {
 
 <template>
   <n-flex vertical>
-    <c-action-wrapper title="格式">
+    <c-action-wrapper :title="t('workspace.compress.formatTitle')">
       <c-radio-group
         v-model:value="imageFormat"
         :options="imageFormatOptions"
@@ -142,7 +149,10 @@ const showPreview = (image: EpubImage) => {
       />
     </c-action-wrapper>
 
-    <c-action-wrapper title="压缩率" align="center">
+    <c-action-wrapper
+      :title="t('workspace.compress.qualityTitle')"
+      align="center"
+    >
       <n-slider
         v-model:value="quality"
         :max="1"
@@ -154,7 +164,7 @@ const showPreview = (image: EpubImage) => {
       <n-text style="width: 6em">{{ (quality * 100).toFixed(0) }}%</n-text>
     </c-action-wrapper>
 
-    <c-action-wrapper title="尺寸" align="center">
+    <c-action-wrapper :title="t('workspace.compress.sizeTitle')" align="center">
       <n-slider
         v-model:value="scaleRatio"
         :max="1"
@@ -167,13 +177,22 @@ const showPreview = (image: EpubImage) => {
     </c-action-wrapper>
 
     <n-button-group>
-      <c-button label="压缩" @action="compressImages" />
-      <c-button label="预览效果" @action="toggleShowDetail" />
+      <c-button
+        :label="t('workspace.compress.compress')"
+        @action="compressImages"
+      />
+      <c-button
+        :label="t('workspace.compress.preview')"
+        @action="toggleShowDetail"
+      />
     </n-button-group>
 
     <template v-if="showDetail">
-      <n-text>点击图片预览压缩效果</n-text>
-      <n-empty v-if="detailList.length === 0" description="未载入文件" />
+      <n-text>{{ t('workspace.compress.previewHint') }}</n-text>
+      <n-empty
+        v-if="detailList.length === 0"
+        :description="t('workspace.compress.empty')"
+      />
       <template v-for="detail of detailList" :key="detail.name">
         <n-text>
           [{{ Humanize.bytes(detail.size) }}

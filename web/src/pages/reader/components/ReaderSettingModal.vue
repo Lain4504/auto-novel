@@ -2,6 +2,9 @@
 import { checkIsMobile, useIsWideScreen } from '@/pages/util';
 import { ReaderSetting, useReaderSettingStore } from '@/stores';
 import { AddOutlined, MinusOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const isMobile = checkIsMobile();
 const isWideScreen = useIsWideScreen(600);
@@ -31,16 +34,16 @@ const setIndentSize = (diff: number) => {
       animated
       style="width: 100%"
     >
-      <n-tab-pane name="signin" tab="内容">
+      <n-tab-pane name="signin" :tab="t('reader.settingModal.contentTab')">
         <n-flex vertical size="large" style="width: 100%; padding: 20px">
-          <c-action-wrapper title="语言">
+          <c-action-wrapper :title="t('reader.settingModal.language')">
             <c-radio-group
               v-model:value="readerSetting.mode"
               :options="ReaderSetting.modeOptions"
             />
           </c-action-wrapper>
 
-          <c-action-wrapper title="翻译">
+          <c-action-wrapper :title="t('reader.settingModal.translation')">
             <n-flex size="large">
               <c-radio-group
                 v-model:value="readerSetting.translationsMode"
@@ -54,40 +57,40 @@ const setIndentSize = (diff: number) => {
             </n-flex>
           </c-action-wrapper>
 
-          <c-action-wrapper v-if="isMobile" title="点按区域">
+          <c-action-wrapper v-if="isMobile" :title="t('reader.settingModal.clickArea')">
             <c-radio-group
               v-model:value="readerSetting.clickArea"
               :options="ReaderSetting.clickAreaOptions"
             />
           </c-action-wrapper>
 
-          <c-action-wrapper title="朗读语言">
+          <c-action-wrapper :title="t('reader.settingModal.speakLanguage')">
             <c-radio-group
               :value="readerSetting.speakLanguages[0]"
               @update-value="(it: any) => (readerSetting.speakLanguages = [it])"
               :options="ReaderSetting.speakLanguagesOptions"
             />
           </c-action-wrapper>
-          <c-action-wrapper title="翻页模式">
+          <c-action-wrapper :title="t('reader.settingModal.pageTurnMode')">
             <c-radio-group
               :value="readerSetting.pageTurnMode"
               @update-value="(it: any) => (readerSetting.pageTurnMode = it)"
               :options="ReaderSetting.pageTurnModeOptions"
             />
           </c-action-wrapper>
-          <c-action-wrapper v-if="isMobile" title="点按动画" align="center">
+          <c-action-wrapper v-if="isMobile" :title="t('reader.settingModal.clickAnimation')" align="center">
             <n-switch
               v-model:value="readerSetting.enableClickAnimition"
               size="small"
             />
           </c-action-wrapper>
-          <c-action-wrapper title="显示翻译来源" align="center">
+          <c-action-wrapper :title="t('reader.settingModal.showTranslationSource')" align="center">
             <n-switch
               v-model:value="readerSetting.enableSourceLabel"
               size="small"
             />
           </c-action-wrapper>
-          <c-action-wrapper title="缩进修正" align="center">
+          <c-action-wrapper :title="t('reader.settingModal.indentFix')" align="center">
             <n-flex size="large" align="center">
               <n-switch
                 :value="readerSetting.indentSize !== undefined"
@@ -98,7 +101,7 @@ const setIndentSize = (diff: number) => {
               />
               <c-action-wrapper
                 v-if="readerSetting.indentSize !== undefined"
-                title="缩进值"
+                :title="t('reader.settingModal.indentValue')"
                 align="center"
               >
                 <n-input-group>
@@ -108,7 +111,7 @@ const setIndentSize = (diff: number) => {
                     </template>
                   </n-button>
                   <n-input
-                    :value="readerSetting.indentSize + ' 字符'"
+                    :value="readerSetting.indentSize + t('reader.settingModal.indentChars')"
                     size="small"
                     style="text-align: center; width: 70px"
                     readonly
@@ -124,21 +127,21 @@ const setIndentSize = (diff: number) => {
           </c-action-wrapper>
 
           <n-text depth="3" style="font-size: 12px">
-            # 左/右方向键跳转章节，数字键1～4切换翻译
+            {{ t('reader.settingModal.keyboardHint') }}
           </n-text>
         </n-flex>
       </n-tab-pane>
 
-      <n-tab-pane name="signup" tab="样式">
+      <n-tab-pane name="signup" :tab="t('reader.settingModal.styleTab')">
         <n-flex vertical size="large" style="width: 100%; padding: 20px">
-          <c-action-wrapper title="字重">
+          <c-action-wrapper :title="t('reader.settingModal.fontWeight')">
             <c-radio-group
               v-model:value="readerSetting.fontWeight"
               :options="ReaderSetting.fontWeightOptions"
             />
           </c-action-wrapper>
 
-          <c-action-wrapper title="字号" align="center">
+          <c-action-wrapper :title="t('reader.settingModal.fontSize')" align="center">
             <n-slider
               v-model:value="readerSetting.fontSize"
               :min="14"
@@ -149,7 +152,7 @@ const setIndentSize = (diff: number) => {
             <n-text style="width: 6em">{{ readerSetting.fontSize }}px</n-text>
           </c-action-wrapper>
 
-          <c-action-wrapper title="行距" align="center">
+          <c-action-wrapper :title="t('reader.settingModal.lineHeight')" align="center">
             <n-slider
               v-model:value="readerSetting.lineSpace"
               :step="0.1"
@@ -163,7 +166,7 @@ const setIndentSize = (diff: number) => {
             </n-text>
           </c-action-wrapper>
 
-          <c-action-wrapper title="页宽" align="center">
+          <c-action-wrapper :title="t('reader.settingModal.pageWidth')" align="center">
             <n-slider
               v-model:value="readerSetting.pageWidth"
               :step="50"
@@ -175,14 +178,14 @@ const setIndentSize = (diff: number) => {
             <n-text style="width: 6em">{{ readerSetting.pageWidth }}px</n-text>
           </c-action-wrapper>
 
-          <c-action-wrapper title="下划线">
+          <c-action-wrapper :title="t('reader.settingModal.underline')">
             <c-radio-group
               v-model:value="readerSetting.textUnderline"
               :options="ReaderSetting.textUnderlineOptions"
             />
           </c-action-wrapper>
 
-          <c-action-wrapper title="主题">
+          <c-action-wrapper :title="t('reader.settingModal.theme')">
             <n-flex size="large" vertical>
               <c-radio-group
                 v-model:value="readerSetting.theme.mode"
@@ -220,7 +223,7 @@ const setIndentSize = (diff: number) => {
                     :on-complete="setCustomBodyColor"
                     style="width: 8.2em"
                   >
-                    <template #label="color">背景：{{ color }}</template>
+                    <template #label="color">{{ t('reader.settingModal.background', { color }) }}</template>
                   </n-color-picker>
                   <n-color-picker
                     :modes="['hex']"
@@ -229,14 +232,14 @@ const setIndentSize = (diff: number) => {
                     :on-complete="setCustomFontColor"
                     style="width: 8.2em"
                   >
-                    <template #label="color">文字：{{ color }}</template>
+                    <template #label="color">{{ t('reader.settingModal.text', { color }) }}</template>
                   </n-color-picker>
                 </n-flex>
               </template>
             </n-flex>
           </c-action-wrapper>
 
-          <c-action-wrapper title="主透明度" align="center">
+          <c-action-wrapper :title="t('reader.settingModal.mainOpacity')" align="center">
             <n-slider
               v-model:value="readerSetting.mixZhOpacity"
               :max="1"
@@ -252,7 +255,7 @@ const setIndentSize = (diff: number) => {
             </n-text>
           </c-action-wrapper>
 
-          <c-action-wrapper title="辅透明度" align="center">
+          <c-action-wrapper :title="t('reader.settingModal.auxOpacity')" align="center">
             <n-slider
               v-model:value="readerSetting.mixJpOpacity"
               :max="1"

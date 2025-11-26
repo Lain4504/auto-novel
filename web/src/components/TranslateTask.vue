@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import type { TranslatorConfig } from '@/domain/translate';
 import { translate } from '@/domain/translate';
 import type {
@@ -18,6 +20,7 @@ const emit = defineEmits<{
 }>();
 
 const message = useMessage();
+const { t } = useI18n();
 
 const title = ref('');
 const chapterTotal = ref<number>();
@@ -47,28 +50,30 @@ const startTask = async (
   signal?: AbortSignal,
 ) => {
   if (running.value) {
-    message.info('已有任务在运行。');
+    message.info(t('components.translateTask.alreadyRunning'));
     return 'fail';
   }
 
   const buildLabel = () => {
     const idToLaber = {
-      baidu: '百度',
-      youdao: '有道',
-      gpt: 'GPT',
-      sakura: 'Sakura',
+      baidu: t('components.translateTask.translators.baidu'),
+      youdao: t('components.translateTask.translators.youdao'),
+      gpt: t('components.translateTask.translators.gpt'),
+      sakura: t('components.translateTask.translators.sakura'),
     };
-    let label = `${idToLaber[translatorDesc.id]}翻译`;
+    let label = `${idToLaber[translatorDesc.id]} ${t(
+      'components.translateTask.translationLabel',
+    )}`;
     const suffixParts: string[] = [];
     if (params.level === 'expire') {
-      suffixParts.push('过期章节');
+      suffixParts.push(t('components.translateTask.suffix.expire'));
     } else if (params.level === 'all') {
-      suffixParts.push('全部章节');
+      suffixParts.push(t('components.translateTask.suffix.all'));
     } else if (params.level === 'sync') {
-      suffixParts.push('源站同步');
+      suffixParts.push(t('components.translateTask.suffix.sync'));
     }
     if (params.forceMetadata) {
-      suffixParts.push('重翻目录');
+      suffixParts.push(t('components.translateTask.suffix.metadata'));
     }
     if (suffixParts.length > 0) {
       label = label + ` [${suffixParts.join('/')}]`;
@@ -128,7 +133,9 @@ const startTask = async (
     signal,
   );
 
-  cardRef.value!.pushLog({ message: '\n结束' });
+  cardRef.value!.pushLog({
+    message: t('components.translateTask.summary.logEnd'),
+  });
   running.value = false;
   releaseKeepAlive();
 
@@ -152,9 +159,11 @@ defineExpose({ startTask });
     <n-flex align="center" vertical size="large" style="flex: none">
       <n-progress type="circle" :percentage="percentage" />
       <n-text>
-        成功 {{ chapterFinished }}/{{ chapterTotal ?? '-' }}
+        {{ t('components.translateTask.summary.success') }}
+        {{ chapterFinished }}/{{ chapterTotal ?? '-' }}
         <br />
-        失败 {{ chapterError }}/{{ chapterTotal ?? '-' }}
+        {{ t('components.translateTask.summary.failure') }}
+        {{ chapterError }}/{{ chapterTotal ?? '-' }}
       </n-text>
     </n-flex>
   </c-task-card>

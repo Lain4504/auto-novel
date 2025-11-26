@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { createReusableTemplate, onKeyDown } from '@vueuse/core';
+import { useI18n } from 'vue-i18n';
 
 import { ReadHistoryApi } from '@/api';
 import { GenericNovelId } from '@/model/Common';
@@ -17,6 +18,8 @@ import { useReaderStore } from './ReaderStore';
 import ReaderLayoutDesktop from './components/ReaderLayoutDesktop.vue';
 import ReaderLayoutMobile from './components/ReaderLayoutMobile.vue';
 import { useScrollDetector } from './components/useScrollDetector';
+
+const { t } = useI18n();
 
 const [DefineChapterLink, ReuseChapterLink] = createReusableTemplate<{
   label: string;
@@ -87,7 +90,7 @@ const updateChapter = (
   if (gnid.type === 'web') {
     prefix = `/novel/${gnid.providerId}/${gnid.novelId}`;
   } else if (gnid.type === 'wenku') {
-    throw '不支持文库';
+    throw t('reader.wenkuNotSupported');
   } else {
     prefix = `/workspace/reader/${encodeURIComponent(gnid.volumeId)}`;
   }
@@ -298,8 +301,8 @@ onKeyDown(['Enter'], (e) => {
           />
           <n-divider />
           <n-flex align="center" justify="space-between" style="width: 100%">
-            <ReuseChapterLink :id="chapter.prevId" label="上一章" />
-            <ReuseChapterLink :id="chapter.nextId" label="下一章" />
+            <ReuseChapterLink :id="chapter.prevId" :label="t('reader.prevChapter')" />
+            <ReuseChapterLink :id="chapter.nextId" :label="t('reader.nextChapter')" />
           </n-flex>
         </template>
         <template
@@ -316,7 +319,7 @@ onKeyDown(['Enter'], (e) => {
             />
 
             <template v-if="!chapterItem.nextId">
-              <div style="text-align: center; margin: 48px 0">暂无更多章节</div>
+              <div style="text-align: center; margin: 48px 0">{{ t('reader.noMoreChapters') }}</div>
             </template>
           </c-result>
         </template>

@@ -1,10 +1,14 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import type { WebNovelOutlineDto } from '@/model/WebNovel';
 
 defineProps<{
   novels: WebNovelOutlineDto[] | undefined;
   error: Error | null;
 }>();
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -22,14 +26,17 @@ defineProps<{
         </c-a>
         <div class="text-2line">{{ item.titleZh }}</div>
         <n-text depth="3">
-          {{ item.type }} / 总计 {{ item.total }} / 百度 {{ item.baidu }}
+          {{ item.type }} / {{ t('home.panelTotal') }} {{ item.total }} /
+          {{ t('home.panelBaidu') }} {{ item.baidu }}
           <br />
-          有道 {{ item.youdao }} / GPT {{ item.gpt }} / Sakura {{ item.sakura }}
+          {{ t('home.panelYoudao') }} {{ item.youdao }} /
+          {{ t('home.panelGpt') }} {{ item.gpt }} / {{ t('home.panelSakura') }}
+          {{ item.sakura }}
         </n-text>
       </n-grid-item>
     </n-grid>
-    <n-empty v-if="novels.length === 0" description="空列表" />
+    <n-empty v-if="novels.length === 0" :description="t('home.panelEmpty')" />
   </template>
 
-  <CResultX v-else :error="error" title="加载错误" />
+  <CResultX v-else :error="error" :title="t('home.panelError')" />
 </template>

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
 import { useWhoamiStore } from '@/stores';
 
 const props = defineProps<{
@@ -9,6 +10,7 @@ const props = defineProps<{
 }>();
 
 const message = useMessage();
+const { t } = useI18n();
 
 const whoamiStore = useWhoamiStore();
 const { whoami } = storeToRefs(whoamiStore);
@@ -19,11 +21,11 @@ const onClick = async (e: MouseEvent) => {
   if (!props.onAction) return;
 
   if (props.requireLogin === true && !whoami.value.isSignedIn) {
-    message.info('请先登录');
+    message.info(t('components.cButton.loginRequired'));
     return;
   }
   if (running.value) {
-    message.warning('处理中...');
+    message.warning(t('components.cButton.processing'));
     return;
   }
   const ret = props.onAction(e);

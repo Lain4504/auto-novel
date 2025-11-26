@@ -7,6 +7,7 @@ import {
 } from '@vicons/material';
 import type { FormInst, FormItemRule, FormRules } from 'naive-ui';
 import { VueDraggable } from 'vue-draggable-plus';
+import { useI18n } from 'vue-i18n';
 
 import { WenkuNovelApi } from '@/api';
 import { prettyCover, smartImport } from '@/domain/smart-import';
@@ -18,6 +19,8 @@ import { doAction, useIsWideScreen } from '@/pages/util';
 import { useWhoamiStore } from '@/stores';
 import { RegexUtil, delay } from '@/util';
 import { runCatching } from '@/util/result';
+
+const { t } = useI18n();
 
 const { novelId } = defineProps<{
   novelId: string | undefined;
@@ -48,12 +51,12 @@ const formRules: FormRules = {
     {
       validator: (_rule: FormItemRule, value: string) =>
         value.trim().length > 0,
-      message: '标题不能为空',
+      message: t('novel.wenkuNovelEdit.titleRequired'),
       trigger: 'input',
     },
     {
       validator: (_rule: FormItemRule, value: string) => value.length <= 80,
-      message: '标题长度不能超过80个字符',
+      message: t('novel.wenkuNovelEdit.titleMaxLength'),
       trigger: 'input',
     },
   ],
@@ -61,25 +64,25 @@ const formRules: FormRules = {
     {
       validator: (_rule: FormItemRule, value: string) =>
         value.trim().length > 0,
-      message: '标题不能为空',
+      message: t('novel.wenkuNovelEdit.titleRequired'),
       trigger: 'input',
     },
     {
       validator: (_rule: FormItemRule, value: string) => value.length <= 80,
-      message: '标题长度不能超过80个字符',
+      message: t('novel.wenkuNovelEdit.titleMaxLength'),
       trigger: 'input',
     },
     {
       validator: (_rule: FormItemRule, value: string) =>
         !RegexUtil.hasKanaChars(value),
-      message: '不要使用日文当作中文标题，没有公认的标题可以尝试自行翻译',
+      message: t('novel.wenkuNovelEdit.titleZhNoJapanese'),
       trigger: 'input',
     },
   ],
   cover: [
     {
       validator: (_rule: FormItemRule, value: string) => RegexUtil.isUrl(value),
-      message: '封面链接必须是有效的URL',
+      message: t('novel.wenkuNovelEdit.coverUrlRequired'),
       trigger: 'input',
     },
   ],
@@ -87,14 +90,14 @@ const formRules: FormRules = {
     {
       validator: (_rule: FormItemRule, value: string) =>
         value !== '成人向' || whoami.value.allowNsfw,
-      message: '你太年轻了，无法创建成人向页面',
+      message: t('novel.wenkuNovelEdit.levelAdultRestricted'),
       trigger: 'input',
     },
   ],
   introduction: [
     {
       validator: (_rule: FormItemRule, value: string) => value.length <= 500,
-      message: '简介长度不能超过500个字符',
+      message: t('novel.wenkuNovelEdit.introductionMaxLength'),
       trigger: 'input',
     },
   ],
@@ -134,14 +137,14 @@ if (novelId !== undefined) {
         amazonUrl.value = data.title.replace(/[?？。!！]$/, '');
         allowSubmit.value = true;
       } else {
-        message.error(`载入失败: ${error?.message}`);
+        message.error(t('novel.wenkuNovelEdit.loadFailed', { message: error?.message }));
       }
     });
 }
 
 const submit = async () => {
   if (!allowSubmit.value) {
-    message.warning('文章未载入，无法提交');
+    message.warning(t('novel.wenkuNovelEdit.notLoaded'));
     return;
   }
 
@@ -174,7 +177,7 @@ const submit = async () => {
       WenkuNovelRepo.createNovel(body).then((id) => {
         router.push({ path: `/wenku/${id}` });
       }),
-      '新建文库',
+      t('novel.wenkuNovelEdit.createAction'),
       message,
     );
   } else {
@@ -182,7 +185,7 @@ const submit = async () => {
       WenkuNovelRepo.updateNovel(novelId, body).then(() => {
         router.push({ path: `/wenku/${novelId}` });
       }),
-      '编辑文库',
+      t('novel.wenkuNovelEdit.editAction'),
       message,
     );
   }
@@ -240,7 +243,7 @@ const populateNovelFromAmazon = async (
   );
 
   formValue.value.cover = formValue.value.volumes[0]?.cover;
-  msgReactive.content = '智能导入完成';
+  msgReactive.content = t('novel.wenkuNovelEdit.smartImportComplete');
   msgReactive.type = 'info';
   delay(3000).then(() => msgReactive.destroy());
 };
@@ -269,7 +272,7 @@ const findSimilarNovels = async () => {
   if (result.ok) {
     similarNovels.value = result.value.items;
   } else {
-    message.error('搜索相似小说失败:' + result.error.message);
+    message.error(t('novel.wenkuNovelEdit.searchSimilarFailed', { message: result.error.message }));
   }
 };
 const moveToPrevStep = () => {
@@ -300,8 +303,8 @@ const deleteVolume = (asin: string) => {
 
 const markAsDuplicate = () => {
   formValue.value = {
-    title: '重复，待删除',
-    titleZh: '重复，待删除',
+    title: t('novel.wenkuNovelEdit.duplicateTitle'),
+    titleZh: t('novel.wenkuNovelEdit.duplicateTitle'),
     cover: '',
     authors: [],
     artists: [],
@@ -331,36 +334,36 @@ const togglePresetKeyword = (checked: boolean, keyword: string) => {
   }
 };
 
-const levelOptions = [
-  { label: '轻小说', value: '一般向' },
-  { label: '轻文学', value: '轻文学' },
+const levelOptions = computed(() => [
+  { label: t('novel.wenkuNovelEdit.levelLightNovel'), value: '一般向' },
+  { label: t('novel.wenkuNovelEdit.levelLiterature'), value: '严肃向' },
   { label: '文学', value: '严肃向' },
-  { label: '非小说', value: '非小说' },
-  { label: 'R18男性向', value: '成人向' },
-  { label: 'R18女性向', value: '成人向女' },
-];
+  { label: t('novel.wenkuNovelEdit.levelNonFiction'), value: '非小说' },
+  { label: t('novel.wenkuNovelEdit.levelR18Male'), value: '成人向' },
+  { label: t('novel.wenkuNovelEdit.levelR18Female'), value: '成人向女' },
+]);
 </script>
 
 <template>
   <div class="layout-content">
-    <n-h1>{{ novelId === undefined ? '新建' : '编辑' }}文库小说</n-h1>
+    <n-h1>{{ novelId === undefined ? t('novel.wenkuNovelEdit.create') : t('novel.wenkuNovelEdit.edit') }} {{ t('novel.wenkuNovelEdit.wenkuNovel') }}</n-h1>
 
     <n-card embedded :bordered="false" style="margin-bottom: 20px">
       <n-text type="error">
-        <b>创建文库小说注意事项：</b>
+        <b>{{ t('novel.wenkuNovelEdit.notesTitle') }}</b>
       </n-text>
       <n-ul>
         <n-li>
-          请先安装机翻站扩展以启用智能导入功能，另外自动机翻简介功能要求你能使用有道机翻。
+          {{ t('novel.wenkuNovelEdit.note1') }}
         </n-li>
         <n-li>
-          文库小说只允许已经发行单行本的日语小说，原则上以亚马逊上可以买到为准，系列小说不要分开导入。
+          {{ t('novel.wenkuNovelEdit.note2') }}
         </n-li>
         <n-li>
-          在导入栏输入亚马逊系列/单本链接直接导入，或是输入小说日文主标题搜索导入。
+          {{ t('novel.wenkuNovelEdit.note3') }}
         </n-li>
         <n-li>
-          导入R18书需要注册机翻站满一个月、使用日本IP，并在亚马逊上点过“已满18岁”。
+          {{ t('novel.wenkuNovelEdit.note4') }}
         </n-li>
       </n-ul>
     </n-card>
@@ -382,7 +385,7 @@ const levelOptions = [
             :input-props="{ spellcheck: false }"
           />
           <c-button
-            label="导入"
+            :label="t('novel.wenkuNovelEdit.import')"
             :round="false"
             type="primary"
             @action="populateNovelFromAmazon(amazonUrl, false)"
@@ -390,7 +393,7 @@ const levelOptions = [
         </n-input-group>
         <n-flex>
           <c-button
-            label="在亚马逊搜索"
+            :label="t('novel.wenkuNovelEdit.searchAmazon')"
             secondary
             tag="a"
             :href="`https://www.amazon.co.jp/s?k=${encodeURIComponent(
@@ -400,14 +403,14 @@ const levelOptions = [
           />
           <c-button
             secondary
-            label="刷新分卷"
+            :label="t('novel.wenkuNovelEdit.refreshVolumes')"
             @action="populateNovelFromAmazon('', true)"
           />
           <c-button
             v-if="whoami.isAdmin"
             type="error"
             secondary
-            label="标记重复"
+            :label="t('novel.wenkuNovelEdit.markDuplicate')"
             @action="markAsDuplicate"
           />
         </n-flex>
@@ -421,54 +424,54 @@ const levelOptions = [
       :label-placement="isWideScreen ? 'left' : 'top'"
       label-width="auto"
     >
-      <n-form-item-row path="title" label="日文标题">
+      <n-form-item-row path="title" :label="t('novel.wenkuNovelEdit.titleJp')">
         <n-input
           v-model:value="formValue.title"
-          placeholder="请输入日文标题"
+          :placeholder="t('novel.wenkuNovelEdit.titleJpPlaceholder')"
           maxlength="80"
           show-count
           :input-props="{ spellcheck: false }"
         />
       </n-form-item-row>
 
-      <n-form-item-row path="titleZh" label="中文标题">
+      <n-form-item-row path="titleZh" :label="t('novel.wenkuNovelEdit.titleZh')">
         <n-input
           v-model:value="formValue.titleZh"
-          placeholder="请输入中文标题"
+          :placeholder="t('novel.wenkuNovelEdit.titleZhPlaceholder')"
           maxlength="80"
           show-count
           :input-props="{ spellcheck: false }"
         />
       </n-form-item-row>
 
-      <n-form-item-row path="cover" label="封面链接">
+      <n-form-item-row path="cover" :label="t('novel.wenkuNovelEdit.cover')">
         <n-input
           v-model:value="formValue.cover"
-          placeholder="请输入封面链接"
+          :placeholder="t('novel.wenkuNovelEdit.coverPlaceholder')"
           :input-props="{ spellcheck: false }"
         />
       </n-form-item-row>
 
-      <n-form-item-row path="authors" label="作者">
+      <n-form-item-row path="authors" :label="t('novel.wenkuNovelEdit.authors')">
         <n-dynamic-tags v-model:value="formValue.authors" />
       </n-form-item-row>
 
-      <n-form-item-row path="artists" label="画师">
+      <n-form-item-row path="artists" :label="t('novel.wenkuNovelEdit.artists')">
         <n-dynamic-tags v-model:value="formValue.artists" />
       </n-form-item-row>
 
-      <n-form-item-row path="level" label="分级">
+      <n-form-item-row path="level" :label="t('novel.wenkuNovelEdit.level')">
         <c-radio-group
           v-model:value="formValue.level"
           :options="levelOptions"
         />
       </n-form-item-row>
 
-      <n-form-item-row path="content" label="简介">
+      <n-form-item-row path="content" :label="t('novel.wenkuNovelEdit.introduction')">
         <n-input
           v-model:value="formValue.introduction"
           type="textarea"
-          placeholder="请输入小说简介"
+          :placeholder="t('novel.wenkuNovelEdit.introductionPlaceholder')"
           :autosize="{
             minRows: 8,
             maxRows: 24,
@@ -479,17 +482,17 @@ const levelOptions = [
         />
       </n-form-item-row>
 
-      <n-form-item-row label="标签">
+      <n-form-item-row :label="t('novel.wenkuNovelEdit.keywords')">
         <n-list bordered style="width: 100%">
           <n-list-item>
             <c-button
               v-if="presetKeywords.groups.length > 0"
-              label="用前必读"
+              :label="t('novel.wenkuNovelEdit.keywordsReadFirst')"
               @action="showKeywordsModal = true"
               text
               type="error"
             />
-            <n-p v-else>暂不支持标签。</n-p>
+            <n-p v-else>{{ t('novel.wenkuNovelEdit.keywordsNotSupported') }}</n-p>
           </n-list-item>
           <n-list-item
             v-for="group of presetKeywords.groups"
@@ -516,7 +519,7 @@ const levelOptions = [
         </n-list>
       </n-form-item-row>
 
-      <n-form-item-row label="分卷" v-if="formValue.volumes.length > 0">
+      <n-form-item-row :label="t('novel.wenkuNovelEdit.volumes')" v-if="formValue.volumes.length > 0">
         <n-list style="width: 100%; font-size: 12px">
           <vue-draggable
             v-model="formValue.volumes"
@@ -553,19 +556,19 @@ const levelOptions = [
                 <template #header-extra>
                   <n-flex :size="6" :wrap="false">
                     <c-icon-button
-                      tooltip="置顶"
+                      :tooltip="t('novel.wenkuNovelEdit.top')"
                       :icon="KeyboardDoubleArrowUpOutlined"
                       @action="topVolume(volume.asin)"
                     />
 
                     <c-icon-button
-                      tooltip="置底"
+                      :tooltip="t('novel.wenkuNovelEdit.bottom')"
                       :icon="KeyboardDoubleArrowDownOutlined"
                       @action="bottomVolume(volume.asin)"
                     />
 
                     <c-icon-button
-                      tooltip="删除"
+                      :tooltip="t('novel.wenkuNovelEdit.delete')"
                       :icon="DeleteOutlineOutlined"
                       type="error"
                       @action="deleteVolume(volume.asin)"
@@ -576,25 +579,25 @@ const levelOptions = [
                 <template #description>
                   <n-flex align="center" :size="0" :wrap="false">
                     <n-text style="word-break: keep-all; font-size: 12px">
-                      标题：
+                      {{ t('novel.wenkuNovelEdit.title') }}：
                     </n-text>
                     <n-input
                       v-model:value="volume.title"
-                      placeholder="标题"
+                      :placeholder="t('novel.wenkuNovelEdit.title')"
                       :input-props="{ spellcheck: false }"
                       size="small"
                       style="font-size: 12px"
                     />
                   </n-flex>
                   <n-text style="font-size: 12px">
-                    缩略：{{ volume.cover }}
+                    {{ t('novel.wenkuNovelEdit.thumbnail') }}：{{ volume.cover }}
                     <br />
-                    高清：{{ volume.coverHires }}
+                    {{ t('novel.wenkuNovelEdit.highRes') }}：{{ volume.coverHires }}
                     <br />
-                    出版：
-                    {{ volume.publisher ?? '未知出版商' }}
+                    {{ t('novel.wenkuNovelEdit.publish') }}：
+                    {{ volume.publisher ?? t('novel.wenkuNovelEdit.unknownPublisher') }}
                     /
-                    {{ volume.imprint ?? '未知文库' }}
+                    {{ volume.imprint ?? t('novel.wenkuNovelEdit.unknownImprint') }}
                     /
                     <n-time
                       v-if="volume.publishAt"
@@ -614,7 +617,7 @@ const levelOptions = [
 
     <c-button
       v-if="novelId"
-      label="提交"
+      :label="t('novel.wenkuNovelEdit.submit')"
       :icon="UploadOutlined"
       require-login
       size="large"
@@ -629,12 +632,12 @@ const levelOptions = [
       vertical
       style="margin-left: 8px"
     >
-      <n-step title="检查小说是否已经存在">
+      <n-step :title="t('novel.wenkuNovelEdit.step1Title')">
         <p>
-          创建文库页面前，请先确定你要创建的小说页面不存在，不要重复创建。你可以通过下面的搜索按钮搜索章节标题，注意自动搜索不总是能正确提取出关键词，如果关键词不正确，请手动搜索日文标题。
+          {{ t('novel.wenkuNovelEdit.step1Desc1') }}
         </p>
         <p>
-          自动搜索关键词：
+          {{ t('novel.wenkuNovelEdit.step1Desc2') }}
           <b>
             {{
               title.split(
@@ -645,7 +648,7 @@ const levelOptions = [
           </b>
         </p>
         <p v-if="similarNovels !== null">
-          <template v-if="similarNovels.length === 0">没有相似的小说</template>
+          <template v-if="similarNovels.length === 0">{{ t('novel.wenkuNovelEdit.noSimilarNovels') }}</template>
           <n-grid v-else :x-gap="12" :y-gap="12" cols="3 600:6">
             <n-grid-item v-for="item in similarNovels" :key="item.id">
               <router-link :to="`/wenku/${item.id}`">
@@ -659,51 +662,51 @@ const levelOptions = [
         </p>
         <n-button-group v-if="submitCurrentStep === 1">
           <c-button
-            label="我确定小说不存在"
+            :label="t('novel.wenkuNovelEdit.confirmNotExists')"
             type="warning"
             @click="moveToNextStep"
           />
-          <c-button label="自动搜索相似小说" @click="findSimilarNovels" />
+          <c-button :label="t('novel.wenkuNovelEdit.searchSimilar')" @click="findSimilarNovels" />
         </n-button-group>
       </n-step>
 
-      <n-step title="检查小说文件是否可以上传">
+      <n-step :title="t('novel.wenkuNovelEdit.step2Title')">
         <p>
-          创建文库页面前，请先确认你有可以上传的小说文件。不要创建文库页再去寻找资源，最后发现资源用不了或者找不到，留下一个空的文库页。尤其禁止创建空页面来求书，会被封号。
+          {{ t('novel.wenkuNovelEdit.step2Desc1') }}
         </p>
-        <p>PDF、或者内容只有图片的EPUB是无法上传的。</p>
+        <p>{{ t('novel.wenkuNovelEdit.step2Desc2') }}</p>
 
         <n-button-group v-if="submitCurrentStep === 2">
           <c-button
-            label="我确定我有可以上传的文件"
+            :label="t('novel.wenkuNovelEdit.confirmHasFiles')"
             type="warning"
             @click="moveToNextStep"
           />
-          <c-button label="上一步" @click="moveToPrevStep" />
+          <c-button :label="t('novel.wenkuNovelEdit.prevStep')" @click="moveToPrevStep" />
         </n-button-group>
       </n-step>
 
-      <n-step title="创建文库小说">
+      <n-step :title="t('novel.wenkuNovelEdit.step3Title')">
         <n-button-group v-if="submitCurrentStep === 3" style="margin-top: 16px">
           <c-button
-            label="提交"
+            :label="t('novel.wenkuNovelEdit.submit')"
             :icon="UploadOutlined"
             require-login
             type="primary"
             @action="submit"
           />
-          <c-button label="上一步" @click="moveToPrevStep" />
+          <c-button :label="t('novel.wenkuNovelEdit.prevStep')" @click="moveToPrevStep" />
         </n-button-group>
       </n-step>
     </n-steps>
   </div>
 
-  <c-modal title="使用说明" v-model:show="showKeywordsModal">
+  <c-modal :title="t('novel.wenkuNovelEdit.keywordsModalTitle')" v-model:show="showKeywordsModal">
     <n-p>
-      标签的意义在于辅助搜索。一个标签是否合适，要看标签相关情节的比例。仅仅是存在相关情节，不足以作为添加标签的依据。在实际操作中，可以思考搜索该标签的用户想不想看到这本书。
+      {{ t('novel.wenkuNovelEdit.keywordsModalDesc1') }}
     </n-p>
     <n-p>
-      下面是一些标签的具体解释。注意，同一个标签在一般向和R18下可能存在区别。
+      {{ t('novel.wenkuNovelEdit.keywordsModalDesc2') }}
     </n-p>
     <n-divider />
     <n-p v-for="row of presetKeywords.explanations" :key="row.word">

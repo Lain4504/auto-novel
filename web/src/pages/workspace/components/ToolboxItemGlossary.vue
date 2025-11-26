@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { ParsedFile } from '@/util/file';
 import { DeleteOutlineOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import type { TranslatorConfig } from '@/domain/translate';
 import { Translator } from '@/domain/translate';
@@ -12,6 +13,7 @@ const props = defineProps<{
 }>();
 
 const message = useMessage();
+const { t } = useI18n();
 const sakuraWorkspace = useSakuraWorkspaceStore().ref;
 
 const countKatakana = (content: string) => {
@@ -90,7 +92,7 @@ const copyTranslationJson = async () => {
   );
   const jsonString = Glossary.toText(obj);
   navigator.clipboard.writeText(jsonString);
-  message.info('已经将翻译结果复制到剪切板');
+  message.info(t('workspace.glossary.copied'));
 };
 
 const showSakuraSelectModal = ref(false);
@@ -105,7 +107,7 @@ const translateKatakanas = async (id: 'baidu' | 'youdao' | 'sakura') => {
       (it) => it.id === selectedSakuraWorkerId.value,
     );
     if (worker === undefined) {
-      message.error('未选择Sakura翻译器');
+      message.error(t('workspace.glossary.noSakura'));
       return;
     }
     config = {
@@ -127,7 +129,9 @@ const translateKatakanas = async (id: 'baidu' | 'youdao' | 'sakura') => {
     });
     katakanaTranslations.value = jpToZh;
   } catch (e: unknown) {
-    message.error(`翻译器错误：${e}`);
+    message.error(
+      t('workspace.glossary.translatorError', { error: String(e) }),
+    );
   }
 };
 </script>
@@ -135,15 +139,17 @@ const translateKatakanas = async (id: 'baidu' | 'youdao' | 'sakura') => {
 <template>
   <n-flex vertical size="large">
     <bulletin>
-      <n-p>术语表辅助制作工具正在开发中，当前方案分为识别和翻译两步。</n-p>
+      <n-p>{{ t('workspace.glossary.intro') }}</n-p>
       <n-ul>
-        <n-li>识别阶段：根据片假名词汇出现频率判断可能是术语的词汇。</n-li>
-        <n-li>翻译阶段：直接翻译日语词汇。</n-li>
+        <n-li>{{ t('workspace.glossary.stepIdentify') }}</n-li>
+        <n-li>{{ t('workspace.glossary.stepTranslate') }}</n-li>
       </n-ul>
-      <n-p><b>注意，这是辅助制作，不是全自动生成，使用前务必检查结果。</b></n-p>
+      <n-p>
+        <b>{{ t('workspace.glossary.note') }}</b>
+      </n-p>
     </bulletin>
 
-    <c-action-wrapper title="次数下限">
+    <c-action-wrapper :title="t('workspace.glossary.thresholdTitle')">
       <n-input-number
         v-model:value="katakanaThredhold"
         clearable
@@ -153,21 +159,21 @@ const translateKatakanas = async (id: 'baidu' | 'youdao' | 'sakura') => {
       />
     </c-action-wrapper>
 
-    <c-action-wrapper title="操作">
+    <c-action-wrapper :title="t('workspace.glossary.actionsTitle')">
       <n-flex vertical>
         <n-button-group size="small">
           <c-button
-            label="复制术语表"
+            :label="t('workspace.glossary.copyLabel')"
             :round="false"
             @action="copyTranslationJson()"
           />
           <c-button
-            label="百度翻译"
+            :label="t('workspace.glossary.baiduLabel')"
             :round="false"
             @action="translateKatakanas('baidu')"
           />
           <c-button
-            label="有道翻译"
+            :label="t('workspace.glossary.youdaoLabel')"
             :round="false"
             @action="translateKatakanas('youdao')"
           />
@@ -175,12 +181,18 @@ const translateKatakanas = async (id: 'baidu' | 'youdao' | 'sakura') => {
 
         <n-button-group size="small">
           <c-button
-            :label="`Sakura翻译-${selectedSakuraWorkerId ?? '未选中'}`"
+            :label="
+              t('workspace.glossary.sakuraLabel', {
+                worker:
+                  selectedSakuraWorkerId ??
+                  t('workspace.glossary.sakuraUnselected'),
+              })
+            "
             :round="false"
             @action="translateKatakanas('sakura')"
           />
           <c-button
-            label="选择翻译器"
+            :label="t('workspace.glossary.selectTranslator')"
             :round="false"
             @action="showSakuraSelectModal = true"
           />
@@ -189,7 +201,7 @@ const translateKatakanas = async (id: 'baidu' | 'youdao' | 'sakura') => {
         <n-flex align="center" :wrap="false">
           <c-button
             :disabled="katakanaDeleted.length === 0"
-            label="撤销删除"
+            :label="t('workspace.glossary.undoDelete')"
             :round="false"
             size="small"
             @action="undoDeleteKatakana"
@@ -219,7 +231,7 @@ const translateKatakanas = async (id: 'baidu' | 'youdao' | 'sakura') => {
         <tr v-for="[word, number] in katakanas" :key="word">
           <td>
             <c-icon-button
-              tooltip="移除"
+              :tooltip="t('workspace.glossary.removeTooltip')"
               :icon="DeleteOutlineOutlined"
               text
               size="small"
@@ -234,7 +246,7 @@ const translateKatakanas = async (id: 'baidu' | 'youdao' | 'sakura') => {
             <n-input
               v-model:value="katakanaTranslations[word]"
               size="tiny"
-              placeholder="请输入中文翻译"
+              :placeholder="t('workspace.glossary.inputPlaceholder')"
               :theme-overrides="{
                 border: '0',
                 color: 'transprent',
@@ -246,7 +258,10 @@ const translateKatakanas = async (id: 'baidu' | 'youdao' | 'sakura') => {
     </n-scrollbar>
   </n-flex>
 
-  <c-modal title="选择Sakura翻译器" v-model:show="showSakuraSelectModal">
+  <c-modal
+    :title="t('workspace.glossary.modalTitle')"
+    v-model:show="showSakuraSelectModal"
+  >
     <n-radio-group v-model:value="selectedSakuraWorkerId">
       <n-flex vertical>
         <n-radio

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ChecklistOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import { useIsWideScreen } from '@/pages/util';
 import { WebNovelRepo } from '@/repos';
@@ -11,6 +12,8 @@ import {
 } from '../list/option';
 import type { WebFavoredListValue } from './option';
 import { getWebFavoredListOptions, parseFavoredListValueSort } from './option';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   page: number;
@@ -66,7 +69,7 @@ const novelListRef = useTemplateRef('novelList');
   <bookshelf-layout :menu-key="`web/${favoredId}`">
     <n-flex style="margin-bottom: 24px">
       <c-button
-        label="选择"
+        :label="t('bookshelf.web.select')"
         :icon="ChecklistOutlined"
         @action="showControlPanel = !showControlPanel"
       />
@@ -104,11 +107,11 @@ const novelListRef = useTemplateRef('novelList');
           :selectable="showControlPanel"
           :simple="!setting.showTagInWebFavored"
         />
-        <n-empty v-if="novelPage.items.length === 0" description="空列表" />
+        <n-empty v-if="novelPage.items.length === 0" :description="t('list.webNovel.empty')" />
         <n-divider />
       </template>
 
-      <CResultX v-else :error="error" title="加载错误" />
+      <CResultX v-else :error="error" :title="t('bookshelf.web.loadError')" />
     </CPage>
   </bookshelf-layout>
 </template>

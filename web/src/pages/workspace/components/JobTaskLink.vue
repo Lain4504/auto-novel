@@ -1,9 +1,13 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import { TranslateTaskDescriptor } from '@/model/Translator';
 
 const props = defineProps<{
   task: string;
 }>();
+
+const { t } = useI18n();
 
 const link = computed(() => {
   const { desc, params } = TranslateTaskDescriptor.parse(props.task);
@@ -23,19 +27,19 @@ const link = computed(() => {
   }
 
   if (startIndex > 0 || endIndex < 65535) {
-    const endLabel = endIndex < 65535 ? endIndex : 'Inf';
+    const endLabel = endIndex < 65535 ? endIndex : t('workspace.jobTask.inf');
     text += ` [${startIndex},${endLabel})`;
   }
 
   const tags: string[] = [];
   if (level === 'expire') {
-    tags.push('过期章节');
+    tags.push(t('workspace.jobTask.tags.expire'));
   } else if (level === 'all') {
-    tags.push('全部章节');
+    tags.push(t('workspace.jobTask.tags.all'));
   } else if (level === 'sync') {
-    tags.push('源站同步');
+    tags.push(t('workspace.jobTask.tags.sync'));
   }
-  if (forceMetadata) tags.push('重翻目录');
+  if (forceMetadata) tags.push(t('workspace.jobTask.tags.metadata'));
   if (tags.length > 0) {
     text += ` [${tags.join('/')}]`;
   }

@@ -5,6 +5,7 @@ import {
   KeyboardDoubleArrowDownOutlined,
   KeyboardDoubleArrowUpOutlined,
 } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import type { TranslateJob } from '@/model/Translator';
 
@@ -17,6 +18,7 @@ const emit = defineEmits<{
   bottomJob: [];
   deleteJob: [];
 }>();
+const { t } = useI18n();
 
 const percentage = computed(() => {
   if (props.progress === undefined) {
@@ -51,19 +53,19 @@ const percentage = computed(() => {
     <template #header-extra>
       <n-flex :size="6" :wrap="false">
         <c-icon-button
-          tooltip="置顶"
+          :tooltip="t('workspace.jobQueue.top')"
           :icon="KeyboardDoubleArrowUpOutlined"
           @action="emit('topJob')"
         />
 
         <c-icon-button
-          tooltip="置底"
+          :tooltip="t('workspace.jobQueue.bottom')"
           :icon="KeyboardDoubleArrowDownOutlined"
           @action="emit('bottomJob')"
         />
 
         <c-icon-button
-          tooltip="删除"
+          :tooltip="t('workspace.jobQueue.delete')"
           :icon="DeleteOutlineOutlined"
           type="error"
           @action="emit('deleteJob')"

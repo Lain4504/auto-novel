@@ -1,18 +1,20 @@
 <script lang="ts" setup>
 import { DeleteOutlineOutlined, PlusOutlined } from '@vicons/material';
 import type { UploadCustomRequestOptions } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 import { useLocalVolumeStore } from '@/stores';
 import type { ParsedFile } from '@/util/file';
 import { parseFile } from '@/util/file';
 
 const message = useMessage();
+const { t } = useI18n();
 
 const files = shallowRef<ParsedFile[]>([]);
 
 const loadFile = async (file: File) => {
   if (files.value.find((it) => it.name === file.name) !== undefined) {
-    message.warning('文件已经载入');
+    message.warning(t('workspace.toolbox.fileLoaded'));
     return;
   }
   try {
@@ -39,10 +41,15 @@ const loadLocalFile = (volumeId: string) =>
   useLocalVolumeStore()
     .then((repo) => repo.getFile(volumeId))
     .then((file) => {
-      if (file === undefined) throw '小说不存在';
+      if (file === undefined)
+        throw new Error(t('workspace.toolbox.novelMissing'));
       return loadFile(file.file);
     })
-    .catch((error) => message.error(`文件载入失败：${error}`));
+    .catch((error) =>
+      message.error(
+        t('workspace.toolbox.loadFailed', { error: String(error) }),
+      ),
+    );
 
 const customRequest = ({
   file,
@@ -53,7 +60,9 @@ const customRequest = ({
   loadFile(file.file)
     .then(onFinish)
     .catch((err) => {
-      message.error('文件载入失败:' + err);
+      message.error(
+        t('workspace.toolbox.loadFailedShort', { error: String(err) }),
+      );
       onError();
     });
 };
@@ -63,7 +72,7 @@ const showListModal = ref(false);
 
 <template>
   <div class="layout-content">
-    <n-h1>小说工具箱</n-h1>
+    <n-h1>{{ t('workspace.toolbox.title') }}</n-h1>
 
     <n-flex>
       <div>
@@ -74,17 +83,20 @@ const showListModal = ref(false);
           directory-dnd
           :custom-request="customRequest"
         >
-          <c-button label="加载文件" :icon="PlusOutlined" />
+          <c-button
+            :label="t('workspace.toolbox.loadFiles')"
+            :icon="PlusOutlined"
+          />
         </n-upload>
       </div>
 
       <c-button
-        label="本地书架"
+        :label="t('workspace.toolbox.localShelf')"
         :icon="PlusOutlined"
         @action="showListModal = true"
       />
       <c-button
-        label="清空"
+        :label="t('workspace.toolbox.clear')"
         :icon="DeleteOutlineOutlined"
         @action="clearFile"
       />
@@ -97,16 +109,16 @@ const showListModal = ref(false);
     </n-flex>
 
     <n-tabs type="segment" animated style="margin-top: 48px">
-      <n-tab-pane name="0" tab="术语表">
+      <n-tab-pane name="0" :tab="t('workspace.toolbox.tabGlossary')">
         <toolbox-item-glossary :files="files" />
       </n-tab-pane>
-      <n-tab-pane name="1" tab="EPUB：压缩图片">
+      <n-tab-pane name="1" :tab="t('workspace.toolbox.tabCompress')">
         <toolbox-item-compress-image :files="files" />
       </n-tab-pane>
-      <n-tab-pane name="2" tab="TXT：修复OCR换行">
+      <n-tab-pane name="2" :tab="t('workspace.toolbox.tabFixOcr')">
         <toolbox-item-fix-ocr :files="files" />
       </n-tab-pane>
-      <n-tab-pane name="3" tab="EPUB：转换成TXT">
+      <n-tab-pane name="3" :tab="t('workspace.toolbox.tabConvert')">
         <toolbox-item-convert v-model:files="files" />
       </n-tab-pane>
     </n-tabs>

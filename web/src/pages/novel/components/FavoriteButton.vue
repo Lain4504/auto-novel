@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 import { FavoriteBorderOutlined, FavoriteOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import { doAction } from '@/pages/util';
 import { FavoredRepo } from '@/stores';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   favored: string | undefined;
@@ -30,7 +33,7 @@ const favoriteNovel = (favoredId: string) =>
       emit('update:favored', favoredId);
       showFavoredModal.value = false;
     }),
-    '收藏',
+    t('novel.favoriteButton.favorite'),
     message,
   );
 
@@ -41,7 +44,7 @@ const unfavoriteNovel = async () => {
       emit('update:favored', undefined);
       showFavoredModal.value = false;
     }),
-    '取消收藏',
+    t('novel.favoriteButton.unfavorite'),
     message,
   );
 };
@@ -54,14 +57,14 @@ const selectedFavoredId = ref(props.favored ?? 'default');
   <template v-if="favoreds.length <= 1">
     <c-button
       v-if="favored && favoredTitle"
-      label="已收藏"
+      :label="t('novel.favoriteButton.favorited')"
       :icon="FavoriteOutlined"
       require-login
       @action="unfavoriteNovel"
     />
     <c-button
       v-else
-      label="收藏"
+      :label="t('novel.favoriteButton.favorite')"
       :icon="FavoriteBorderOutlined"
       require-login
       @action="favoriteNovel(favoreds[0].id)"
@@ -70,14 +73,14 @@ const selectedFavoredId = ref(props.favored ?? 'default');
 
   <template v-else>
     <c-button
-      :label="favored && favoredTitle ? '已收藏:' + favoredTitle : '收藏'"
+      :label="favored && favoredTitle ? t('novel.favoriteButton.favoritedWithTitle', { title: favoredTitle }) : t('novel.favoriteButton.favorite')"
       :icon="favored ? FavoriteOutlined : FavoriteBorderOutlined"
       require-login
       @action="showFavoredModal = true"
     />
   </template>
 
-  <c-modal v-model:show="showFavoredModal" title="收藏到...">
+  <c-modal v-model:show="showFavoredModal" :title="t('novel.favoriteButton.favoriteTo')">
     <n-radio-group v-model:value="selectedFavoredId">
       <n-flex vertical size="large">
         <n-radio
@@ -87,12 +90,12 @@ const selectedFavoredId = ref(props.favored ?? 'default');
         >
           {{ favoredItem.title }}
         </n-radio>
-        <n-radio key="deleted" value="deleted">取消收藏</n-radio>
+        <n-radio key="deleted" value="deleted">{{ t('novel.favoriteButton.unfavorite') }}</n-radio>
       </n-flex>
     </n-radio-group>
     <template #action>
       <c-button
-        label="确定"
+        :label="t('novel.favoriteButton.confirm')"
         require-login
         type="primary"
         @action="

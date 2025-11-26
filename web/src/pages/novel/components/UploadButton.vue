@@ -5,12 +5,15 @@ import type {
   UploadFileInfo,
   UploadInst,
 } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 import { formatError } from '@/api';
 import { WenkuNovelRepo } from '@/repos';
 import { useNoticeStore, useWhoamiStore } from '@/stores';
 import { RegexUtil } from '@/util';
 import { getFullContent } from '@/util/file';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   novelId: string;
@@ -24,7 +27,7 @@ const { whoami } = storeToRefs(whoamiStore);
 
 async function beforeUpload({ file }: { file: UploadFileInfo }) {
   if (!whoami.value.isSignedIn) {
-    message.info('请先登录');
+    message.info(t('uploadButton.loginRequired'));
     return false;
   }
   if (!file.file) {
@@ -35,11 +38,11 @@ async function beforeUpload({ file }: { file: UploadFileInfo }) {
       file.file!.name.startsWith(prefix),
     )
   ) {
-    message.error('不要上传本网站上生成的机翻文件');
+    message.error(t('uploadButton.noMachineFile'));
     return false;
   }
   if (file.file.size > 1024 * 1024 * 40) {
-    message.error('文件大小不能超过40MB');
+    message.error(t('uploadButton.fileTooLarge'));
     return false;
   }
 
@@ -48,19 +51,19 @@ async function beforeUpload({ file }: { file: UploadFileInfo }) {
     content = await getFullContent(file.file);
   } catch (e) {
     console.error(e);
-    message.error(`文件解析错误:${e}`);
+    message.error(t('uploadButton.parseError', { error: e }));
     return false;
   }
   const charsCount = RegexUtil.countLanguageCharacters(content);
   if (charsCount.total < 500) {
-    message.error('字数过少，请检查内容是不是图片');
+    message.error(t('uploadButton.tooFewChars'));
     return false;
   }
 
   const p = (charsCount.jp + charsCount.ko) / charsCount.total;
   if (p < 0.33) {
     if (!props.allowZh) {
-      message.error('疑似中文小说，文库不允许上传');
+      message.error(t('uploadButton.chineseNotAllowed'));
       return false;
     } else {
       file.url = 'zh';
@@ -93,7 +96,7 @@ const customRequest = async ({
     onFinish();
   } catch (e) {
     onError();
-    message.error(`上传失败:${await formatError(e)}`);
+    message.error(t('uploadButton.uploadFailed', { error: await formatError(e) }));
   }
 };
 
@@ -115,7 +118,7 @@ const uploadVolumes = () => {
 <template>
   <c-button
     v-if="!haveReadRule"
-    label="上传"
+    :label="t('novel.uploadButton.upload')"
     :icon="PlusOutlined"
     @action="uploadVolumes"
   />
@@ -127,27 +130,27 @@ const uploadVolumes = () => {
     :show-trigger="haveReadRule"
     @before-upload="beforeUpload"
   >
-    <c-button label="上传" :icon="PlusOutlined" />
+    <c-button :label="t('novel.uploadButton.upload')" :icon="PlusOutlined" />
   </n-upload>
 
   <c-modal
-    title="上传须知"
+    :title="t('uploadButton.rules.title')"
     v-model:show="showRuleModal"
     @after-leave="uploadRef?.openOpenFileDialog()"
   >
-    <n-p>在上传小说之前，请务必遵守以下规则。</n-p>
+    <n-p>{{ t('uploadButton.rules.intro') }}</n-p>
     <n-ul>
       <n-li>
-        日文章节上传前请确定里面有文本，单卷书压缩包超40MB里面大概率只有扫图无文本，这种是无法翻译的。
+        {{ t('uploadButton.rules.rule1') }}
       </n-li>
-      <n-li>EPUB文件大小超过40MB无法上传，请压缩里面的图片。</n-li>
-      <n-li>不要上传已存在的分卷，现存的分卷有问题请联系管理员。</n-li>
-      <n-li>分卷文件名应当只包含日文标题、卷数、分卷日文标题。</n-li>
+      <n-li>{{ t('uploadButton.rules.rule2') }}</n-li>
+      <n-li>{{ t('uploadButton.rules.rule3') }}</n-li>
+      <n-li>{{ t('uploadButton.rules.rule4') }}</n-li>
     </n-ul>
-    <n-p>由于文库小说还在开发中，规则也会变化，务必留意。</n-p>
+    <n-p>{{ t('uploadButton.rules.note') }}</n-p>
 
     <template #action>
-      <c-button label="确定" type="primary" @action="showRuleModal = false" />
+      <c-button :label="t('novel.uploadButton.confirm')" type="primary" @action="showRuleModal = false" />
     </template>
   </c-modal>
 </template>

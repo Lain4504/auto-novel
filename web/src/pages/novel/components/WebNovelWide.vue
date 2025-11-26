@@ -5,11 +5,14 @@ import {
   SortOutlined,
 } from '@vicons/material';
 import { NScrollbar } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 import type { WebNovelDto, WebNovelTocItemDto } from '@/model/WebNovel';
 import { useSettingStore } from '@/stores';
 import { useTocExpansion } from './UseTocExpansion';
 import { useLastReadChapter, useToc } from './UseWebNovel';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   providerId: string;
@@ -66,10 +69,10 @@ const { expandedNames, hasSeparators, isAnyExpanded, toggleAll, tocSections } =
     />
 
     <template #sidebar>
-      <section-header title="目录">
+      <section-header :title="t('novel.webNovelWide.catalog')">
         <c-button
           v-if="hasSeparators"
-          :label="isAnyExpanded ? '折叠' : '展开'"
+          :label="isAnyExpanded ? t('novel.catalog.collapse') : t('novel.catalog.expand')"
           :icon="isAnyExpanded ? KeyboardArrowUpRound : KeyboardArrowDownRound"
           quaternary
           size="small"
@@ -78,7 +81,7 @@ const { expandedNames, hasSeparators, isAnyExpanded, toggleAll, tocSections } =
           style="margin-right: 8px"
         />
         <c-button
-          :label="setting.tocSortReverse ? '倒序' : '正序'"
+          :label="setting.tocSortReverse ? t('novel.catalog.reverseOrder') : t('novel.catalog.normalOrder')"
           :icon="SortOutlined"
           quaternary
           size="small"

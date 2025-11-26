@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ChecklistOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import { useIsWideScreen } from '@/pages/util';
 import { WenkuNovelRepo } from '@/repos';
@@ -10,6 +11,8 @@ import {
   getWenkuFavoredListOptions,
   parseFavoredListValueSort,
 } from './option';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   page: number;
@@ -50,7 +53,7 @@ const novelListRef = useTemplateRef('novelList');
   <bookshelf-layout :menu-key="`wenku/${favoredId}`">
     <n-flex style="margin-bottom: 24px">
       <c-button
-        label="选择"
+        :label="t('bookshelf.wenku.select')"
         :icon="ChecklistOutlined"
         @action="showControlPanel = !showControlPanel"
       />
@@ -88,11 +91,11 @@ const novelListRef = useTemplateRef('novelList');
           :selectable="showControlPanel"
           simple
         />
-        <n-empty v-if="novelPage.items.length === 0" description="空列表" />
+        <n-empty v-if="novelPage.items.length === 0" :description="t('list.wenkuNovel.empty')" />
         <n-divider />
       </template>
 
-      <CResultX v-else :error="error" title="加载错误" />
+      <CResultX v-else :error="error" :title="t('bookshelf.wenku.loadError')" />
     </CPage>
   </bookshelf-layout>
 </template>

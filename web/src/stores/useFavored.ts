@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import type { Favored } from '@/api';
 import { FavoredApi } from '@/api';
+import { i18nGlobal } from '@/locales';
 import { useLocalStorage } from '@/util';
 import { LSKey } from './key';
 import { useWhoamiStore } from './useWhoamiStore';
@@ -13,12 +14,42 @@ interface FavoredList {
   local: Favored[];
 }
 
+const buildDefaultFavored = () => {
+  const locale = i18nGlobal.locale.value;
+  // Only use i18n if locale is valid
+  const title = (locale === 'vi' || locale === 'zh')
+    ? i18nGlobal.t('stores.favored.defaultTitle')
+    : 'Default';
+  return { id: 'default', title };
+};
+
 export const useFavoredStore = defineStore(LSKey.Favored, () => {
   const favoreds = useLocalStorage<FavoredList>(LSKey.Favored, {
-    web: [{ id: 'default', title: '默认收藏夹' }],
-    wenku: [{ id: 'default', title: '默认收藏夹' }],
-    local: [{ id: 'default', title: '默认收藏夹' }],
+    web: [buildDefaultFavored()],
+    wenku: [buildDefaultFavored()],
+    local: [buildDefaultFavored()],
   });
+
+  watch(
+    () => i18nGlobal.locale.value,
+    (locale) => {
+      // Only sync if locale is valid
+      if (locale !== 'vi' && locale !== 'zh') {
+        return;
+      }
+
+      const title = i18nGlobal.t('stores.favored.defaultTitle');
+      (['web', 'wenku', 'local'] as const).forEach((type) => {
+        const defaultFavored = favoreds.value[type].find(
+          (it) => it.id === 'default',
+        );
+        if (defaultFavored) {
+          defaultFavored.title = title;
+        }
+      });
+    },
+    { immediate: true },
+  );
 
   const whoamiStore = useWhoamiStore();
   const { whoami } = storeToRefs(whoamiStore);
@@ -46,7 +77,7 @@ const createFavored = async (
   const store = useFavoredStore();
   const favoreds = store.favoreds[type];
   if (favoreds.length >= 20) {
-    throw new Error('收藏夹最多只能创建20个');
+    throw new Error(i18nGlobal.t('stores.favored.maxLimit'));
   }
   let id: string;
   if (type === 'web') {
@@ -79,7 +110,7 @@ const updateFavored = async (
 
 const deleteFavored = async (type: 'web' | 'wenku' | 'local', id: string) => {
   if (id === 'default') {
-    throw new Error('无法删除默认收藏夹');
+    throw new Error(i18nGlobal.t('stores.favored.deleteDefault'));
   }
   if (type === 'web') {
     await FavoredApi.deleteFavoredWeb(id);

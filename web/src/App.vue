@@ -1,7 +1,15 @@
 <script lang="ts" setup>
-import { darkTheme, dateZhCN, useOsTheme, zhCN } from 'naive-ui';
+import {
+  darkTheme,
+  dateViVN,
+  dateZhCN,
+  useOsTheme,
+  viVN,
+  zhCN,
+} from 'naive-ui';
 
 import {
+  useLocaleStore,
   useReaderSettingStore,
   useSettingStore,
   useWhoamiStore,
@@ -16,6 +24,14 @@ const { setting } = storeToRefs(settingStore);
 
 const readerSettingStore = useReaderSettingStore();
 const { readerSetting } = storeToRefs(readerSettingStore);
+
+const localeStore = useLocaleStore();
+const { locale } = storeToRefs(localeStore);
+
+const naiveLocale = computed(() => (locale.value === 'vi' ? viVN : zhCN));
+const naiveDateLocale = computed(() =>
+  locale.value === 'vi' ? dateViVN : dateZhCN,
+);
 
 // 主题
 const route = useRoute();
@@ -72,8 +88,8 @@ if (RegexUtil.isSafari(navigator.userAgent)) {
 <template>
   <n-config-provider
     :theme="theme.isDark ? darkTheme : null"
-    :locale="zhCN"
-    :date-locale="dateZhCN"
+    :locale="naiveLocale"
+    :date-locale="naiveDateLocale"
     inline-theme-disabled
     :theme-overrides="{
       Drawer: { bodyPadding: '0px' },

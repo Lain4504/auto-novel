@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { FormInst, FormItemRule, FormRules } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 import type { GptWorker } from '@/model/Translator';
 import { useGptWorkspaceStore } from '@/stores';
@@ -14,6 +15,7 @@ const emit = defineEmits<{
 
 const workspace = useGptWorkspaceStore();
 const workspaceRef = workspace.ref;
+const { t } = useI18n();
 
 const initFormValue = (): {
   id: string;
@@ -42,27 +44,42 @@ const initFormValue = (): {
 const formRef = useTemplateRef<FormInst>('form');
 const formValue = ref(initFormValue());
 
-const emptyCheck = (name: string) => ({
+const fieldLabel = (field: 'name' | 'model' | 'endpoint' | 'key') => {
+  switch (field) {
+    case 'name':
+      return t('workspace.gptWorker.fieldName');
+    case 'model':
+      return t('workspace.gptWorker.fieldModel');
+    case 'endpoint':
+      return t('workspace.gptWorker.fieldEndpoint');
+    case 'key':
+      return t('workspace.gptWorker.fieldKey');
+  }
+};
+
+const emptyCheck = (field: 'name' | 'model' | 'endpoint' | 'key') => ({
   validator: (rule: FormItemRule, value: string) => value.trim().length > 0,
-  message: name + '不能为空',
+  message: t('workspace.gptWorker.validation.required', {
+    field: fieldLabel(field),
+  }),
   trigger: 'input',
 });
 
 const formRules: FormRules = {
   id: [
-    emptyCheck('名字'),
+    emptyCheck('name'),
     {
       validator: (rule: FormItemRule, value: string) =>
         workspaceRef.value.workers
           .filter(({ id }) => id !== props.worker?.id)
           .find(({ id }) => id === value) === undefined,
-      message: '名字不能重复',
+      message: t('workspace.gptWorker.validation.nameDuplicate'),
       trigger: 'input',
     },
   ],
-  model: [emptyCheck('模型')],
+  model: [emptyCheck('model')],
   endpoint: [
-    emptyCheck('链接'),
+    emptyCheck('endpoint'),
     {
       validator: (rule: FormItemRule, value: string) => {
         try {
@@ -72,19 +89,19 @@ const formRules: FormRules = {
           return false;
         }
       },
-      message: '链接不合法',
+      message: t('workspace.gptWorker.validation.endpointInvalid'),
       trigger: 'input',
     },
   ],
   key: [
-    emptyCheck('Key'),
+    emptyCheck('key'),
     {
       level: 'warning',
       validator: (rule: FormItemRule, value: string) =>
         workspaceRef.value.workers
           .filter(({ id }) => id !== props.worker?.id)
           .find(({ key }) => key === value) === undefined,
-      message: '有重复的Key，请确保使用的API支持并发',
+      message: t('workspace.gptWorker.validation.keyDuplicate'),
       trigger: 'input',
     },
   ],
@@ -119,14 +136,23 @@ const submit = async () => {
   }
 };
 
-const verb = computed(() => (props.worker === undefined ? '添加' : '更新'));
+const verb = computed(() =>
+  props.worker === undefined
+    ? t('workspace.gptWorker.add')
+    : t('workspace.gptWorker.update'),
+);
+const modalTitle = computed(() =>
+  props.worker === undefined
+    ? t('workspace.gptWorker.modalTitleAdd')
+    : t('workspace.gptWorker.modalTitleUpdate'),
+);
 </script>
 
 <template>
   <c-modal
     :show="show"
     @update:show="$emit('update:show', $event)"
-    :title="verb + 'GPT翻译器'"
+    :title="modalTitle"
   >
     <n-form
       ref="form"
@@ -135,44 +161,54 @@ const verb = computed(() => (props.worker === undefined ? '添加' : '更新'));
       label-placement="left"
       label-width="auto"
     >
-      <n-form-item-row path="id" label="名字">
+      <n-form-item-row path="id" :label="t('workspace.gptWorker.fieldName')">
         <n-input
           v-model:value="formValue.id"
-          placeholder="给你的翻译器起个名字"
+          :placeholder="t('workspace.gptWorker.placeholderName')"
           :input-props="{ spellcheck: false }"
         />
       </n-form-item-row>
 
-      <n-form-item-row path="model" label="模型">
+      <n-form-item-row
+        path="model"
+        :label="t('workspace.gptWorker.fieldModel')"
+      >
         <n-input
           v-model:value="formValue.model"
-          placeholder="模型名称"
+          :placeholder="t('workspace.gptWorker.placeholderModel')"
           :input-props="{ spellcheck: false }"
         />
       </n-form-item-row>
-      <n-form-item-row path="endpoint" label="链接">
+      <n-form-item-row
+        path="endpoint"
+        :label="t('workspace.gptWorker.fieldEndpoint')"
+      >
         <n-input
           v-model:value="formValue.endpoint"
-          placeholder="兼容OpenAI的API链接，默认使用deepseek"
+          :placeholder="t('workspace.gptWorker.placeholderEndpoint')"
           :input-props="{ spellcheck: false }"
         />
       </n-form-item-row>
 
-      <n-form-item-row path="key" label="Key">
+      <n-form-item-row path="key" :label="t('workspace.gptWorker.fieldKey')">
         <n-input
           v-model:value="formValue.key"
-          placeholder="请输入Api key"
+          :placeholder="t('workspace.gptWorker.placeholderKey')"
           :input-props="{ spellcheck: false }"
         />
       </n-form-item-row>
 
       <n-text depth="3" style="font-size: 12px">
-        # 链接例子：https://api.deepseek.com
+        {{ t('workspace.gptWorker.tipExample') }}
       </n-text>
     </n-form>
 
     <template #action>
-      <c-button :label="verb" type="primary" @action="submit" />
+      <c-button
+        :label="t('workspace.gptWorker.submit')"
+        type="primary"
+        @action="submit"
+      />
     </template>
   </c-modal>
 </template>

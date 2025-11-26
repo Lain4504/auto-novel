@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { ScrollbarInst } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
   title: string;
@@ -45,6 +46,8 @@ watch(
 const showLogDetailModal = ref(false);
 const selectedLogDetail = ref([] as string[]);
 const selectedLogMessage = ref('');
+const { t } = useI18n();
+
 const showDetail = (message: string, detail: string[]) => {
   selectedLogMessage.value = message.trim();
   selectedLogDetail.value = detail;
@@ -63,19 +66,31 @@ defineExpose({
 <template>
   <n-card
     v-show="show"
-    :title="`${title} [${running ? '运行中' : '已结束'}]`"
+    :title="`${title} [${
+      running
+        ? t('components.taskCard.running')
+        : t('components.taskCard.finished')
+    }]`"
     embedded
     :bordered="false"
   >
     <template #header-extra>
       <n-flex align="center">
         <c-button
-          :label="enableAutoScroll ? '暂停滚动' : '自动滚动'"
+          :label="
+            enableAutoScroll
+              ? t('components.taskCard.pauseScroll')
+              : t('components.taskCard.autoScroll')
+          "
           size="small"
           @action="enableAutoScroll = !enableAutoScroll"
         />
         <c-button
-          :label="expandLog ? '收起日志' : '展开日志'"
+          :label="
+            expandLog
+              ? t('components.taskCard.collapseLog')
+              : t('components.taskCard.expandLog')
+          "
           size="small"
           @action="expandLog = !expandLog"
         />
@@ -90,7 +105,7 @@ defineExpose({
         <div v-for="log of logs" :key="log.message">
           {{ log.message }}
           <span v-if="log.detail" @click="showDetail(log.message, log.detail!)">
-            [详细]
+            {{ t('components.taskCard.detailLink') }}
           </span>
         </div>
       </n-scrollbar>
@@ -99,7 +114,9 @@ defineExpose({
 
     <c-modal
       v-model:show="showLogDetailModal"
-      :title="`日志详情 - ${selectedLogMessage}`"
+      :title="
+        t('components.taskCard.detailTitle', { message: selectedLogMessage })
+      "
     >
       <n-p
         v-for="line of selectedLogDetail"

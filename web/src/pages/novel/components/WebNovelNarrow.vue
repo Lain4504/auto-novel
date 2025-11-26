@@ -5,11 +5,14 @@ import {
   SortOutlined,
 } from '@vicons/material';
 import { NScrollbar } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 import type { WebNovelDto, WebNovelTocItemDto } from '@/model/WebNovel';
 import { useSettingStore } from '@/stores';
 import { useTocExpansion } from './UseTocExpansion';
 import { useLastReadChapter, useToc } from './UseWebNovel';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   providerId: string;
@@ -81,7 +84,7 @@ const { expandedNames, hasSeparators, isAnyExpanded, toggleAll, tocSections } =
     <c-button
       v-if="novel.toc.length > 1"
       secondary
-      label="展开目录"
+      :label="t('novel.webNovelNarrow.expandCatalog')"
       @action="showCatalogDrawer = true"
       style="width: 100%"
     />
@@ -98,7 +101,7 @@ const { expandedNames, hasSeparators, isAnyExpanded, toggleAll, tocSections } =
       <div style="flex: 1"></div>
       <c-button
         v-if="hasSeparators"
-        :label="isAnyExpanded ? '折叠' : '展开'"
+        :label="isAnyExpanded ? t('novel.catalog.collapse') : t('novel.catalog.expand')"
         :icon="isAnyExpanded ? KeyboardArrowUpRound : KeyboardArrowDownRound"
         quaternary
         size="small"
@@ -107,7 +110,7 @@ const { expandedNames, hasSeparators, isAnyExpanded, toggleAll, tocSections } =
         style="margin-right: 8px"
       />
       <c-button
-        :label="setting.tocSortReverse ? '倒序' : '正序'"
+        :label="setting.tocSortReverse ? t('novel.catalog.reverseOrder') : t('novel.catalog.normalOrder')"
         :icon="SortOutlined"
         quaternary
         size="small"
@@ -122,7 +125,7 @@ const { expandedNames, hasSeparators, isAnyExpanded, toggleAll, tocSections } =
       style="margin-bottom: 8px"
       content-style="padding: 6px 0px 0px;"
     >
-      <b style="padding-left: 6px">上次读到:</b>
+      <b style="padding-left: 6px">{{ t('novel.webNovelNarrow.lastRead') }}:</b>
       <ChapterTocItem
         :provider-id="providerId"
         :novel-id="novelId"
@@ -154,12 +157,12 @@ const { expandedNames, hasSeparators, isAnyExpanded, toggleAll, tocSections } =
     v-if="setting.tocCollapseInNarrowScreen && novel.toc.length > 1"
     :width="320"
     v-model:show="showCatalogDrawer"
-    title="目录"
+    :title="t('novel.webNovelNarrow.catalog')"
   >
     <template #action>
       <c-button
         v-if="hasSeparators"
-        :label="isAnyExpanded ? '折叠' : '展开'"
+        :label="isAnyExpanded ? t('novel.catalog.collapse') : t('novel.catalog.expand')"
         :icon="isAnyExpanded ? KeyboardArrowUpRound : KeyboardArrowDownRound"
         quaternary
         size="small"
@@ -168,7 +171,7 @@ const { expandedNames, hasSeparators, isAnyExpanded, toggleAll, tocSections } =
         style="margin-right: 8px"
       />
       <c-button
-        :label="setting.tocSortReverse ? '倒序' : '正序'"
+        :label="setting.tocSortReverse ? t('novel.catalog.reverseOrder') : t('novel.catalog.normalOrder')"
         :icon="SortOutlined"
         quaternary
         size="small"

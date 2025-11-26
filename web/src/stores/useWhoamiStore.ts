@@ -1,11 +1,21 @@
 import { setTokenGetter } from '@/api/novel/client';
+import { UserRole } from '@/model/User';
+import { i18nGlobal } from '@/locales';
 import { useUserData } from '@/util';
 import { LSKey } from './key';
-import { UserRole } from '@/model/User';
 
 export const useWhoamiStore = defineStore(LSKey.Auth, () => {
   const { userData, refresh, logout } = useUserData('n');
   setTokenGetter(() => userData.value?.profile?.token ?? '');
+
+  const guestLabel = computed(() => {
+    const locale = i18nGlobal.locale.value;
+    // Only use i18n if locale is valid, otherwise return fallback
+    if (locale === 'vi' || locale === 'zh') {
+      return i18nGlobal.t('stores.whoami.guest');
+    }
+    return 'Guest'; // Fallback value
+  });
 
   const whoami = computed(() => {
     const { profile, adminMode } = userData.value;
@@ -25,7 +35,7 @@ export const useWhoamiStore = defineStore(LSKey.Auth, () => {
 
     return {
       user: {
-        username: profile?.username ?? '未登录',
+        username: profile?.username ?? guestLabel.value,
         role: buildRoleLabel(),
         createAt: profile?.createdAt ?? Date.now() / 1000,
       },

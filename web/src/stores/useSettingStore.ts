@@ -1,4 +1,5 @@
 import type { TranslatorId } from '@/model/Translator';
+import { i18nGlobal } from '@/locales';
 import { defaultConverter, useLocalStorage, useOpenCC } from '@/util';
 import { LSKey } from './key';
 
@@ -32,7 +33,7 @@ export interface Setting {
     desc: boolean;
   };
   //
-  locale: 'zh-cn' | 'zh-tw';
+  locale: 'vi' | 'zh';
   searchLocaleAware: boolean;
 }
 
@@ -67,7 +68,7 @@ export namespace Setting {
       desc: true,
     },
     //
-    locale: 'zh-cn',
+    locale: 'vi',
     searchLocaleAware: false,
   };
 
@@ -96,16 +97,20 @@ export namespace Setting {
     if ((setting.paginationMode as unknown) === 'auto') {
       setting.paginationMode = 'pagination';
     }
+    // 2025-11-27: Migrate old locale values to new supported locales
+    if ((setting.locale as unknown) === 'zh-cn' || (setting.locale as unknown) === 'zh-tw') {
+      setting.locale = 'zh';
+    }
   };
 
   export const downloadModeOptions = [
-    { label: '中文', value: 'zh' },
-    { label: '中日', value: 'zh-jp' },
-    { label: '日中', value: 'jp-zh' },
+    { label: '', value: 'zh' },
+    { label: '', value: 'zh-jp' },
+    { label: '', value: 'jp-zh' },
   ];
   export const downloadTranslationModeOptions = [
-    { label: '优先', value: 'priority' },
-    { label: '并列', value: 'parallel' },
+    { label: '', value: 'priority' },
+    { label: '', value: 'parallel' },
   ];
   export const downloadTypeOptions = [
     { label: 'EPUB', value: 'epub' },
@@ -113,22 +118,22 @@ export namespace Setting {
   ];
 
   export const themeOptions = [
-    { label: '亮色主题', value: 'light' },
-    { label: '暗色主题', value: 'dark' },
-    { label: '跟随系统', value: 'system' },
+    { label: '', value: 'light' },
+    { label: '', value: 'dark' },
+    { label: '', value: 'system' },
   ];
   export const paginationModeOptions = [
-    { label: '分页', value: 'pagination' },
-    { label: '滚动', value: 'scroll' },
+    { label: '', value: 'pagination' },
+    { label: '', value: 'scroll' },
   ];
   export const localVolumeOrderOptions = [
-    { value: 'byCreateAt', label: '添加时间' },
-    { value: 'byReadAt', label: '阅读时间' },
-    { value: 'byId', label: '标题' },
+    { value: 'byCreateAt', label: '' },
+    { value: 'byReadAt', label: '' },
+    { value: 'byId', label: '' },
   ];
   export const localeOptions = [
-    { label: '简体中文', value: 'zh-cn' },
-    { label: '繁体中文', value: 'zh-tw' },
+    { label: '', value: 'vi' },
+    { label: '', value: 'zh' },
   ];
 }
 
@@ -219,50 +224,50 @@ export namespace ReaderSetting {
   };
 
   export const modeOptions = [
-    { label: '日文', value: 'jp' },
-    { label: '中文', value: 'zh' },
-    { label: '中日', value: 'zh-jp' },
-    { label: '日中', value: 'jp-zh' },
+    { label: '', value: 'jp' },
+    { label: '', value: 'zh' },
+    { label: '', value: 'zh-jp' },
+    { label: '', value: 'jp-zh' },
   ];
   export const translationModeOptions = [
-    { label: '优先', value: 'priority' },
-    { label: '并列', value: 'parallel' },
+    { label: '', value: 'priority' },
+    { label: '', value: 'parallel' },
   ];
 
   export const clickAreaOptions = [
-    { label: '默认', value: 'default' },
-    { label: '左右', value: 'left-right' },
-    { label: '上下', value: 'up-down' },
-    { label: '关闭', value: 'none' },
+    { label: '', value: 'default' },
+    { label: '', value: 'left-right' },
+    { label: '', value: 'up-down' },
+    { label: '', value: 'none' },
   ];
 
   export const speakLanguagesOptions = [
-    { label: '中文', value: 'zh' },
-    { label: '日文', value: 'jp' },
+    { label: '', value: 'zh' },
+    { label: '', value: 'jp' },
   ];
 
   export const pageTurnModeOptions = [
-    { label: '章节翻页', value: 'page' },
-    { label: '滚动翻页', value: 'scroll' },
+    { label: '', value: 'page' },
+    { label: '', value: 'scroll' },
   ];
 
   export const fontWeightOptions = [
-    { label: '正常', value: 400 },
-    { label: '加粗', value: 600 },
+    { label: '', value: 400 },
+    { label: '', value: 600 },
   ];
 
   export const textUnderlineOptions = [
-    { label: '关闭', value: 'none' },
-    { label: '实线', value: 'solid' },
-    { label: '虚线', value: 'dashed' },
-    { label: '点状', value: 'dotted' },
+    { label: '', value: 'none' },
+    { label: '', value: 'solid' },
+    { label: '', value: 'dashed' },
+    { label: '', value: 'dotted' },
   ];
 
   export const themeModeOptions = [
-    { label: '浅色', value: 'light' },
-    { label: '深色', value: 'dark' },
-    { label: '跟随系统', value: 'system' },
-    { label: '自定义', value: 'custom' },
+    { label: '', value: 'light' },
+    { label: '', value: 'dark' },
+    { label: '', value: 'system' },
+    { label: '', value: 'custom' },
   ];
   export const themeOptions = [
     { bodyColor: '#FFFFFF', fontColor: '#000000' },
@@ -276,11 +281,129 @@ export namespace ReaderSetting {
   ];
 }
 
+const syncSettingOptionLabels = () => {
+  Setting.downloadModeOptions[0].label = i18nGlobal.t(
+    'stores.setting.downloadModes.zh',
+  );
+  Setting.downloadModeOptions[1].label = i18nGlobal.t(
+    'stores.setting.downloadModes.zhJp',
+  );
+  Setting.downloadModeOptions[2].label = i18nGlobal.t(
+    'stores.setting.downloadModes.jpZh',
+  );
+  Setting.downloadTranslationModeOptions[0].label = i18nGlobal.t(
+    'stores.setting.translationModes.priority',
+  );
+  Setting.downloadTranslationModeOptions[1].label = i18nGlobal.t(
+    'stores.setting.translationModes.parallel',
+  );
+  Setting.themeOptions[0].label = i18nGlobal.t('stores.setting.theme.light');
+  Setting.themeOptions[1].label = i18nGlobal.t('stores.setting.theme.dark');
+  Setting.themeOptions[2].label = i18nGlobal.t('stores.setting.theme.system');
+  Setting.paginationModeOptions[0].label = i18nGlobal.t(
+    'stores.setting.pagination.pagination',
+  );
+  Setting.paginationModeOptions[1].label = i18nGlobal.t(
+    'stores.setting.pagination.scroll',
+  );
+  Setting.localVolumeOrderOptions[0].label = i18nGlobal.t(
+    'stores.setting.localOrder.created',
+  );
+  Setting.localVolumeOrderOptions[1].label = i18nGlobal.t(
+    'stores.setting.localOrder.read',
+  );
+  Setting.localVolumeOrderOptions[2].label = i18nGlobal.t(
+    'stores.setting.localOrder.title',
+  );
+  Setting.localeOptions[0].label = i18nGlobal.t('stores.setting.locale.vi');
+  Setting.localeOptions[1].label = i18nGlobal.t('stores.setting.locale.zh');
+
+  ReaderSetting.modeOptions[0].label = i18nGlobal.t('stores.reader.mode.jp');
+  ReaderSetting.modeOptions[1].label = i18nGlobal.t('stores.reader.mode.zh');
+  ReaderSetting.modeOptions[2].label = i18nGlobal.t('stores.reader.mode.zhJp');
+  ReaderSetting.modeOptions[3].label = i18nGlobal.t('stores.reader.mode.jpZh');
+  ReaderSetting.translationModeOptions[0].label = i18nGlobal.t(
+    'stores.setting.translationModes.priority',
+  );
+  ReaderSetting.translationModeOptions[1].label = i18nGlobal.t(
+    'stores.setting.translationModes.parallel',
+  );
+  ReaderSetting.clickAreaOptions[0].label = i18nGlobal.t(
+    'stores.reader.clickArea.default',
+  );
+  ReaderSetting.clickAreaOptions[1].label = i18nGlobal.t(
+    'stores.reader.clickArea.leftRight',
+  );
+  ReaderSetting.clickAreaOptions[2].label = i18nGlobal.t(
+    'stores.reader.clickArea.upDown',
+  );
+  ReaderSetting.clickAreaOptions[3].label = i18nGlobal.t(
+    'stores.reader.clickArea.none',
+  );
+  ReaderSetting.speakLanguagesOptions[0].label = i18nGlobal.t(
+    'stores.reader.speak.zh',
+  );
+  ReaderSetting.speakLanguagesOptions[1].label = i18nGlobal.t(
+    'stores.reader.speak.jp',
+  );
+  ReaderSetting.pageTurnModeOptions[0].label = i18nGlobal.t(
+    'stores.reader.pageTurn.page',
+  );
+  ReaderSetting.pageTurnModeOptions[1].label = i18nGlobal.t(
+    'stores.reader.pageTurn.scroll',
+  );
+  ReaderSetting.fontWeightOptions[0].label = i18nGlobal.t(
+    'stores.reader.fontWeight.normal',
+  );
+  ReaderSetting.fontWeightOptions[1].label = i18nGlobal.t(
+    'stores.reader.fontWeight.bold',
+  );
+  ReaderSetting.textUnderlineOptions[0].label = i18nGlobal.t(
+    'stores.reader.underline.none',
+  );
+  ReaderSetting.textUnderlineOptions[1].label = i18nGlobal.t(
+    'stores.reader.underline.solid',
+  );
+  ReaderSetting.textUnderlineOptions[2].label = i18nGlobal.t(
+    'stores.reader.underline.dashed',
+  );
+  ReaderSetting.textUnderlineOptions[3].label = i18nGlobal.t(
+    'stores.reader.underline.dotted',
+  );
+  ReaderSetting.themeModeOptions[0].label = i18nGlobal.t(
+    'stores.reader.themeMode.light',
+  );
+  ReaderSetting.themeModeOptions[1].label = i18nGlobal.t(
+    'stores.reader.themeMode.dark',
+  );
+  ReaderSetting.themeModeOptions[2].label = i18nGlobal.t(
+    'stores.reader.themeMode.system',
+  );
+  ReaderSetting.themeModeOptions[3].label = i18nGlobal.t(
+    'stores.reader.themeMode.custom',
+  );
+};
+
 export const useSettingStore = defineStore(LSKey.Setting, () => {
   const setting = useLocalStorage<Setting>(LSKey.Setting, Setting.defaultValue);
   Setting.migrate(setting.value);
 
   const cc = ref(defaultConverter);
+
+  watch(
+    () => i18nGlobal.locale.value,
+    (locale) => {
+      // Only sync if locale is valid
+      if (locale === 'vi' || locale === 'zh') {
+        try {
+          syncSettingOptionLabels();
+        } catch (error) {
+          console.warn('Failed to sync setting option labels:', error);
+        }
+      }
+    },
+    { immediate: true },
+  );
 
   watch(
     () => setting.value.locale,

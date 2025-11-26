@@ -10,8 +10,10 @@ import {
   WarningAmberOutlined,
 } from '@vicons/material';
 import type { DropdownOption } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 import type { Draft } from '@/stores';
+import { useLocaleStore } from '@/stores';
 
 const props = defineProps<{
   elTextarea?: HTMLTextAreaElement;
@@ -27,26 +29,36 @@ const emit = defineEmits<{
 // ==============================
 
 const draftOptions = ref<DropdownOption[]>([]);
+const { t } = useI18n();
+const localeStore = useLocaleStore();
+const { locale } = storeToRefs(localeStore);
 
 watch(
-  props.drafts,
-  (drafts) => {
+  () => ({ drafts: props.drafts, selectedLocale: locale.value }),
+  ({ drafts, selectedLocale }) => {
+    const formatter = new Intl.DateTimeFormat(
+      selectedLocale === 'vi' ? 'vi-VN' : 'zh-CN',
+      { dateStyle: 'short', timeStyle: 'medium' },
+    );
     const draftOptionsValue: DropdownOption[] = [];
     for (const draft of drafts.slice().reverse()) {
       draftOptionsValue.push({
-        label: draft.createdAt.toLocaleString('zh-CN'),
+        label: formatter.format(draft.createdAt),
         key: draft.createdAt.getTime(),
         draftText: draft.text,
       });
     }
-    draftOptionsValue.push({ type: 'divider' }, { label: '清空', key: '清空' });
+    draftOptionsValue.push(
+      { type: 'divider' },
+      { label: t('components.markdownToolbar.clear'), key: 'clear' },
+    );
     draftOptions.value = draftOptionsValue;
   },
   { immediate: true },
 );
 
 const handleSelectDraft = (key: string, option: DropdownOption) => {
-  if (key === '清空') {
+  if (key === 'clear') {
     emit('clearDraft');
   } else {
     const { elTextarea } = props;
@@ -132,15 +144,29 @@ const insert = (text: string) => {
   });
 };
 
-const formatBold = () => warp('**', '**', '粗体');
-const formatItalic = () => warp('*', '*', '斜体');
-const formatStrikethrough = () => warp('~~', '~~', '删除线');
-const formatLink = () => warp('[', '](链接)', '');
-const formatSpoiler = () => warp('!!', '!!', '剧透');
+const formatBold = () =>
+  warp('**', '**', t('components.markdownToolbar.placeholders.bold'));
+const formatItalic = () =>
+  warp('*', '*', t('components.markdownToolbar.placeholders.italic'));
+const formatStrikethrough = () =>
+  warp('~~', '~~', t('components.markdownToolbar.placeholders.strike'));
+const formatLink = () =>
+  warp(
+    '[',
+    `](${t('components.markdownToolbar.placeholders.linkUrl')})`,
+    t('components.markdownToolbar.actions.link'),
+  );
+const formatSpoiler = () =>
+  warp('!!', '!!', t('components.markdownToolbar.placeholders.spoiler'));
 
 const formatStar = () => insert('::: star 5');
 const formatCollapsibleBlock = () =>
-  warp('::: details 点击展开\n', '\n:::', '折叠内容', false);
+  warp(
+    t('components.markdownToolbar.collapsePrefix'),
+    '\n:::',
+    t('components.markdownToolbar.placeholders.collapse'),
+    false,
+  );
 </script>
 
 <template>
@@ -151,48 +177,50 @@ const formatCollapsibleBlock = () =>
     @select="handleSelectDraft"
   >
     <n-button size="small" quaternary>
-      <n-badge :value="drafts.length" dot :offset="[8, -4]">草稿</n-badge>
+      <n-badge :value="drafts.length" dot :offset="[8, -4]">
+        {{ t('components.markdownToolbar.drafts') }}
+      </n-badge>
     </n-button>
   </n-dropdown>
 
   <MarkdownToolbarButton
-    label="粗体"
+    :label="t('components.markdownToolbar.actions.bold')"
     :icon="FormatBoldOutlined"
     @action="formatBold"
   />
   <MarkdownToolbarButton
-    label="斜体"
+    :label="t('components.markdownToolbar.actions.italic')"
     :icon="FormatItalicOutlined"
     @action="formatItalic"
   />
   <MarkdownToolbarButton
-    label="删除线"
+    :label="t('components.markdownToolbar.actions.strike')"
     :icon="StrikethroughSOutlined"
     @action="formatStrikethrough"
   />
   <MarkdownToolbarButton
-    label="链接"
+    :label="t('components.markdownToolbar.actions.link')"
     :icon="LinkOutlined"
     @action="formatLink"
   />
   <MarkdownToolbarButton
-    label="剧透"
+    :label="t('components.markdownToolbar.actions.spoiler')"
     :icon="WarningAmberOutlined"
     @action="formatSpoiler"
   />
   <n-divider vertical />
   <MarkdownToolbarButton
-    label="评分"
+    :label="t('components.markdownToolbar.actions.rating')"
     :icon="StarOutlineFilled"
     @action="formatStar"
   />
   <MarkdownToolbarButton
-    label="折叠"
+    :label="t('components.markdownToolbar.actions.collapse')"
     :icon="MenuOpenOutlined"
     @action="formatCollapsibleBlock"
   />
   <MarkdownToolbarButton
-    label="格式帮助"
+    :label="t('components.markdownToolbar.actions.help')"
     :icon="HelpOutlineOutlined"
     @action="() => (showGuideModal = true)"
   />

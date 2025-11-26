@@ -9,6 +9,7 @@ import {
   SettingsOutlined,
   StopOutlined,
 } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import type { TranslatorConfig } from '@/domain/translate';
 import { Translator } from '@/domain/translate';
@@ -36,6 +37,7 @@ const emit = defineEmits<{
 }>();
 
 const message = useMessage();
+const { t } = useI18n();
 
 const translatorConfig = computed(() => {
   const worker = props.worker;
@@ -148,20 +150,27 @@ const testWorker = async () => {
     const lineZh = textZh[0];
 
     if (worker.translatorId === 'gpt') {
-      message.success(`原文：${lineJp}\n译文：${lineZh}`);
-    } else {
       message.success(
-        [
-          `原文：${lineJp}`,
-          `译文：${lineZh}`,
-          `模型：${translator.sakuraModel()} ${
-            translator.allowUpload() ? '允许上传' : '禁止上传'
-          }`,
-        ].join('\n'),
+        t('workspace.jobWorker.testSuccessGpt', {
+          jp: lineJp,
+          zh: lineZh,
+        }),
+      );
+    } else {
+      const uploadLabel = translator.allowUpload()
+        ? t('workspace.jobWorker.uploadAllowed')
+        : t('workspace.jobWorker.uploadForbidden');
+      message.success(
+        t('workspace.jobWorker.testSuccessSakura', {
+          jp: lineJp,
+          zh: lineZh,
+          model: translator.sakuraModel(),
+          upload: uploadLabel,
+        }),
       );
     }
   } catch (e: unknown) {
-    message.error(`翻译器错误：${e}`);
+    message.error(t('workspace.jobWorker.testError', { error: String(e) }));
   }
 };
 
@@ -197,7 +206,7 @@ const showEditWorkerModal = ref(false);
       <n-flex :size="6" :wrap="false">
         <c-button
           v-if="running"
-          label="停止"
+          :label="t('workspace.jobWorker.stop')"
           :icon="StopOutlined"
           size="tiny"
           secondary
@@ -205,7 +214,7 @@ const showEditWorkerModal = ref(false);
         />
         <c-button
           v-else
-          label="启动"
+          :label="t('workspace.jobWorker.start')"
           :icon="PlayArrowOutlined"
           size="tiny"
           secondary
@@ -213,32 +222,32 @@ const showEditWorkerModal = ref(false);
         />
 
         <c-icon-button
-          tooltip="测试"
+          :tooltip="t('workspace.jobWorker.test')"
           :icon="FlashOnOutlined"
           @action="testWorker"
         />
 
         <c-icon-button
-          tooltip="设置"
+          :tooltip="t('workspace.jobWorker.settings')"
           :icon="SettingsOutlined"
           @action="showEditWorkerModal = !showEditWorkerModal"
         />
 
         <c-icon-button
           v-if="enableAutoMode"
-          tooltip="自动翻译下个任务：已启动"
+          :tooltip="t('workspace.jobWorker.autoOn')"
           :icon="FontDownloadOutlined"
           @action="enableAutoMode = false"
         />
         <c-icon-button
           v-else
-          tooltip="自动翻译下个任务：已关闭"
+          :tooltip="t('workspace.jobWorker.autoOff')"
           :icon="FontDownloadOffOutlined"
           @action="enableAutoMode = true"
         />
 
         <c-icon-button
-          tooltip="删除"
+          :tooltip="t('workspace.jobWorker.delete')"
           :icon="DeleteOutlineOutlined"
           type="error"
           @action="deleteWorker"

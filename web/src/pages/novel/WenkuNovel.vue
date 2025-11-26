@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { EditNoteOutlined, LanguageOutlined } from '@vicons/material';
 import { createReusableTemplate } from '@vueuse/core';
+import { useI18n } from 'vue-i18n';
 
 import { WenkuNovelRepo } from '@/repos';
 import coverPlaceholder from '@/image/cover_placeholder.png';
@@ -8,6 +9,8 @@ import { GenericNovelId } from '@/model/Common';
 import { doAction, useIsWideScreen } from '@/pages/util';
 import { useSettingStore, useWhoamiStore } from '@/stores';
 import type { VolumeJpDto } from '@/model/WenkuNovel';
+
+const { t } = useI18n();
 
 const { novelId } = defineProps<{ novelId: string }>();
 
@@ -37,7 +40,7 @@ watch(novel, (novel) => {
 const translateOptions = useTemplateRef('translateOptions');
 
 const deleteVolume = (volumeId: string) =>
-  doAction(WenkuNovelRepo.deleteVolume(novelId, volumeId), '删除', message);
+  doAction(WenkuNovelRepo.deleteVolume(novelId, volumeId), t('novel.wenkuNovel.delete'), message);
 
 const buildSearchLink = (tag: string) => `/wenku?query="${tag}"`;
 
@@ -119,13 +122,13 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
               </b>
             </n-h2>
 
-            <ReuseTagGroup label="作者" :tags="novel.authors" />
-            <ReuseTagGroup label="画师" :tags="novel.artists" />
+            <ReuseTagGroup :label="t('novel.wenkuNovel.author')" :tags="novel.authors" />
+            <ReuseTagGroup :label="t('novel.wenkuNovel.artist')" :tags="novel.artists" />
             <ReuseTagGroup
-              label="出版"
+              :label="t('novel.wenkuNovel.publish')"
               :tags="[
-                novel.publisher ?? '未知出版商',
-                novel.imprint ?? '未知文库',
+                novel.publisher ?? t('novel.wenkuNovel.unknownPublisher'),
+                novel.imprint ?? t('novel.wenkuNovel.unknownImprint'),
               ]"
             />
           </n-flex>
@@ -141,7 +144,7 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
           v-if="whoami.allowAdvancedFeatures"
           :to="`/wenku-edit/${novelId}`"
         >
-          <c-button label="编辑" :icon="EditNoteOutlined" />
+          <c-button :label="t('novel.wenkuNovel.edit')" :icon="EditNoteOutlined" />
         </router-link>
 
         <favorite-button
@@ -151,13 +154,13 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
 
         <c-button
           v-if="novel.webIds.length > 0"
-          label="网络"
+          :label="t('novel.wenkuNovel.web')"
           :icon="LanguageOutlined"
           @action="showWebNovelsModal = true"
         />
 
         <c-modal
-          title="相关网络小说"
+          :title="t('novel.wenkuNovel.relatedWebNovel')"
           v-model:show="showWebNovelsModal"
           :extra-height="100"
         >
@@ -171,9 +174,9 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
         </c-modal>
       </n-flex>
 
-      <n-p>原名：{{ novel.title }}</n-p>
+      <n-p>{{ t('novel.wenkuNovel.originalTitle') }}：{{ novel.title }}</n-p>
       <n-p v-if="novel.latestPublishAt">
-        最新出版于
+        {{ t('novel.wenkuNovel.latestPublishedAt') }}
         <n-time :time="novel.latestPublishAt * 1000" type="date" />
       </n-p>
       <!-- eslint-disable-next-line vue/no-v-html -->
@@ -208,7 +211,7 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
         </c-x-scrollbar>
       </template>
 
-      <section-header title="目录" />
+      <section-header :title="t('novel.wenkuNovel.catalog')" />
       <template v-if="whoami.isSignedIn">
         <upload-button :allow-zh="whoami.isAdmin" :novel-id="novelId" />
 
@@ -249,8 +252,8 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
 
               <c-button-confirm
                 v-if="whoami.asAdmin"
-                :hint="`真的要删除《${volumeId}》吗？`"
-                label="删除"
+                :hint="t('novel.wenkuNovel.deleteConfirm', { volumeId })"
+                :label="t('novel.wenkuNovel.delete')"
                 text
                 type="error"
                 style="margin-left: 16px"
@@ -262,7 +265,7 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
 
         <n-empty
           v-if="novel.volumeJp.length === 0 && novel.volumeZh.length === 0"
-          description="请不要创建一个空页面"
+          :description="t('novel.wenkuNovel.emptyPageWarning')"
         />
 
         <n-empty
@@ -271,10 +274,10 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
             novel.volumeJp.length === 0 &&
             novel.volumeZh.length > 0
           "
-          description="网站已撤下中文小说板块，请上传日文生成翻译"
+          :description="t('novel.wenkuNovel.chineseRemoved')"
         />
       </template>
-      <n-p v-else>游客无法查看内容，请先登录。</n-p>
+      <n-p v-else>{{ t('novel.wenkuNovel.guestMessage') }}</n-p>
 
       <comment-list
         v-if="!setting.hideCommmentWenkuNovel"
@@ -286,7 +289,7 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
     <n-result
       v-else-if="error"
       status="error"
-      title="加载错误"
+      :title="t('novel.wenkuNovel.loadError')"
       :description="error.message"
     />
   </div>

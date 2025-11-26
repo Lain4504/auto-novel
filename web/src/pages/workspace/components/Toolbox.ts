@@ -1,3 +1,4 @@
+import { i18nGlobal } from '@/locales';
 import { downloadFile } from '@/util';
 import type { ParsedFile } from '@/util/file';
 
@@ -20,7 +21,10 @@ export namespace Toolbox {
       );
       await writer.close();
       const zipBlob = await zipBlobWriter.getData();
-      downloadFile(`工具箱打包下载[${files.length}].zip`, zipBlob);
+      const zipName = i18nGlobal.t('workspace.toolbox.zipName', {
+        count: files.length,
+      });
+      downloadFile(zipName, zipBlob);
     }
   };
 

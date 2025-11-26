@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import { UploadOutlined } from '@vicons/material';
 import type { FormInst, FormItemRule, FormRules } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 import { ArticleRepo } from '@/repos';
 import type { ArticleCategory } from '@/model/Article';
 import { doAction, useIsWideScreen } from '@/pages/util';
 import { useDraftStore, useWhoamiStore } from '@/stores';
+
+const { t } = useI18n();
 
 const { articleId, category } = defineProps<{
   articleId: string | undefined;
@@ -22,16 +25,18 @@ const { whoami } = storeToRefs(whoamiStore);
 const draftStore = useDraftStore();
 const draftId = `article-${articleId ?? 'new'}`;
 
-const articleCategoryOptions = whoami.value.asAdmin
-  ? [
-      { value: 'General', label: '小说交流' },
-      { value: 'Guide', label: '使用指南' },
-      { value: 'Support', label: '反馈与建议' },
-    ]
-  : [
-      { value: 'General', label: '小说交流' },
-      { value: 'Support', label: '反馈与建议' },
-    ];
+const articleCategoryOptions = computed(() =>
+  whoami.value.asAdmin
+    ? [
+        { value: 'General', label: t('forum.categories.general') },
+        { value: 'Guide', label: t('forum.categories.guide') },
+        { value: 'Support', label: t('forum.categories.support') },
+      ]
+    : [
+        { value: 'General', label: t('forum.categories.general') },
+        { value: 'Support', label: t('forum.categories.support') },
+      ],
+);
 
 const allowSubmit = ref(articleId === undefined);
 const formRef = useTemplateRef<FormInst>('form');
@@ -45,12 +50,12 @@ const formRules: FormRules = {
     {
       validator: (_rule: FormItemRule, value: string) =>
         value.trim().length >= 2,
-      message: '标题长度不能少于2个字符',
+      message: t('forum.articleEdit.titleMinLength'),
       trigger: 'input',
     },
     {
       validator: (_rule: FormItemRule, value: string) => value.length <= 80,
-      message: '标题长度不能超过80个字符',
+      message: t('forum.articleEdit.titleMaxLength'),
       trigger: 'input',
     },
   ],
@@ -58,12 +63,12 @@ const formRules: FormRules = {
     {
       validator: (_rule: FormItemRule, value: string) =>
         value.trim().length >= 2,
-      message: '正文长度不能少于2个字符',
+      message: t('forum.articleEdit.contentMinLength'),
       trigger: 'input',
     },
     {
       validator: (_rule: FormItemRule, value: string) => value.length <= 20_000,
-      message: '正文长度不能超过2万个字符',
+      message: t('forum.articleEdit.contentMaxLength'),
       trigger: 'input',
     },
   ],
@@ -71,7 +76,7 @@ const formRules: FormRules = {
     {
       validator: (_rule: FormItemRule, value: string | undefined) =>
         value !== undefined,
-      message: '未选择要发表的版块',
+      message: t('forum.articleEdit.categoryRequired'),
       trigger: 'input',
     },
   ],
@@ -89,14 +94,14 @@ if (articleId !== undefined) {
         };
         allowSubmit.value = true;
       } else {
-        message.error(`载入失败: ${error?.message}`);
+        message.error(t('forum.articleEdit.loadFailed', { message: error?.message }));
       }
     });
 }
 
 const submit = async () => {
   if (!allowSubmit.value) {
-    message.warning('文章未载入，无法提交');
+    message.warning(t('forum.articleEdit.notLoaded'));
     return;
   }
 
@@ -112,7 +117,7 @@ const submit = async () => {
         draftStore.removeDraft(draftId);
         router.push({ path: `/forum/${id}` });
       }),
-      '发布',
+      t('forum.articleEdit.publish'),
       message,
     );
   } else {
@@ -121,7 +126,7 @@ const submit = async () => {
         draftStore.removeDraft(draftId);
         router.push({ path: `/forum/${articleId}` });
       }),
-      '更新',
+      t('forum.articleEdit.update'),
       message,
     );
   }
@@ -130,7 +135,7 @@ const submit = async () => {
 
 <template>
   <div class="layout-content">
-    <n-h1>{{ articleId === undefined ? '发布' : '编辑' }}文章</n-h1>
+    <n-h1>{{ articleId === undefined ? t('forum.articleEdit.publish') : t('forum.articleEdit.edit') }} {{ t('forum.articleEdit.article') }}</n-h1>
     <n-form
       ref="form"
       :model="formValue"
@@ -138,27 +143,27 @@ const submit = async () => {
       :label-placement="isWideScreen ? 'left' : 'top'"
       label-width="auto"
     >
-      <n-form-item-row path="title" label="标题">
+      <n-form-item-row path="title" :label="t('forum.articleEdit.title')">
         <n-input
           v-model:value="formValue.title"
-          placeholder="请输入标题"
+          :placeholder="t('forum.articleEdit.titlePlaceholder')"
           maxlength="80"
           show-count
           :input-props="{ spellcheck: false }"
         />
       </n-form-item-row>
-      <n-form-item-row path="category" label="版块">
+      <n-form-item-row path="category" :label="t('forum.articleEdit.category')">
         <c-radio-group
           v-model:value="formValue.category"
           :options="articleCategoryOptions"
         />
       </n-form-item-row>
-      <n-form-item-row path="content" label="正文">
+      <n-form-item-row path="content" :label="t('forum.articleEdit.content')">
         <MarkdownEditor
           mode="article"
           :draft-id="draftId"
           v-model:value="formValue.content"
-          placeholder="请输入正文"
+          :placeholder="t('forum.articleEdit.contentPlaceholder')"
           :autosize="{ minRows: 8 }"
           maxlength="20000"
           style="width: 100%"
@@ -167,7 +172,7 @@ const submit = async () => {
     </n-form>
 
     <c-button
-      label="提交"
+      :label="t('forum.articleEdit.submit')"
       :icon="UploadOutlined"
       require-login
       size="large"

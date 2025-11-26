@@ -7,6 +7,9 @@ import {
   ArrowUpwardOutlined,
   ArrowDownwardOutlined,
 } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps<{
   novelUrl?: string;
@@ -32,29 +35,29 @@ const router = useRouter();
       <n-flex size="large" vertical style="position: fixed; bottom: 20px">
         <side-button
           :disabled="!chapter.prevId"
-          text="上一章"
+          :text="t('reader.prevChapter')"
           :icon="ArrowUpwardOutlined"
           @click="emit('nav', chapter.prevId!)"
         />
         <side-button
           :disabled="!chapter.nextId"
-          text="下一章"
+          :text="t('reader.nextChapter')"
           :icon="ArrowDownwardOutlined"
           @click="emit('nav', chapter.nextId!)"
         />
         <side-button
           v-if="novelUrl"
-          text="详情"
+          :text="t('reader.details')"
           :icon="LibraryBooksOutlined"
           @click="router.push(novelUrl)"
         />
         <side-button
-          text="目录"
+          :text="t('reader.catalog')"
           :icon="FormatListBulletedOutlined"
           @click="emit('requireCatalogModal')"
         />
         <side-button
-          text="设置"
+          :text="t('reader.settings')"
           :icon="TuneOutlined"
           @click="emit('requireSettingModal')"
         />

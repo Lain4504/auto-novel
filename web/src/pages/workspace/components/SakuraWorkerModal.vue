@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { FormInst, FormItemRule, FormRules } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 import type { SakuraWorker } from '@/model/Translator';
 import { useSakuraWorkspaceStore } from '@/stores';
@@ -14,6 +15,7 @@ const emit = defineEmits<{
 
 const workspace = useSakuraWorkspaceStore();
 const workspaceRef = workspace.ref;
+const { t } = useI18n();
 
 const initFormValue = () => {
   const worker = props.worker;
@@ -35,7 +37,7 @@ const formRules: FormRules = {
   id: [
     {
       validator: (rule: FormItemRule, value: string) => value.trim().length > 0,
-      message: '名字不能为空',
+      message: t('workspace.sakuraWorker.validation.nameRequired'),
       trigger: 'input',
     },
     {
@@ -43,14 +45,14 @@ const formRules: FormRules = {
         workspaceRef.value.workers
           .filter(({ id }) => id !== props.worker?.id)
           .find(({ id }) => id === value) === undefined,
-      message: '名字不能重复',
+      message: t('workspace.sakuraWorker.validation.nameDuplicate'),
       trigger: 'input',
     },
   ],
   endpoint: [
     {
       validator: (rule: FormItemRule, value: string) => value.trim().length > 0,
-      message: '链接不能为空',
+      message: t('workspace.sakuraWorker.validation.endpointRequired'),
       trigger: 'input',
     },
     {
@@ -62,7 +64,7 @@ const formRules: FormRules = {
           return false;
         }
       },
-      message: '链接不合法',
+      message: t('workspace.sakuraWorker.validation.endpointInvalid'),
       trigger: 'input',
     },
   ],
@@ -92,14 +94,23 @@ const submit = async () => {
   }
 };
 
-const verb = computed(() => (props.worker === undefined ? '添加' : '更新'));
+const verb = computed(() =>
+  props.worker === undefined
+    ? t('workspace.sakuraWorker.add')
+    : t('workspace.sakuraWorker.update'),
+);
+const modalTitle = computed(() =>
+  props.worker === undefined
+    ? t('workspace.sakuraWorker.modalTitleAdd')
+    : t('workspace.sakuraWorker.modalTitleUpdate'),
+);
 </script>
 
 <template>
   <c-modal
     :show="show"
     @update:show="$emit('update:show', $event)"
-    :title="verb + 'Sakura翻译器'"
+    :title="modalTitle"
   >
     <n-form
       ref="form"
@@ -108,22 +119,28 @@ const verb = computed(() => (props.worker === undefined ? '添加' : '更新'));
       label-placement="left"
       label-width="auto"
     >
-      <n-form-item-row path="id" label="名字">
+      <n-form-item-row path="id" :label="t('workspace.sakuraWorker.fieldName')">
         <n-input
           v-model:value="formValue.id"
-          placeholder="给你的翻译器起个名字"
+          :placeholder="t('workspace.sakuraWorker.placeholderName')"
           :input-props="{ spellcheck: false }"
         />
       </n-form-item-row>
-      <n-form-item-row path="endpoint" label="链接">
+      <n-form-item-row
+        path="endpoint"
+        :label="t('workspace.sakuraWorker.fieldEndpoint')"
+      >
         <n-input
           v-model:value="formValue.endpoint"
-          placeholder="翻译器的链接"
+          :placeholder="t('workspace.sakuraWorker.placeholderEndpoint')"
           :input-props="{ spellcheck: false }"
         />
       </n-form-item-row>
 
-      <n-form-item-row path="segLength" label="分段长度">
+      <n-form-item-row
+        path="segLength"
+        :label="t('workspace.sakuraWorker.fieldSegLength')"
+      >
         <n-input-number
           v-model:value="formValue.segLength"
           :show-button="false"
@@ -131,7 +148,10 @@ const verb = computed(() => (props.worker === undefined ? '添加' : '更新'));
         />
       </n-form-item-row>
 
-      <n-form-item-row path="prevSegLength" label="前文长度">
+      <n-form-item-row
+        path="prevSegLength"
+        :label="t('workspace.sakuraWorker.fieldPrevSegLength')"
+      >
         <n-input-number
           v-model:value="formValue.prevSegLength"
           :show-button="false"
@@ -140,18 +160,22 @@ const verb = computed(() => (props.worker === undefined ? '添加' : '更新'));
       </n-form-item-row>
 
       <n-text type="error" style="font-size: 12px">
-        # 前文长度是临时功能，非默认500无法上传
+        {{ t('workspace.sakuraWorker.tipPrev') }}
       </n-text>
       <br />
       <n-text depth="3" style="font-size: 12px">
-        # 分段长度还在测试中，非默认500无法上传
+        {{ t('workspace.sakuraWorker.tipSeg') }}
         <br />
-        # 链接例子：http://127.0.0.1:8080
+        {{ t('workspace.sakuraWorker.tipExample') }}
       </n-text>
     </n-form>
 
     <template #action>
-      <c-button :label="verb" type="primary" @action="submit" />
+      <c-button
+        :label="t('workspace.sakuraWorker.submit')"
+        type="primary"
+        @action="submit"
+      />
     </template>
   </c-modal>
 </template>

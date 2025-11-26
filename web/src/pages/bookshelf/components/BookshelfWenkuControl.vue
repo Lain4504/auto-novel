@@ -1,6 +1,10 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import type { WenkuNovelOutlineDto } from '@/model/WenkuNovel';
 import { FavoredRepo } from '@/stores';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   selectedNovels: WenkuNovelOutlineDto[];
@@ -22,7 +26,7 @@ const showDeleteModal = ref(false);
 const openDeleteModal = () => {
   const novels = props.selectedNovels;
   if (novels.length === 0) {
-    message.info('没有选中小说');
+    message.info(t('workspace.localVolume.noneSelected'));
     return;
   }
   showDeleteModal.value = true;
@@ -43,7 +47,7 @@ const deleteSelected = async () => {
   }
   const success = novels.length - failed;
 
-  message.info(`${success}本小说被删除，${failed}本失败`);
+  message.info(t('workspace.localVolume.deleteResult', { success, failed }));
 };
 
 // 移动小说
@@ -52,12 +56,12 @@ const targetFavoredId = ref(props.favoredId);
 const moveToFavored = async () => {
   const novels = props.selectedNovels;
   if (novels.length === 0) {
-    message.info('没有选中小说');
+    message.info(t('workspace.localVolume.noneSelected'));
     return;
   }
 
   if (targetFavoredId.value === props.favoredId) {
-    message.info('无需移动');
+    message.info(t('bookshelf.wenku.moveDisabled'));
     return;
   }
 
@@ -74,7 +78,7 @@ const moveToFavored = async () => {
   }
   const success = novels.length - failed;
 
-  message.info(`${success}本小说已移动，${failed}本失败`);
+  message.info(t('workspace.localVolume.deleteResult', { success, failed }));
   window.location.reload();
 };
 </script>
@@ -86,19 +90,19 @@ const moveToFavored = async () => {
         <n-flex align="baseline">
           <n-button-group size="small">
             <c-button
-              label="全选"
+              :label="t('bookshelf.wenku.selectAll')"
               :round="false"
               @action="$emit('selectAll')"
             />
             <c-button
-              label="反选"
+              :label="t('bookshelf.wenku.invertSelection')"
               :round="false"
               @action="$emit('invertSelection')"
             />
           </n-button-group>
 
           <c-button
-            label="删除"
+            :label="t('bookshelf.wenku.delete')"
             secondary
             :round="false"
             size="small"
@@ -106,31 +110,29 @@ const moveToFavored = async () => {
             @click="openDeleteModal"
           />
           <c-modal
-            :title="`确定删除 ${
-              selectedNovels.length === 1
-                ? selectedNovels[0].titleZh ?? selectedNovels[0].title
-                : `${selectedNovels.length}本小说`
-            }？`"
+            :title="selectedNovels.length === 1
+              ? t('bookshelf.wenku.deleteConfirmSingle', { name: selectedNovels[0].titleZh ?? selectedNovels[0].title })
+              : t('bookshelf.wenku.deleteConfirmMultiple', { count: selectedNovels.length })"
             v-model:show="showDeleteModal"
           >
             <template #action>
-              <c-button label="确定" type="primary" @action="deleteSelected" />
+              <c-button :label="t('bookshelf.wenku.confirm')" type="primary" @action="deleteSelected" />
             </template>
           </c-modal>
         </n-flex>
-        <n-text depth="3">已选择{{ selectedNovels.length }}本小说</n-text>
+        <n-text depth="3">{{ t('bookshelf.wenku.selected', { count: selectedNovels.length }) }}</n-text>
       </n-flex>
     </n-list-item>
 
     <n-list-item v-if="favoreds.wenku.length > 1">
-      <n-p>移动小说功能暂时关闭</n-p>
+      <n-p>{{ t('bookshelf.wenku.moveDisabled') }}</n-p>
       <n-flex v-if="false" vertical>
-        <b>移动小说（低配版，很慢，等到显示移动完成）</b>
+        <b>{{ t('bookshelf.wenku.moveTitle') }}</b>
 
         <n-radio-group v-model:value="targetFavoredId">
           <n-flex align="center">
             <c-button
-              label="移动"
+              :label="t('bookshelf.wenku.move')"
               size="small"
               :round="false"
               @action="moveToFavored"

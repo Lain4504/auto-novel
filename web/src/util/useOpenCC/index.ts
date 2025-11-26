@@ -1,4 +1,4 @@
-type Locale = 'zh-cn' | 'zh-tw';
+type Locale = 'vi' | 'zh';
 
 type Converter = {
   toView: (text: string) => string;
@@ -11,22 +11,7 @@ export const defaultConverter: Converter = {
 };
 
 export async function useOpenCC(locale: Locale) {
-  if (locale === 'zh-cn') {
-    return defaultConverter;
-  } else if (locale === 'zh-tw') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const opencc: any = await import('opencc-js');
-    const ccLocale = opencc.Locale;
-    const customDict = [
-      ['託', '托'],
-      ['孃', '娘'],
-    ];
-    return {
-      toView: opencc.ConverterFactory(ccLocale.from.cn, ccLocale.to.tw, [
-        customDict,
-      ]),
-      toData: opencc.ConverterFactory(ccLocale.from.tw, ccLocale.to.cn),
-    };
-  }
-  return locale satisfies never;
+  // Both Vietnamese and Chinese (simplified) use default converter
+  // No character conversion needed
+  return defaultConverter;
 }

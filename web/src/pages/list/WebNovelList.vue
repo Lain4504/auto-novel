@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import { WebNovelRepo } from '@/repos';
 import { FavoredRepo, useWhoamiStore } from '@/stores';
 import type { WebListValue } from './option';
@@ -8,6 +10,8 @@ import {
   onUpdatePage,
   parseWebListValueProvider,
 } from './option';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   page: number;
@@ -61,7 +65,7 @@ watch(novelPage, (novelPage) => {
 
 <template>
   <div class="layout-content">
-    <n-h1>网络小说</n-h1>
+    <n-h1>{{ t('list.webNovel.title') }}</n-h1>
 
     <ListFilter
       :options="listOptions"
@@ -77,11 +81,11 @@ watch(novelPage, (novelPage) => {
       <template v-if="novelPage">
         <n-divider />
         <NovelListWeb :items="novelPage.items" />
-        <n-empty v-if="novelPage.items.length === 0" description="空列表" />
+        <n-empty v-if="novelPage.items.length === 0" :description="t('list.webNovel.empty')" />
         <n-divider />
       </template>
 
-      <CResultX v-else :error="error" title="加载错误" />
+      <CResultX v-else :error="error" :title="t('list.webNovel.loadError')" />
     </CPage>
   </div>
 </template>

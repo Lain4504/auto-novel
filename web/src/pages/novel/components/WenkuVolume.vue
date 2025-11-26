@@ -1,12 +1,15 @@
 <script lang="ts" setup>
 import { FileDownloadOutlined } from '@vicons/material';
 import { useKeyModifier } from '@vueuse/core';
+import { useI18n } from 'vue-i18n';
 
 import { WenkuNovelApi } from '@/api';
 import type { TranslateTaskParams } from '@/model/Translator';
 import { TranslateTaskDescriptor } from '@/model/Translator';
 import type { VolumeJpDto } from '@/model/WenkuNovel';
 import { useSettingStore, useWhoamiStore, useWorkspaceStore } from '@/stores';
+
+const { t } = useI18n();
 
 const { novelId, volume, getParams } = defineProps<{
   novelId: string;
@@ -63,12 +66,12 @@ const submitJob = (id: 'gpt' | 'sakura') => {
   };
   const success = workspace.addJob(job);
   if (success) {
-    message.success('排队成功');
+    message.success(t('workspace.specific.queueSuccess'));
     if (shouldTopJob.value) {
       workspace.topJob(job);
     }
   } else {
-    message.error('排队失败：翻译任务已经存在');
+    message.error(t('workspace.specific.queueExists'));
   }
 };
 </script>
@@ -79,21 +82,21 @@ const submitJob = (id: 'gpt' | 'sakura') => {
       <n-text>{{ volume.volumeId }}</n-text>
 
       <n-text depth="3">
-        总计 {{ volume.total }} / 百度 {{ volume.baidu }} / 有道
-        {{ volume.youdao }} / GPT {{ volume.gpt }} / Sakura {{ volume.sakura }}
+        {{ t('home.panelTotal') }} {{ volume.total }} / {{ t('home.panelBaidu') }} {{ volume.baidu }} / {{ t('home.panelYoudao') }}
+        {{ volume.youdao }} / {{ t('home.panelGpt') }} {{ volume.gpt }} / {{ t('home.panelSakura') }} {{ volume.sakura }}
       </n-text>
 
       <n-flex :size="8">
         <c-button
           v-if="setting.enabledTranslator.includes('baidu')"
-          label="更新百度"
+          :label="t('novel.wenkuVolume.updateBaidu')"
           size="tiny"
           secondary
           @action="startTranslateTask('baidu')"
         />
         <c-button
           v-if="setting.enabledTranslator.includes('youdao')"
-          label="更新有道"
+          :label="t('novel.wenkuVolume.updateYoudao')"
           size="tiny"
           secondary
           @action="startTranslateTask('youdao')"
@@ -101,22 +104,22 @@ const submitJob = (id: 'gpt' | 'sakura') => {
 
         <c-button
           v-if="setting.enabledTranslator.includes('gpt')"
-          label="排队GPT"
+          :label="t('novel.wenkuVolume.queueGpt')"
           size="tiny"
           secondary
           @action="submitJob('gpt')"
         />
         <c-button
           v-if="setting.enabledTranslator.includes('sakura')"
-          label="排队Sakura"
+          :label="t('novel.wenkuVolume.queueSakura')"
           size="tiny"
           secondary
           @action="submitJob('sakura')"
         />
         <c-button-confirm
           v-if="whoami.asAdmin"
-          :hint="`真的要删除《${volume.volumeId}》吗？`"
-          label="删除"
+          :hint="t('novel.wenkuVolume.deleteConfirm', { volumeId: volume.volumeId })"
+          :label="t('novel.wenkuVolume.delete')"
           type="error"
           size="tiny"
           secondary
@@ -126,7 +129,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
     </n-flex>
 
     <c-button
-      label="下载"
+      :label="t('novel.wenkuVolume.download')"
       :icon="FileDownloadOutlined"
       tag="a"
       :href="file.url"

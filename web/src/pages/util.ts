@@ -5,6 +5,7 @@ import {
 import type { MessageApi } from 'naive-ui';
 
 import { formatError } from '@/api';
+import { i18nGlobal } from '@/locales';
 
 export const useIsWideScreen = (limit: number = 840) => {
   const { width } = useWindowSize();
@@ -41,10 +42,16 @@ export const doAction = (
 ) =>
   promise
     .then(() => {
-      message.info(label + '成功');
+      message.info(i18nGlobal.t('common.actionSuccess', { label }));
     })
     .catch(async (e) => {
-      message.error(label + '失败:' + (await formatError(e)));
+      const reason = await formatError(e);
+      message.error(
+        i18nGlobal.t('common.actionFailed', {
+          label,
+          reason,
+        }),
+      );
     });
 
 type KeyPredicate = (event: KeyboardEvent) => boolean;

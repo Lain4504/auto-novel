@@ -1,12 +1,15 @@
 <script lang="ts" setup>
 import { BookOutlined, EditNoteOutlined } from '@vicons/material';
 import { NA, NText } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 
 import type { WebNovelDto } from '@/model/WebNovel';
 import { useWhoamiStore } from '@/stores';
 import { WebUtil } from '@/util/web';
 
 import { useIsWideScreen } from '@/pages/util';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   providerId: string;
@@ -35,8 +38,8 @@ const labels = computed(() => {
   const labels = [
     props.novel.type,
     withPointDeco(readableNumber(props.novel.points)),
-    readableNumber(props.novel.totalCharacters) + ' 字',
-    readableNumber(props.novel.visited) + ' 浏览',
+    readableNumber(props.novel.totalCharacters) + ' ' + t('novel.webNovelMetadata.characters'),
+    readableNumber(props.novel.visited) + ' ' + t('novel.webNovelMetadata.views'),
   ]
     .filter(Boolean)
     .join(' / ');
@@ -91,7 +94,7 @@ const latestChapterCreateAt = computed(() => {
   </n-h3>
 
   <n-p v-if="novel.authors.length > 0">
-    作者：
+    {{ t('webNovelMetadata.author') }}：
     <template v-for="author in novel.authors" :key="author.name">
       <n-a :href="author.link">{{ author.name }}</n-a>
     </template>
@@ -103,16 +106,16 @@ const latestChapterCreateAt = computed(() => {
       :to="`/novel/${providerId}/${novelId}/${startReadChapter.chapter.chapterId}`"
     >
       <c-button
-        :label="startReadChapter.type === 'continue' ? '继续阅读' : '开始阅读'"
+        :label="startReadChapter.type === 'continue' ? t('webNovelMetadata.continueReading') : t('novel.webNovelMetadata.startReading')"
       />
     </router-link>
-    <c-button v-else label="开始阅读" disabled />
+    <c-button v-else :label="t('novel.webNovelMetadata.startReading')" disabled />
 
     <router-link
       v-if="whoami.allowAdvancedFeatures"
       :to="`/novel-edit/${providerId}/${novelId}`"
     >
-      <c-button label="编辑" :icon="EditNoteOutlined" />
+      <c-button :label="t('novel.webNovelMetadata.edit')" :icon="EditNoteOutlined" />
     </router-link>
 
     <favorite-button
@@ -121,7 +124,7 @@ const latestChapterCreateAt = computed(() => {
     />
 
     <router-link v-if="novel.wenkuId" :to="`/wenku/${novel.wenkuId}`">
-      <c-button label="文库" :icon="BookOutlined" />
+      <c-button :label="t('novel.webNovelMetadata.wenku')" :icon="BookOutlined" />
     </router-link>
   </n-flex>
 
@@ -131,14 +134,14 @@ const latestChapterCreateAt = computed(() => {
 
   <n-p>
     <template v-if="latestChapterCreateAt">
-      最近更新于
+      {{ t('webNovelMetadata.recentlyUpdated') }}
       <n-time :time="latestChapterCreateAt * 1000" type="date" />
       /
     </template>
-    <c-a :to="generateSearchUrl(novel.titleJp)">搜索标题</c-a>
+    <c-a :to="generateSearchUrl(novel.titleJp)">{{ t('webNovelMetadata.searchTitle') }}</c-a>
     <template v-if="novel.authors">
       /
-      <c-a :to="generateSearchUrl(novel.authors[0].name)">搜索作者</c-a>
+      <c-a :to="generateSearchUrl(novel.authors[0].name)">{{ t('webNovelMetadata.searchAuthor') }}</c-a>
     </template>
   </n-p>
 

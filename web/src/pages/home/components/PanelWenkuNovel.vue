@@ -1,10 +1,14 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import type { WenkuNovelOutlineDto } from '@/model/WenkuNovel';
 
 defineProps<{
   novels: WenkuNovelOutlineDto[] | undefined;
   error: Error | null;
 }>();
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -19,8 +23,8 @@ defineProps<{
         </router-link>
       </n-grid-item>
     </n-grid>
-    <n-empty v-if="novels.length === 0" description="空列表" />
+    <n-empty v-if="novels.length === 0" :description="t('home.panelEmpty')" />
   </template>
 
-  <CResultX v-else :error="error" title="加载错误" />
+  <CResultX v-else :error="error" :title="t('home.panelError')" />
 </template>

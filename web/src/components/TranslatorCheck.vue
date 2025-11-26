@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
 import type { TranslatorId } from '@/model/Translator';
 
 const props = defineProps<{
@@ -10,12 +11,16 @@ const emit = defineEmits<{
   'update:value': [TranslatorId[]];
 }>();
 
-const translationOptions: { label: string; value: TranslatorId }[] = [
-  { label: '百度', value: 'baidu' },
-  { label: '有道', value: 'youdao' },
-  { label: 'GPT', value: 'gpt' },
-  { label: 'Sakura', value: 'sakura' },
-];
+const { t } = useI18n();
+
+const translationOptions = computed<{ label: string; value: TranslatorId }[]>(
+  () => [
+    { label: t('components.translatorCheck.baidu'), value: 'baidu' },
+    { label: t('components.translatorCheck.youdao'), value: 'youdao' },
+    { label: t('components.translatorCheck.gpt'), value: 'gpt' },
+    { label: t('components.translatorCheck.sakura'), value: 'sakura' },
+  ],
+);
 
 const toggleTranslator = (id: TranslatorId) => {
   if (props.value.includes(id)) {

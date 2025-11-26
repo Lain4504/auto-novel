@@ -1,9 +1,13 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 import { Setting, useSettingStore } from '@/stores';
 import {
   BookshelfLocalUtil,
   useBookshelfLocalStore,
 } from '../BookshelfLocalStore';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   selectable?: boolean;
@@ -65,15 +69,15 @@ defineExpose({
 
 <template>
   <n-flex vertical>
-    <c-action-wrapper title="搜索">
+    <c-action-wrapper :title="t('bookshelf.local.search')">
       <search-input
         v-model:value="search"
-        placeholder="搜索文件名"
+        :placeholder="t('bookshelf.local.searchPlaceholder')"
         style="max-width: 400px"
       />
     </c-action-wrapper>
 
-    <c-action-wrapper title="排序" align="center">
+    <c-action-wrapper :title="t('bookshelf.local.sort')" align="center">
       <order-sort
         v-model:value="setting.localVolumeOrder"
         :options="Setting.localVolumeOrderOptions"
@@ -87,7 +91,7 @@ defineExpose({
 
   <n-empty
     v-else-if="sortedVolumes.length === 0"
-    description="没有文件"
+    :description="t('bookshelf.local.empty')"
     style="margin-top: 20px"
   />
 

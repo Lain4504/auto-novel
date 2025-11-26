@@ -4,6 +4,7 @@ import {
   KeyboardArrowUpRound,
   SortOutlined,
 } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import type { GenericNovelId } from '@/model/Common';
 import type { ReadableTocItem } from '@/pages/novel/components/common';
@@ -13,6 +14,8 @@ import { WebNovelRepo } from '@/repos';
 import { useLocalVolumeStore, useSettingStore } from '@/stores';
 import type { Result } from '@/util/result';
 import { Err, Ok, runCatching } from '@/util/result';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   show: boolean;
@@ -77,14 +80,14 @@ watch(
             });
             return Ok(tocItems);
           } else {
-            return Err('载入失败');
+            return Err(t('reader.catalogModal.loadFailed'));
           }
         };
 
         const getLocalToc = async (volumeId: string) => {
           const repo = await useLocalVolumeStore();
           const volume = await repo.getVolume(volumeId);
-          if (volume === undefined) throw Error('小说不存在');
+          if (volume === undefined) throw Error(t('reader.catalogModal.novelNotFound'));
           return volume.toc.map(
             (it, index) =>
               <TocItem>{
@@ -99,7 +102,7 @@ watch(
         if (gnid.type === 'web') {
           tocResult.value = await getWebToc(gnid.providerId, gnid.novelId);
         } else if (gnid.type === 'wenku') {
-          throw '不支持文库';
+          throw t('reader.catalogModal.wenkuNotSupported');
         } else {
           tocResult.value = await runCatching(getLocalToc(gnid.volumeId));
         }
@@ -128,18 +131,18 @@ const onTocItemClick = (item: ReadableTocItem) => {
   >
     <template #header>
       <div style="display: flex; align-items: baseline">
-        <span>目录</span>
+        <span>{{ t('novel.catalog.title') }}</span>
         <n-text
           v-if="tocNumber !== undefined"
           depth="3"
           style="font-size: 12px; margin-left: 12px"
         >
-          共{{ tocNumber }}章
+          {{ t('novel.catalog.totalChapters', { count: tocNumber }) }}
         </n-text>
         <div style="flex: 1" />
         <c-button
           v-if="hasSeparators"
-          :label="isAnyExpanded ? '折叠' : '展开'"
+          :label="isAnyExpanded ? t('novel.catalog.collapse') : t('novel.catalog.expand')"
           :icon="isAnyExpanded ? KeyboardArrowUpRound : KeyboardArrowDownRound"
           quaternary
           size="small"
@@ -148,7 +151,7 @@ const onTocItemClick = (item: ReadableTocItem) => {
           style="margin-right: 8px"
         />
         <c-button
-          :label="setting.tocSortReverse ? '倒序' : '正序'"
+          :label="setting.tocSortReverse ? t('novel.catalog.reverseOrder') : t('novel.catalog.normalOrder')"
           :icon="SortOutlined"
           quaternary
           size="small"

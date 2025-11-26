@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { CommentOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import { CommentRepo } from '@/repos';
 import { useDraftStore } from '@/stores';
@@ -30,32 +31,33 @@ function onReplied() {
   draftStore.removeDraft(draftId);
 }
 
+const { t } = useI18n();
 const showInput = ref(false);
 </script>
 
 <template>
   <div ref="anchor" />
   <SectionHeader
-    title="评论"
+    :title="t('components.commentList.title')"
     ref="commentSectionRef"
     style="margin-bottom: 32px"
   >
     <c-button
       v-if="!locked"
-      label="发表评论"
+      :label="t('components.commentList.create')"
       :icon="CommentOutlined"
       require-login
       @action="showInput = !showInput"
     />
   </SectionHeader>
 
-  <n-p v-if="locked">评论区已锁定，不能再回复。</n-p>
+  <n-p v-if="locked">{{ t('components.commentList.locked') }}</n-p>
 
   <template v-if="showInput">
     <CommentEditor
       :site="site"
       :draft-id="draftId"
-      :placeholder="`发表回复`"
+      :placeholder="t('components.commentList.replyPlaceholder')"
       @replied="onReplied()"
       @cancel="showInput = false"
     />
@@ -70,10 +72,14 @@ const showInput = ref(false);
       </template>
       <n-empty
         v-if="commentPage.items.length === 0 && !locked"
-        description="暂无评论"
+        :description="t('components.commentList.empty')"
       />
     </template>
 
-    <CResultX v-else :error="error" title="加载错误" />
+    <CResultX
+      v-else
+      :error="error"
+      :title="t('components.commentList.loadError')"
+    />
   </CPage>
 </template>

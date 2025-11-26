@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { FileDownloadOutlined, MoreVertOutlined } from '@vicons/material';
+import { useI18n } from 'vue-i18n';
 
 import type { LocalVolumeMetadata } from '@/model/LocalVolume';
 import {
@@ -18,6 +19,7 @@ const emit = defineEmits<{
 }>();
 
 const message = useMessage();
+const { t } = useI18n();
 
 const settingStore = useSettingStore();
 const { setting } = storeToRefs(settingStore);
@@ -27,15 +29,21 @@ const { volumes } = storeToRefs(store);
 
 store.loadVolumes();
 
+const BULK_DELETE_KEY = 'bulk-delete';
+
 const options = computed(() => {
-  return [...Object.keys(props.options ?? {}), '批量删除'].map((it) => ({
-    label: it,
-    key: it,
+  const propOptions = Object.keys(props.options ?? {}).map((key) => ({
+    label: key,
+    key,
   }));
+  return [
+    ...propOptions,
+    { label: t('workspace.localVolume.bulkDelete'), key: BULK_DELETE_KEY },
+  ];
 });
 const handleSelect = (key: string) => {
   switch (key) {
-    case '批量删除':
+    case BULK_DELETE_KEY:
       openDeleteModal();
       break;
     default:
@@ -46,19 +54,19 @@ const handleSelect = (key: string) => {
 
 const downloadVolumes = async () => {
   if (sortedVolumes.value.length === 0) {
-    message.info('没有选中小说');
+    message.info(t('workspace.localVolume.noneSelected'));
     return;
   }
   const ids = sortedVolumes.value.map((it) => it.id);
   const { success, failed } = await store.downloadVolumes(ids);
-  message.info(`${success}本小说被打包，${failed}本失败`);
+  message.info(t('workspace.localVolume.downloadResult', { success, failed }));
 };
 
 const showDeleteModal = ref(false);
 
 const openDeleteModal = () => {
   if (sortedVolumes.value.length === 0) {
-    message.info('没有选中小说');
+    message.info(t('workspace.localVolume.noneSelected'));
     return;
   }
   showDeleteModal.value = true;
@@ -68,7 +76,7 @@ const deleteAllVolumes = async () => {
   const ids = sortedVolumes.value.map((it) => it.id);
   const { success, failed } = await store.deleteVolumes(ids);
   showDeleteModal.value = false;
-  message.info(`${success}本小说被删除，${failed}本失败`);
+  message.info(t('workspace.localVolume.deleteResult', { success, failed }));
 };
 
 const search = reactive({
@@ -101,14 +109,14 @@ const sortedVolumes = computed(() => {
 </script>
 
 <template>
-  <c-drawer-right title="本地小说">
+  <c-drawer-right :title="t('workspace.localVolume.drawerTitle')">
     <template #action>
       <bookshelf-local-add-button
         :favored-id="selectedFavored"
         @done="emit('volumeAdd', $event)"
       />
       <c-button
-        label="下载"
+        :label="t('workspace.localVolume.download')"
         :icon="FileDownloadOutlined"
         @click="downloadVolumes"
       />
@@ -126,15 +134,18 @@ const sortedVolumes = computed(() => {
 
     <div style="padding: 24px 16px">
       <n-flex vertical>
-        <c-action-wrapper title="搜索">
+        <c-action-wrapper :title="t('workspace.localVolume.searchTitle')">
           <search-input
             v-model:value="search"
-            placeholder="搜索文件名"
+            :placeholder="t('workspace.localVolume.searchPlaceholder')"
             style="max-width: 400px"
           />
         </c-action-wrapper>
 
-        <c-action-wrapper v-if="favoreds.local.length > 1" title="收藏">
+        <c-action-wrapper
+          v-if="favoreds.local.length > 1"
+          :title="t('workspace.localVolume.favoriteTitle')"
+        >
           <n-select
             v-model:value="selectedFavored"
             :options="favoredsOptions"
@@ -142,7 +153,10 @@ const sortedVolumes = computed(() => {
           />
         </c-action-wrapper>
 
-        <c-action-wrapper title="排序" align="center">
+        <c-action-wrapper
+          :title="t('workspace.localVolume.sortTitle')"
+          align="center"
+        >
           <order-sort
             v-model:value="setting.localVolumeOrder"
             :options="Setting.localVolumeOrderOptions"
@@ -157,7 +171,7 @@ const sortedVolumes = computed(() => {
 
       <n-empty
         v-else-if="sortedVolumes.length === 0"
-        description="没有文件"
+        :description="t('workspace.localVolume.empty')"
         style="margin-top: 20px"
       />
 
@@ -169,14 +183,18 @@ const sortedVolumes = computed(() => {
         </n-list>
       </n-scrollbar>
 
-      <c-modal title="清空所有文件" v-model:show="showDeleteModal">
-        <n-p>
-          这将清空你的浏览器里面保存的所有EPUB/TXT文件，包括已经翻译的章节和术语表，无法恢复。
-          你确定吗？
-        </n-p>
+      <c-modal
+        :title="t('workspace.localVolume.modalTitle')"
+        v-model:show="showDeleteModal"
+      >
+        <n-p>{{ t('workspace.localVolume.modalWarning') }}</n-p>
 
         <template #action>
-          <c-button label="确定" type="primary" @action="deleteAllVolumes" />
+          <c-button
+            :label="t('workspace.localVolume.modalConfirm')"
+            type="primary"
+            @action="deleteAllVolumes"
+          />
         </template>
       </c-modal>
     </div>
