@@ -39,7 +39,7 @@ class WebNovelFileRepository(
             .firstOrNull()
             ?: return null
 
-        val zhFilename = buildString {
+        val viFilename = buildString {
             append("${providerId}.${novelId}.")
             append(mode.serialName())
             append('.')
@@ -59,16 +59,16 @@ class WebNovelFileRepository(
 
         if (temp.isFileModifiedAfter(
                 TempFileType.Web,
-                zhFilename,
+                viFilename,
                 novel.changeAt,
             )
         ) {
-            return zhFilename
+            return viFilename
         }
 
-        val zhPath = temp.createFile(
+        val viPath = temp.createFile(
             TempFileType.Web,
-            zhFilename,
+            viFilename,
         )
 
         val chapters = novel.toc
@@ -91,22 +91,22 @@ class WebNovelFileRepository(
 
         when (type) {
             NovelFileType.EPUB -> makeEpubFile(
-                zhPath,
+                viPath,
                 novel,
                 chapters,
-                jp = mode != NovelFileMode.Zh,
-                zh = mode != NovelFileMode.Jp,
+                jp = mode != NovelFileMode.Vi,
+                vi = mode != NovelFileMode.Jp,
             )
 
             NovelFileType.TXT -> makeTxtFile(
-                zhPath,
+                viPath,
                 novel,
                 chapters,
-                jp = mode != NovelFileMode.Zh,
-                zh = mode != NovelFileMode.Jp,
+                jp = mode != NovelFileMode.Vi,
+                vi = mode != NovelFileMode.Jp,
             )
         }
-        return zhFilename
+        return viFilename
     }
 }
 
@@ -140,7 +140,7 @@ private fun generateWriteInfoFromChapter(
         }
 
     val jpParagraphs = chapter.paragraphs
-    val zhParagraphsList = when (translationsMode) {
+    val viParagraphsList = when (translationsMode) {
         NovelFileTranslationsMode.Parallel ->
             translations.mapNotNull { getTranslation(it) }
 
@@ -152,13 +152,13 @@ private fun generateWriteInfoFromChapter(
 
     val paragraphs = when (mode) {
         NovelFileMode.Jp -> listOf(jpParagraphs).map { ParagraphsWriteData(it, true) }
-        NovelFileMode.Zh -> zhParagraphsList.map { ParagraphsWriteData(it, true) }
-        NovelFileMode.JpZh ->
+        NovelFileMode.Vi -> viParagraphsList.map { ParagraphsWriteData(it, true) }
+        NovelFileMode.JpVi ->
             listOf(jpParagraphs).map { ParagraphsWriteData(it, false) } +
-                    zhParagraphsList.map { ParagraphsWriteData(it, true) }
+                    viParagraphsList.map { ParagraphsWriteData(it, true) }
 
-        NovelFileMode.ZhJp ->
-            zhParagraphsList.map { ParagraphsWriteData(it, true) } +
+        NovelFileMode.ViJp ->
+            viParagraphsList.map { ParagraphsWriteData(it, true) } +
                     listOf(jpParagraphs).map { ParagraphsWriteData(it, false) }
     }
     return ChapterWriteData(

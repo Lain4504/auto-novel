@@ -18,7 +18,7 @@ const { t } = useI18n();
         <router-link :to="`/wenku/${item.id}`">
           <ImageCard
             :src="item.cover"
-            :title="item.titleZh ? item.titleZh : item.title"
+            :title="item.titleVi ? item.titleVi : item.title"
           />
         </router-link>
       </n-grid-item>

@@ -20,7 +20,7 @@ fun elasticSearchClient(host: String, port: Int?) =
                     mappings(dynamicEnabled = false) {
                         keyword("providerId")
                         text("titleJp") { analyzer = "icu_analyzer" }
-                        text("titleZh") { analyzer = "icu_analyzer" }
+                        text("titleVi") { analyzer = "icu_analyzer" }
                         keyword("authors")
                         keyword("type")
                         keyword("attentions")
@@ -38,7 +38,7 @@ fun elasticSearchClient(host: String, port: Int?) =
                 createIndex(ElasticSearchIndexNames.WENKU_NOVEL) {
                     mappings(dynamicEnabled = false) {
                         text("title") { analyzer = "icu_analyzer" }
-                        text("titleZh") { analyzer = "icu_analyzer" }
+                        text("titleVi") { analyzer = "icu_analyzer" }
                         keyword("authors")
                         keyword("artists")
                         keyword("keywords")

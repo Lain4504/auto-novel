@@ -118,7 +118,7 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
               :style="{ 'font-size': isWideScreen ? '22px' : '18px' }"
             >
               <b>
-                {{ novel.titleZh ? novel.titleZh : novel.title }}
+                {{ novel.titleVi ? novel.titleVi : novel.title }}
               </b>
             </n-h2>
 
@@ -241,7 +241,7 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
           <n-divider style="margin: 0" />
 
           <n-ul>
-            <n-li v-for="volumeId in novel.volumeZh" :key="volumeId">
+            <n-li v-for="volumeId in novel.volumeVi" :key="volumeId">
               <n-a
                 :href="`/files-wenku/${novelId}/${encodeURIComponent(volumeId)}`"
                 target="_blank"
@@ -264,7 +264,7 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
         </template>
 
         <n-empty
-          v-if="novel.volumeJp.length === 0 && novel.volumeZh.length === 0"
+          v-if="novel.volumeJp.length === 0 && novel.volumeVi.length === 0"
           :description="t('novel.wenkuNovel.emptyPageWarning')"
         />
 
@@ -272,7 +272,7 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
           v-if="
             !whoami.isAdmin &&
             novel.volumeJp.length === 0 &&
-            novel.volumeZh.length > 0
+            novel.volumeVi.length > 0
           "
           :description="t('novel.wenkuNovel.chineseRemoved')"
         />

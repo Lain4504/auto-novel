@@ -54,7 +54,7 @@ defineExpose({
         <router-link :to="`/wenku/${item.id}`">
           <ImageCard
             :src="item.cover"
-            :title="item.titleZh ? item.titleZh : item.title"
+            :title="item.titleVi ? item.titleVi : item.title"
           >
             <template #prefix>
               <n-text v-if="item.favored" type="warning">

@@ -14,19 +14,19 @@ suspend fun makeEpubFile(
     metadata: WebNovel,
     chapters: Map<String, ChapterWriteData>,
     jp: Boolean,
-    zh: Boolean,
+    vi: Boolean,
 ) {
     val language =
-        if (zh) "zh-CN"
+        if (vi) "vi-VN"
         else "ja"
     val title =
-        if (zh) metadata.titleZh ?: metadata.titleJp
+        if (vi) metadata.titleVi ?: metadata.titleJp
         else metadata.titleJp
     val introduction =
-        if (zh) metadata.introductionZh ?: metadata.introductionJp
+        if (vi) metadata.introductionVi ?: metadata.introductionJp
         else metadata.introductionJp
     val getChapterTitle =
-        if (zh) { item: WebNovelTocItem -> item.titleZh ?: item.titleJp }
+        if (vi) { item: WebNovelTocItem -> item.titleVi ?: item.titleJp }
         else { item: WebNovelTocItem -> item.titleJp }
 
     val epub = EpubBook()
@@ -56,7 +56,7 @@ suspend fun makeEpubFile(
 
         val resource = createEpubXhtml(path, id, language, getChapterTitle(token)) {
             if (jp) it.appendElement("h1").appendText(token.titleJp)
-            if (zh) it.appendElement("h1").appendText(token.titleZh ?: token.titleJp)
+            if (vi) it.appendElement("h1").appendText(token.titleVi ?: token.titleJp)
 
             if (chapter == null) {
                 it.appendElement("p").appendText(MISSING_EPISODE_HINT)

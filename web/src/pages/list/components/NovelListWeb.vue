@@ -97,8 +97,8 @@ defineExpose({
           {{ item.titleJp }}
         </c-a>
 
-        <n-text v-if="item.titleZh">
-          {{ item.titleZh }}
+        <n-text v-if="item.titleVi">
+          {{ item.titleVi }}
         </n-text>
 
         <n-a

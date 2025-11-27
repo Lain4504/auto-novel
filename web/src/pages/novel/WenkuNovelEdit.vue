@@ -37,7 +37,7 @@ const allowSubmit = ref(novelId === undefined);
 const formRef = useTemplateRef<FormInst>('form');
 const formValue = ref({
   title: '',
-  titleZh: '',
+  titleVi: '',
   cover: '',
   authors: <string[]>[],
   artists: <string[]>[],
@@ -60,7 +60,7 @@ const formRules: FormRules = {
       trigger: 'input',
     },
   ],
-  titleZh: [
+  titleVi: [
     {
       validator: (_rule: FormItemRule, value: string) =>
         value.trim().length > 0,
@@ -75,7 +75,7 @@ const formRules: FormRules = {
     {
       validator: (_rule: FormItemRule, value: string) =>
         !RegexUtil.hasKanaChars(value),
-      message: t('novel.wenkuNovelEdit.titleZhNoJapanese'),
+      message: t('novel.wenkuNovelEdit.titleViNoJapanese'),
       trigger: 'input',
     },
   ],
@@ -112,7 +112,7 @@ if (novelId !== undefined) {
       if (data) {
         const {
           title,
-          titleZh,
+          titleVi,
           cover,
           authors,
           artists,
@@ -122,7 +122,7 @@ if (novelId !== undefined) {
         } = data;
         formValue.value = {
           title,
-          titleZh,
+          titleVi,
           cover: prettyCover(cover ?? ''),
           authors,
           artists,
@@ -160,7 +160,7 @@ const submit = async () => {
 
   const body = {
     title: formValue.value.title,
-    titleZh: formValue.value.titleZh,
+    titleVi: formValue.value.titleVi,
     cover: formValue.value.cover,
     authors: formValue.value.authors,
     artists: formValue.value.artists,
@@ -211,9 +211,9 @@ const populateNovelFromAmazon = async (
       populateNovel: (novel) => {
         formValue.value = {
           title: formValue.value.title ? formValue.value.title : novel.title,
-          titleZh: formValue.value.titleZh
-            ? formValue.value.titleZh
-            : novel.titleZh ?? '',
+          titleVi: formValue.value.titleVi
+            ? formValue.value.titleVi
+            : novel.titleVi ?? '',
           cover: novel.volumes[0]?.cover,
           authors:
             formValue.value.authors.length > 0
@@ -304,7 +304,7 @@ const deleteVolume = (asin: string) => {
 const markAsDuplicate = () => {
   formValue.value = {
     title: t('novel.wenkuNovelEdit.duplicateTitle'),
-    titleZh: t('novel.wenkuNovelEdit.duplicateTitle'),
+    titleVi: t('novel.wenkuNovelEdit.duplicateTitle'),
     cover: '',
     authors: [],
     artists: [],
@@ -433,10 +433,10 @@ const levelOptions = computed(() => [
         />
       </n-form-item-row>
 
-      <n-form-item-row path="titleZh" :label="t('novel.wenkuNovelEdit.titleZh')">
+      <n-form-item-row path="titleVi" :label="t('novel.wenkuNovelEdit.titleVi')">
         <n-input
-          v-model:value="formValue.titleZh"
-          :placeholder="t('novel.wenkuNovelEdit.titleZhPlaceholder')"
+          v-model:value="formValue.titleVi"
+          :placeholder="t('novel.wenkuNovelEdit.titleViPlaceholder')"
           maxlength="80"
           show-count
           :input-props="{ spellcheck: false }"
@@ -653,7 +653,7 @@ const levelOptions = computed(() => [
               <router-link :to="`/wenku/${item.id}`">
                 <ImageCard
                   :src="item.cover"
-                  :title="item.titleZh ? item.titleZh : item.title"
+                  :title="item.titleVi ? item.titleVi : item.title"
                 />
               </router-link>
             </n-grid-item>

@@ -23,7 +23,7 @@ const formValue = ref({
   introductionJp: '',
   introduction: '',
   wenkuId: '',
-  toc: <{ jp: string; zh: string }[]>[],
+  toc: <{ jp: string; vi: string }[]>[],
 });
 
 WebNovelRepo.useWebNovel(providerId, novelId, false)
@@ -33,9 +33,9 @@ WebNovelRepo.useWebNovel(providerId, novelId, false)
       const tocSet = new Set();
       formValue.value = {
         titleJp: data.titleJp,
-        title: data.titleZh ?? '',
+        title: data.titleVi ?? '',
         introductionJp: data.introductionJp,
-        introduction: data.introductionZh ?? '',
+        introduction: data.introductionVi ?? '',
         wenkuId: data.wenkuId ?? '',
         toc: data.toc
           .filter((item) => {
@@ -45,7 +45,7 @@ WebNovelRepo.useWebNovel(providerId, novelId, false)
           })
           .map((item) => ({
             jp: item.titleJp,
-            zh: item.titleZh ?? '',
+            vi: item.titleVi ?? '',
           })),
       };
       allowSubmit.value = true;
@@ -67,7 +67,7 @@ const submit = async () => {
       wenkuId: formValue.value.wenkuId.trim(),
       toc: Object.assign(
         {},
-        ...formValue.value.toc.map((item) => ({ [item.jp]: item.zh })),
+        ...formValue.value.toc.map((item) => ({ [item.jp]: item.vi })),
       ),
     }).then(() => {
       router.push({ path: `/novel/${providerId}/${novelId}` });
@@ -136,14 +136,14 @@ const submit = async () => {
           <br />
           <n-input
             v-if="!isWideScreen"
-            v-model:value="token.zh"
+            v-model:value="token.vi"
             :placeholder="token.jp"
             :input-props="{ spellcheck: false }"
           />
         </td>
         <td v-if="isWideScreen" style="padding: 4px">
           <n-input
-            v-model:value="token.zh"
+            v-model:value="token.vi"
             :placeholder="token.jp"
             :input-props="{ spellcheck: false }"
           />

@@ -164,7 +164,7 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
           />
           <c-modal
             :title="selectedNovels.length === 1
-              ? t('bookshelf.web.deleteConfirmSingle', { name: selectedNovels[0].titleZh ?? selectedNovels[0].titleJp })
+              ? t('bookshelf.web.deleteConfirmSingle', { name: selectedNovels[0].titleVi ?? selectedNovels[0].titleJp })
               : t('bookshelf.web.deleteConfirmMultiple', { count: selectedNovels.length })"
             v-model:show="showDeleteModal"
           >

@@ -135,7 +135,7 @@ class OperationHistoryApi(
         fun WebNovelTocItem.asDto() =
             WebNovelApi.NovelTocItemDto(
                 titleJp = titleJp,
-                titleZh = titleZh,
+                titleVi = titleVi,
                 chapterId = chapterId,
                 createAt = createAt?.epochSeconds,
             )

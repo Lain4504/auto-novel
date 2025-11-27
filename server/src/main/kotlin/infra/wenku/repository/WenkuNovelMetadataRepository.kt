@@ -61,7 +61,7 @@ class WenkuNovelMetadataRepository(
                 WenkuNovelListItem(
                     id = novel.id,
                     title = novel.title,
-                    titleZh = novel.titleZh,
+                    titleVi = novel.titleVi,
                     cover = novel.cover,
                     favored = favored?.favoredId,
                 )
@@ -98,7 +98,7 @@ class WenkuNovelMetadataRepository(
 
     suspend fun create(
         title: String,
-        titleZh: String,
+        titleVi: String,
         cover: String?,
         authors: List<String>,
         artists: List<String>,
@@ -110,7 +110,7 @@ class WenkuNovelMetadataRepository(
         val model = WenkuNovel(
             id = ObjectId(),
             title = title,
-            titleZh = titleZh,
+            titleVi = titleVi,
             cover = cover,
             authors = authors,
             artists = artists,
@@ -134,7 +134,7 @@ class WenkuNovelMetadataRepository(
     suspend fun update(
         novelId: String,
         title: String,
-        titleZh: String,
+        titleVi: String,
         cover: String?,
         authors: List<String>,
         artists: List<String>,
@@ -149,7 +149,7 @@ class WenkuNovelMetadataRepository(
                 combine(
                     listOf(
                         set(WenkuNovel::title.field(), title),
-                        set(WenkuNovel::titleZh.field(), titleZh),
+                        set(WenkuNovel::titleVi.field(), titleVi),
                         set(WenkuNovel::cover.field(), cover),
                         set(WenkuNovel::authors.field(), authors),
                         set(WenkuNovel::artists.field(), artists),

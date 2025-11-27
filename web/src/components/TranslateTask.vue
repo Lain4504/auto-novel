@@ -105,17 +105,17 @@ const startTask = async (
         chapterTotal.value = total;
         onProgressUpdated();
       },
-      onChapterSuccess: ({ jp, zh }) => {
+      onChapterSuccess: ({ jp, vi }) => {
         if (jp !== undefined) emit('update:jp', jp);
-        if (zh !== undefined) {
+        if (vi !== undefined) {
           if (translatorDesc.id === 'baidu') {
-            emit('update:baidu', zh);
+            emit('update:baidu', vi);
           } else if (translatorDesc.id === 'youdao') {
-            emit('update:youdao', zh);
+            emit('update:youdao', vi);
           } else if (translatorDesc.id === 'gpt') {
-            emit('update:gpt', zh);
+            emit('update:gpt', vi);
           } else {
-            emit('update:sakura', zh);
+            emit('update:sakura', vi);
           }
         }
         chapterFinished.value += 1;

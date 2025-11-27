@@ -2,8 +2,8 @@ interface EpubParser {
   extractText: (doc: Document) => string[];
   injectTranslation: (
     doc: Document,
-    mode: 'zh' | 'jp-zh' | 'zh-jp',
-    zhLinesList: string[][],
+    mode: 'vi' | 'jp-vi' | 'vi-jp',
+    viLinesList: string[][],
   ) => Document;
 }
 
@@ -21,22 +21,22 @@ export const EpubParserV1: EpubParser = {
   },
   injectTranslation: (
     doc: Document,
-    mode: 'zh' | 'jp-zh' | 'zh-jp',
-    zhLinesList: string[][],
+    mode: 'vi' | 'jp-vi' | 'vi-jp',
+    viLinesList: string[][],
   ) => {
     Array.from(doc.body.getElementsByTagName('p'))
       .filter((el) => el.innerText.trim().length !== 0)
       .forEach((el, index) => {
-        if (mode === 'zh') {
-          zhLinesList.forEach((lines) => {
+        if (mode === 'vi') {
+          viLinesList.forEach((lines) => {
             const p = document.createElement('p');
             const t = document.createTextNode(lines[index]);
             p.appendChild(t);
             el.parentNode!.insertBefore(p, el);
           });
           el.parentNode!.removeChild(el);
-        } else if (mode === 'jp-zh') {
-          zhLinesList.forEach((lines) => {
+        } else if (mode === 'jp-vi') {
+          viLinesList.forEach((lines) => {
             const p = document.createElement('p');
             const t = document.createTextNode(lines[index]);
             p.appendChild(t);
@@ -44,7 +44,7 @@ export const EpubParserV1: EpubParser = {
           });
           el.setAttribute('style', 'opacity:0.4;');
         } else {
-          zhLinesList.forEach((lines) => {
+          viLinesList.forEach((lines) => {
             const p = document.createElement('p');
             const t = document.createTextNode(lines[index]);
             p.appendChild(t);

@@ -200,9 +200,9 @@ const showDownloadModal = ref(false);
         >
           <n-switch
             size="small"
-            :value="setting.downloadFilenameType === 'zh'"
+            :value="setting.downloadFilenameType === 'vi'"
             @update-value="
-              (it: boolean) => (setting.downloadFilenameType = it ? 'zh' : 'jp')
+              (it: boolean) => (setting.downloadFilenameType = it ? 'vi' : 'jp')
             "
           />
         </c-action-wrapper>

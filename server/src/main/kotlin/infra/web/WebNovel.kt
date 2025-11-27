@@ -54,7 +54,7 @@ data class WebNovelListItem(
     @SerialName("bookId")
     val novelId: String,
     val titleJp: String,
-    val titleZh: String?,
+    val titleVi: String?,
     val type: WebNovelType?,
     val attentions: List<WebNovelAttention>,
     val keywords: List<String>,
@@ -80,7 +80,7 @@ class WebNovel(
     val novelId: String,
     val wenkuId: String? = null,
     val titleJp: String,
-    val titleZh: String? = null,
+    val titleVi: String? = null,
     val authors: List<WebNovelAuthor>,
     val type: WebNovelType = WebNovelType.连载中,
     val attentions: List<WebNovelAttention> = emptyList(),
@@ -88,7 +88,7 @@ class WebNovel(
     val points: Int?,
     val totalCharacters: Int? = null,
     val introductionJp: String,
-    val introductionZh: String? = null,
+    val introductionVi: String? = null,
     val glossaryUuid: String? = "no glossary",
     val glossary: Map<String, String> = emptyMap(),
     val toc: List<WebNovelTocItem>,
@@ -123,7 +123,7 @@ data class WebNovelAuthor(
 @Serializable
 data class WebNovelTocItem(
     val titleJp: String,
-    val titleZh: String?,
+    val titleVi: String?,
     @SerialName("episodeId")
     val chapterId: String?,
     @Contextual val createAt: Instant? = null,
@@ -143,7 +143,7 @@ data class WebNovelChapter(
     val baiduGlossaryUuid: String? = null,
     @SerialName("glossary")
     val baiduGlossary: Map<String, String>? = emptyMap(),
-    @SerialName("paragraphsZh")
+    @SerialName("paragraphsVi")
     val baiduParagraphs: List<String>? = null,
 
     val youdaoGlossaryUuid: String? = null,

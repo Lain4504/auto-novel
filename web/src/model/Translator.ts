@@ -69,7 +69,7 @@ export type TranslateTaskParams = {
 
 export type TranslateTaskCallback = {
   onStart: (total: number) => void;
-  onChapterSuccess: (state: { jp?: number; zh?: number }) => void;
+  onChapterSuccess: (state: { jp?: number; vi?: number }) => void;
   onChapterFailure: () => void;
   log: (message: string, detail?: string[]) => void;
 };
@@ -159,22 +159,22 @@ export namespace TranslateTaskDescriptor {
 
 export interface WebTranslateTask {
   titleJp: string;
-  titleZh?: string;
+  titleVi?: string;
   introductionJp: string;
-  introductionZh?: string;
+  introductionVi?: string;
   glossaryUuid: string;
   glossary: Glossary;
   toc: {
     chapterId?: string;
     titleJp: string;
-    titleZh?: string;
+    titleVi?: string;
     glossaryUuid?: string;
   }[];
 }
 
 export interface WebChapterTranslateTask {
   paragraphJp: string[];
-  oldParagraphZh?: string[];
+  oldParagraphVi?: string[];
   glossaryId: string;
   glossary: Glossary;
   oldGlossaryId?: string;
@@ -191,7 +191,7 @@ export interface WenkuTranslateTask {
 
 export interface WenkuChapterTranslateTask {
   paragraphJp: string[];
-  oldParagraphZh?: string[];
+  oldParagraphVi?: string[];
   glossaryId: string;
   glossary: Glossary;
   oldGlossaryId?: string;

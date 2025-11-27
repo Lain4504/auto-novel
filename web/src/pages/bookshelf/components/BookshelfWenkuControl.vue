@@ -111,7 +111,7 @@ const moveToFavored = async () => {
           />
           <c-modal
             :title="selectedNovels.length === 1
-              ? t('bookshelf.wenku.deleteConfirmSingle', { name: selectedNovels[0].titleZh ?? selectedNovels[0].title })
+              ? t('bookshelf.wenku.deleteConfirmSingle', { name: selectedNovels[0].titleVi ?? selectedNovels[0].title })
               : t('bookshelf.wenku.deleteConfirmMultiple', { count: selectedNovels.length })"
             v-model:show="showDeleteModal"
           >

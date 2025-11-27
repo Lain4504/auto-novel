@@ -109,7 +109,7 @@ const createTranslationApi = (
     chapterId: string,
     json: {
       glossaryId?: string;
-      paragraphsZh: string[];
+      paragraphsVi: string[];
     },
   ) =>
     client
@@ -117,7 +117,7 @@ const createTranslationApi = (
         json: { ...json, sakuraVersion: '0.9' },
         signal,
       })
-      .json<{ jp: number; zh: number }>();
+      .json<{ jp: number; vi: number }>();
 
   return {
     getTranslateTask,
@@ -139,7 +139,7 @@ const createFileUrl = ({
 }: {
   providerId: string;
   novelId: string;
-  mode: 'jp' | 'zh' | 'zh-jp' | 'jp-zh';
+  mode: 'jp' | 'vi' | 'vi-jp' | 'jp-vi';
   translationsMode: 'parallel' | 'priority';
   translations: ('sakura' | 'baidu' | 'youdao' | 'gpt')[];
   type: 'epub' | 'txt';

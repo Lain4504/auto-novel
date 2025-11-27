@@ -61,7 +61,7 @@ const chapterHref = computed(() => {
     <n-h4 class="chapter-title">
       <n-a :href="chapterHref">{{ chapter.titleJp }}</n-a>
       <br />
-      <n-text depth="3">{{ chapter.titleZh }}</n-text>
+      <n-text depth="3">{{ chapter.titleVi }}</n-text>
       <br />
     </n-h4>
     <n-divider />
@@ -128,7 +128,7 @@ const chapterHref = computed(() => {
   margin-right: 0.5em;
 }
 .chapter-content p .first {
-  opacity: v-bind('readerSetting.mixZhOpacity');
+  opacity: v-bind('readerSetting.mixViOpacity');
 }
 .chapter-content p .second {
   opacity: v-bind('readerSetting.mixJpOpacity');

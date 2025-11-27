@@ -11,7 +11,7 @@ const message = useMessage();
 const { t } = useI18n();
 
 const textJp = ref('');
-const textZh = ref('');
+const textVi = ref('');
 
 const translatorId = ref<TranslatorId>('sakura');
 const translationOptions = computed<{ label: string; value: TranslatorId }[]>(
@@ -24,10 +24,10 @@ const translationOptions = computed<{ label: string; value: TranslatorId }[]>(
 );
 
 watch(textJp, () => {
-  textZh.value = '';
+  textVi.value = '';
 });
 watch(translatorId, () => {
-  textZh.value = '';
+  textVi.value = '';
 });
 
 const gptWorkspaceRef = useGptWorkspaceStore().ref;
@@ -41,7 +41,7 @@ interface SavedTranslation {
   workerId?: string;
   endpoint?: string;
   jp: string;
-  zh: string;
+  vi: string;
 }
 const savedTranslation = ref<SavedTranslation[]>([]);
 
@@ -91,10 +91,10 @@ const translate = async () => {
   try {
     const translator = await Translator.create(config, false);
     const linesJp = textJp.value.split('\n');
-    const linesZh = await translator.translate(linesJp, {
+    const linesVi = await translator.translate(linesJp, {
       glossary: glossary.value,
     });
-    textZh.value = linesZh.join('\n');
+    textVi.value = linesVi.join('\n');
   } catch (e: unknown) {
     message.error(
       t('workspace.interactive.translatorError', { error: String(e) }),
@@ -106,15 +106,15 @@ const translate = async () => {
     workerId: selectedWorker?.id,
     endpoint: selectedWorker?.endpoint,
     jp: textJp.value,
-    zh: textZh.value,
+    vi: textVi.value,
   });
 };
 const clearTranslation = () => {
   textJp.value = '';
-  textZh.value = '';
+  textVi.value = '';
 };
 const copyToClipboard = () => {
-  navigator.clipboard.writeText(textZh.value);
+  navigator.clipboard.writeText(textVi.value);
   message.info(t('workspace.interactive.copySuccess'));
 };
 const clearSavedTranslation = () => {
@@ -215,7 +215,7 @@ const clearSavedTranslation = () => {
       />
 
       <n-input
-        v-model:value="textZh"
+        v-model:value="textVi"
         readonly
         :placeholder="t('workspace.interactive.outputPlaceholder')"
         type="textarea"
@@ -265,7 +265,7 @@ const clearSavedTranslation = () => {
                 </template>
               </n-collapse-item>
               <n-collapse-item :title="t('workspace.interactive.historyZh')">
-                <template v-for="line of t.zh.split('\n')" :key="line">
+                <template v-for="line of t.vi.split('\n')" :key="line">
                   {{ line }}
                   <br />
                 </template>

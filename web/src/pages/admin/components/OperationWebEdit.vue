@@ -9,14 +9,14 @@ defineProps<{ op: OperationWebEdit }>();
     {{ `${op.providerId}/${op.novelId}` }}
   </c-a>
   <TextDiff
-    v-if="op.new.titleZh"
-    :zh-old="op.old.titleZh"
-    :zh-new="op.new.titleZh"
+    v-if="op.new.titleVi"
+    :vi-old="op.old.titleVi"
+    :vi-new="op.new.titleVi"
   />
   <TextDiff
-    v-if="op.new.introductionZh"
-    :zh-old="op.old.introductionZh"
-    :zh-new="op.new.introductionZh"
+    v-if="op.new.introductionVi"
+    :vi-old="op.old.introductionVi"
+    :vi-new="op.new.introductionVi"
   />
 
   <TextDiff

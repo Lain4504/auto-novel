@@ -153,7 +153,7 @@ const testWorker = async () => {
       message.success(
         t('workspace.jobWorker.testSuccessGpt', {
           jp: lineJp,
-          zh: lineZh,
+          vi: lineVi,
         }),
       );
     } else {
@@ -163,7 +163,7 @@ const testWorker = async () => {
       message.success(
         t('workspace.jobWorker.testSuccessSakura', {
           jp: lineJp,
-          zh: lineZh,
+          vi: lineVi,
           model: translator.sakuraModel(),
           upload: uploadLabel,
         }),

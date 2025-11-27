@@ -13,7 +13,7 @@ export const getTranslationFile = async (
     translations,
   }: {
     id: string;
-    mode: 'zh' | 'zh-jp' | 'jp-zh';
+    mode: 'vi' | 'vi-jp' | 'jp-vi';
     translationsMode: 'parallel' | 'priority';
     translations: ('sakura' | 'baidu' | 'youdao' | 'gpt')[];
   },
@@ -29,24 +29,24 @@ export const getTranslationFile = async (
   if (metadata === undefined)
     throw Error(i18nGlobal.t('stores.translationFile.novelMissing'));
 
-  const getZhLinesList = async (chapterId: string) => {
+  const getViLinesList = async (chapterId: string) => {
     const chapter = await dao.getChapter(id, chapterId);
     if (chapter === undefined)
       throw Error(i18nGlobal.t('stores.translationFile.chapterMissing'));
 
     const jpLines = chapter.paragraphs;
-    const zhLinesList: Array<Array<string>> = [];
+    const viLinesList: Array<Array<string>> = [];
 
     for (const id of translations) {
-      const zhLine = chapter[id]?.paragraphs;
-      if (zhLine !== undefined) zhLinesList.push(zhLine);
+      const viLine = chapter[id]?.paragraphs;
+      if (viLine !== undefined) viLinesList.push(viLine);
     }
 
-    if (translationsMode === 'priority' && zhLinesList.length > 1) {
-      zhLinesList.length = 1;
+    if (translationsMode === 'priority' && viLinesList.length > 1) {
+      viLinesList.length = 1;
     }
 
-    return { jpLines, zhLinesList };
+    return { jpLines, viLinesList };
   };
 
   const file = await dao.getFile(id);
@@ -58,15 +58,15 @@ export const getTranslationFile = async (
   if (myFile.type === 'txt') {
     const buffer = [];
     for (const { chapterId } of metadata.toc) {
-      const { jpLines, zhLinesList } = await getZhLinesList(chapterId);
+      const { jpLines, viLinesList } = await getViLinesList(chapterId);
 
-      if (zhLinesList.length === 0) {
+      if (viLinesList.length === 0) {
         buffer.push(i18nGlobal.t('stores.translationFile.missingSegment'));
       } else {
-        const combinedLinesList = zhLinesList;
-        if (mode === 'jp-zh') {
+        const combinedLinesList = viLinesList;
+        if (mode === 'jp-vi') {
           combinedLinesList.unshift(jpLines);
-        } else if (mode === 'zh-jp') {
+        } else if (mode === 'vi-jp') {
           combinedLinesList.push(jpLines);
         }
         for (let i = 0; i < combinedLinesList[0].length; i++) {
@@ -84,9 +84,9 @@ export const getTranslationFile = async (
 
     for await (const item of myFile.iterDoc()) {
       if (metadata.toc.some((it) => it.chapterId === item.href)) {
-        const { zhLinesList } = await getZhLinesList(item.href);
-        if (zhLinesList.length > 0) {
-          await EpubParserV1.injectTranslation(item.doc, mode, zhLinesList);
+        const { viLinesList } = await getViLinesList(item.href);
+        if (viLinesList.length > 0) {
+          await EpubParserV1.injectTranslation(item.doc, mode, viLinesList);
         }
       }
     }
@@ -94,17 +94,17 @@ export const getTranslationFile = async (
     // 清除css格式
     myFile.cleanStyle();
   } else if (myFile.type === 'srt') {
-    const { zhLinesList } = await getZhLinesList('0');
+    const { viLinesList } = await getViLinesList('0');
     const newSubtitles: typeof myFile.subtitles = [];
     for (const s of myFile.subtitles) {
       const texts: string[][] = [];
-      for (const zhLines of zhLinesList) {
-        texts.push(zhLines.slice(0, s.text.length));
-        zhLines.splice(0, s.text.length);
+      for (const viLines of viLinesList) {
+        texts.push(viLines.slice(0, s.text.length));
+        viLines.splice(0, s.text.length);
       }
-      if (mode === 'jp-zh') {
+      if (mode === 'jp-vi') {
         texts.unshift(s.text);
-      } else if (mode === 'zh-jp') {
+      } else if (mode === 'vi-jp') {
         texts.push(s.text);
       }
 

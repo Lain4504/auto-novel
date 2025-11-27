@@ -20,7 +20,7 @@ class WenkuNovelEsDataSource(
     data class WenkuNovelMetadataEsModel(
         val id: String,
         val title: String,
-        val titleZh: String,
+        val titleVi: String,
         val cover: String?,
         val authors: List<String>,
         val artists: List<String>,
@@ -84,7 +84,7 @@ class WenkuNovelEsDataSource(
                         simpleQueryString(
                             queryWords.joinToString(" "),
                             WenkuNovelMetadataEsModel::title,
-                            WenkuNovelMetadataEsModel::titleZh,
+                            WenkuNovelMetadataEsModel::titleVi,
                             WenkuNovelMetadataEsModel::authors,
                             WenkuNovelMetadataEsModel::artists,
                             WenkuNovelMetadataEsModel::keywords,
@@ -117,7 +117,7 @@ class WenkuNovelEsDataSource(
             document = WenkuNovelMetadataEsModel(
                 id = novel.id.toHexString(),
                 title = novel.title,
-                titleZh = novel.titleZh,
+                titleVi = novel.titleVi,
                 cover = novel.cover,
                 authors = novel.authors,
                 artists = novel.artists,

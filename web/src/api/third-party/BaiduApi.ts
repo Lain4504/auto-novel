@@ -23,7 +23,7 @@ const translate = (query: string, from: string, options: Options) => {
       },
       json: {
         from,
-        to: 'zh',
+        to: 'vie',
         query,
         corpusIds: [],
         domain: 'common',

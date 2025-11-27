@@ -292,18 +292,18 @@ class WebNovelMetadataRepository(
     suspend fun updateTranslation(
         providerId: String,
         novelId: String,
-        titleZh: String?,
-        introductionZh: String?,
+        titleVi: String?,
+        introductionVi: String?,
         tocZh: Map<Int, String?>,
     ) {
         val list = mutableListOf(
-            set(WebNovel::titleZh.field(), titleZh),
-            set(WebNovel::introductionZh.field(), introductionZh),
+            set(WebNovel::titleVi.field(), titleVi),
+            set(WebNovel::introductionVi.field(), introductionVi),
         )
         tocZh.forEach { (index, itemTitleZh) ->
             list.add(
                 set(
-                    WebNovel::toc.field() + ".${index}." + WebNovelTocItem::titleZh.field(),
+                    WebNovel::toc.field() + ".${index}." + WebNovelTocItem::titleVi.field(),
                     itemTitleZh,
                 )
             )
@@ -355,7 +355,7 @@ private fun RemoteNovelListItem.toOutline(
         providerId = providerId,
         novelId = novelId,
         titleJp = title,
-        titleZh = novel?.titleZh,
+        titleVi = novel?.titleVi,
         type = null,
         attentions = attentions,
         keywords = keywords,
@@ -377,7 +377,7 @@ fun WebNovel.toOutline(
         providerId = providerId,
         novelId = novelId,
         titleJp = titleJp,
-        titleZh = titleZh,
+        titleVi = titleVi,
         type = type,
         attentions = attentions,
         keywords = keywords,
@@ -470,10 +470,10 @@ private fun simpleMergeToc(
 ): List<WebNovelTocItem> {
     return remoteToc.map { itemNew ->
         val itemOld = localToc.find { it.titleJp == itemNew.titleJp }
-        if (itemOld?.titleZh == null) {
+        if (itemOld?.titleVi == null) {
             itemNew
         } else {
-            itemNew.copy(titleZh = itemOld.titleZh)
+            itemNew.copy(titleVi = itemOld.titleVi)
         }
     }
 }

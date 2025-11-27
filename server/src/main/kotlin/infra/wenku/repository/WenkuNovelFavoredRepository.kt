@@ -109,7 +109,7 @@ class WenkuNovelFavoredRepository(
                     WenkuNovelListItem(
                         id = it.id.toHexString(),
                         title = it.title,
-                        titleZh = it.titleZh,
+                        titleVi = it.titleVi,
                         cover = it.cover,
                         favored = null,
                     )

@@ -31,7 +31,7 @@ const getNovel = (novelId: string) =>
 
 interface WenkuNovelCreateBody {
   title: string;
-  titleZh: string;
+  titleVi: string;
   cover?: string;
   authors: string[];
   artists: string[];
@@ -53,7 +53,7 @@ const updateGlossary = (id: string, json: { [key: string]: string }) =>
 const createVolume = (
   novelId: string,
   volumeId: string,
-  type: 'jp' | 'zh',
+  type: 'jp' | 'vi',
   file: File,
   onProgress: (p: number) => void,
 ) =>
@@ -88,7 +88,7 @@ const createTranslationApi = (
 
   const updateChapterTranslation = (
     chapterId: string,
-    json: { glossaryId: string | undefined; paragraphsZh: string[] },
+    json: { glossaryId: string | undefined; paragraphsVi: string[] },
   ) =>
     client
       .post(`${endpointV2}/chapter/${chapterId}`, {
@@ -114,7 +114,7 @@ const createFileUrl = ({
 }: {
   novelId: string;
   volumeId: string;
-  mode: 'zh' | 'zh-jp' | 'jp-zh';
+  mode: 'vi' | 'vi-jp' | 'jp-vi';
   translationsMode: 'parallel' | 'priority';
   translations: ('sakura' | 'baidu' | 'youdao' | 'gpt')[];
 }) => {

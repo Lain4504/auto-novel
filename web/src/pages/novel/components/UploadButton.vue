@@ -34,7 +34,7 @@ async function beforeUpload({ file }: { file: UploadFileInfo }) {
     return false;
   }
   if (
-    ['jp', 'zh', 'zh-jp', 'jp-zh'].some((prefix) =>
+    ['jp', 'vi', 'vi-jp', 'jp-vi'].some((prefix) =>
       file.file!.name.startsWith(prefix),
     )
   ) {
@@ -66,7 +66,7 @@ async function beforeUpload({ file }: { file: UploadFileInfo }) {
       message.error(t('uploadButton.chineseNotAllowed'));
       return false;
     } else {
-      file.url = 'zh';
+      file.url = 'vi';
     }
   } else {
     file.url = 'jp';
@@ -85,7 +85,7 @@ const customRequest = async ({
   }
 
   try {
-    const type = file.url === 'jp' ? 'jp' : 'zh';
+    const type = file.url === 'jp' ? 'jp' : 'vi';
     await WenkuNovelRepo.createVolume(
       props.novelId,
       file.name,

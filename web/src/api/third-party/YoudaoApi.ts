@@ -97,7 +97,7 @@ async function webtranslate(query: string, from: string, options?: Options) {
       body: new URLSearchParams({
         i: query,
         from,
-        to: 'zh-CHS',
+        to: 'vi',
         dictResult: 'true',
         keyid: 'webfanyi',
         ...getBaseBody(key),

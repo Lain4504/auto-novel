@@ -21,8 +21,8 @@ sealed interface Operation {
     ) : Operation {
         @Serializable
         data class Data(
-            val titleZh: String?,
-            val introductionZh: String?,
+            val titleVi: String?,
+            val introductionVi: String?,
         )
 
         @Serializable
@@ -52,7 +52,7 @@ sealed interface Operation {
         @Serializable
         data class Data(
             val title: String,
-            val titleZh: String,
+            val titleVi: String,
             val authors: List<String>,
             val artists: List<String>,
             val introduction: String,

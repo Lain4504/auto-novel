@@ -7,7 +7,7 @@ import type { TranslatorId } from '@/model/Translator';
 
 export type Segmentor = (
   textJp: string[],
-  textZh?: string[],
+  textVi?: string[],
 ) => [string[], string[]?][];
 
 export type Logger = (message: string, detail?: string[]) => void;
@@ -78,12 +78,12 @@ export const createGlossaryWrapper = (glossary: Glossary) => {
     Object.keys(glossary).sort((a, b) => b.length - a.length);
 
   const wordJpToToken: Glossary = {};
-  const tokenToWordZh: Glossary = {};
+  const tokenToWordVi: Glossary = {};
   for (const wordJp of sortedKeys(glossary)) {
-    const wordZh = glossary[wordJp];
+    const wordVi = glossary[wordJp];
     const token = generateToken();
     wordJpToToken[wordJp] = token;
-    tokenToWordZh[token] = wordZh;
+    tokenToWordVi[token] = wordVi;
   }
 
   const encode = (text: string[]): string[] => {
@@ -98,12 +98,12 @@ export const createGlossaryWrapper = (glossary: Glossary) => {
 
   const decode = (text: string[]): string[] => {
     return text.map((line) => {
-      for (const token of sortedKeys(tokenToWordZh)) {
-        const wordZh = tokenToWordZh[token];
+      for (const token of sortedKeys(tokenToWordVi)) {
+        const wordVi = tokenToWordVi[token];
         line = line
-          .replaceAll('$' + token, wordZh)
-          .replaceAll('$ ' + token, wordZh)
-          .replaceAll(token, wordZh);
+          .replaceAll('$' + token, wordVi)
+          .replaceAll('$ ' + token, wordVi)
+          .replaceAll(token, wordVi);
       }
       return line;
     });
@@ -114,9 +114,9 @@ export const createGlossaryWrapper = (glossary: Glossary) => {
     callback: (input: string[]) => Promise<string[]>,
   ) => {
     const textJpEncoded = encode(textJp);
-    const textZh = await callback(textJpEncoded);
-    const textZhDecoded = decode(textZh);
-    return textZhDecoded;
+    const textVi = await callback(textJpEncoded);
+    const textViDecoded = decode(textVi);
+    return textViDecoded;
   };
 };
 
@@ -126,11 +126,11 @@ export const createLengthSegmentor = (
 ): Segmentor => {
   maxLine = maxLine ?? 65536;
 
-  return (textJp: string[], textZh?: string[]) => {
+  return (textJp: string[], textVi?: string[]) => {
     type Seg = [string[], string[]?];
     const segs: Seg[] = [];
     let segJp: string[] = [];
-    let segZh: string[] = [];
+    let segVi: string[] = [];
     let segSize = 0;
 
     for (let i = 0; i < textJp.length; i++) {
@@ -139,20 +139,20 @@ export const createLengthSegmentor = (
 
       if (segSize + lineJpSize > maxLength || segJp.length >= maxLine) {
         if (segJp.length > 0) {
-          if (textZh === undefined) {
+          if (textVi === undefined) {
             segs.push([segJp]);
           } else {
-            segs.push([segJp, segZh]);
-            segZh = [];
+            segs.push([segJp, segVi]);
+            segVi = [];
           }
           segJp = [];
           segSize = 0;
         }
       }
 
-      if (textZh !== undefined) {
-        const lineZh = textZh[i];
-        segZh.push(lineZh);
+      if (textVi !== undefined) {
+        const lineVi = textVi[i];
+        segVi.push(lineVi);
       }
 
       segJp.push(lineJp);
@@ -160,10 +160,10 @@ export const createLengthSegmentor = (
     }
 
     if (segJp.length > 0) {
-      if (textZh === undefined) {
+      if (textVi === undefined) {
         segs.push([segJp]);
       } else {
-        segs.push([segJp, segZh]);
+        segs.push([segJp, segVi]);
       }
     }
     return segs;
