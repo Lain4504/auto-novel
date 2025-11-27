@@ -87,15 +87,15 @@ export const translateLocal = async (
       }
       const textsJp = chapter?.paragraphs;
 
-      const oldTextsZh = await localVolumeRepository.getChapter(
+      const oldTextsVi = await localVolumeRepository.getChapter(
         volumeId,
         chapterId,
       );
-      const textsZh = await translator.translate(textsJp, {
+      const textsVi = await translator.translate(textsJp, {
         glossary: metadata.glossary,
         oldGlossary: chapter[translator.id]?.glossary,
-        oldTextZh: oldTextsZh
-          ? oldTextsZh[translator.id]?.paragraphs
+        oldTextVi: oldTextsVi
+          ? oldTextsVi[translator.id]?.paragraphs
           : undefined,
         force: forceSeg,
         signal,
@@ -105,9 +105,9 @@ export const translateLocal = async (
       const state = await updateTranslation(chapterId, {
         glossaryId: metadata.glossaryId,
         glossary: metadata.glossary,
-        paragraphs: textsZh,
+        paragraphs: textsVi,
       });
-      callback.onChapterSuccess({ zh: state });
+      callback.onChapterSuccess({ vi: state });
     } catch (e) {
       if (e === 'quit') {
         callback.log(`发生错误，结束翻译任务`);

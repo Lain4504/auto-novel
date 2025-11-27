@@ -140,10 +140,10 @@ const submitJob = (id: 'gpt' | 'sakura') => {
 
   <TranslateTask
     ref="translateTask"
-    @update:baidu="(zh) => (volume.baidu = zh)"
-    @update:youdao="(zh) => (volume.youdao = zh)"
-    @update:gpt="(zh) => (volume.gpt = zh)"
-    @update:sakura="(zh) => (volume.sakura = zh)"
+    @update:baidu="(vi) => (volume.baidu = vi)"
+    @update:youdao="(vi) => (volume.youdao = vi)"
+    @update:gpt="(vi) => (volume.gpt = vi)"
+    @update:sakura="(vi) => (volume.sakura = vi)"
     style="margin-top: 20px"
   />
 </template>

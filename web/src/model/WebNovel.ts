@@ -2,7 +2,7 @@ export interface WebNovelOutlineDto {
   providerId: string;
   novelId: string;
   titleJp: string;
-  titleZh?: string;
+  titleVi?: string;
   type: string;
   attentions: string[];
   keywords: string[];
@@ -22,7 +22,7 @@ export interface WebNovelOutlineDto {
 
 export interface WebNovelTocItemDto {
   titleJp: string;
-  titleZh?: string;
+  titleVi?: string;
   chapterId?: string;
   createAt?: number;
 }
@@ -30,7 +30,7 @@ export interface WebNovelTocItemDto {
 export interface WebNovelDto {
   wenkuId?: string;
   titleJp: string;
-  titleZh?: string;
+  titleVi?: string;
   authors: { name: string; link: string }[];
   type: string;
   attentions: string[];
@@ -38,7 +38,7 @@ export interface WebNovelDto {
   points?: number;
   totalCharacters?: number;
   introductionJp: string;
-  introductionZh?: string;
+  introductionVi?: string;
   glossary: { [key: string]: string };
   toc: WebNovelTocItemDto[];
   visited: number;
@@ -54,7 +54,7 @@ export interface WebNovelDto {
 
 export interface WebNovelChapterDto {
   titleJp: string;
-  titleZh?: string;
+  titleVi?: string;
   prevId?: string;
   nextId?: string;
   paragraphs: string[];

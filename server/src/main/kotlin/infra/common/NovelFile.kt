@@ -8,14 +8,14 @@ enum class NovelFileMode {
     @SerialName("jp")
     Jp,
 
-    @SerialName("zh")
-    Zh,
+    @SerialName("vi")
+    Vi,
 
-    @SerialName("jp-zh")
-    JpZh,
+    @SerialName("jp-vi")
+    JpVi,
 
-    @SerialName("zh-jp")
-    ZhJp,
+    @SerialName("vi-jp")
+    ViJp,
 }
 
 @Serializable

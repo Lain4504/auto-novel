@@ -30,8 +30,8 @@ export const buildParagraphs = (
   }[] = [];
   const needSpeakJp =
     setting.mode === 'jp' || setting.speakLanguages.includes('jp');
-  const needSpeakZh =
-    setting.mode === 'zh' || setting.speakLanguages.includes('zh');
+  const needSpeakVi =
+    setting.mode === 'vi' || setting.speakLanguages.includes('vi');
 
   if (setting.mode === 'jp') {
     styles.push({
@@ -41,7 +41,7 @@ export const buildParagraphs = (
       needSpeak: needSpeakJp,
     });
   } else {
-    if (setting.mode === 'jp-zh') {
+    if (setting.mode === 'jp-vi') {
       styles.push({
         paragraphs: chapter.paragraphs,
         source: 'J',
@@ -73,7 +73,7 @@ export const buildParagraphs = (
             paragraphs: paragraphs.map((it) => cc.toView(it)),
             source: t[0].toUpperCase(),
             secondary: false,
-            needSpeak: needSpeakZh,
+            needSpeak: needSpeakVi,
           });
           break;
         } else {
@@ -97,7 +97,7 @@ export const buildParagraphs = (
             paragraphs: paragraphs.map((it) => cc.toView(it)),
             source: t[0].toUpperCase(),
             secondary: false,
-            needSpeak: needSpeakZh && i === 0,
+            needSpeak: needSpeakVi && i === 0,
           });
         } else {
           merged.push({
@@ -111,7 +111,7 @@ export const buildParagraphs = (
       }
     }
 
-    if (setting.mode === 'zh-jp') {
+    if (setting.mode === 'vi-jp') {
       styles.push({
         paragraphs: chapter.paragraphs,
         source: 'J',

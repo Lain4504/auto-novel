@@ -59,7 +59,7 @@ const { expandedNames, hasSeparators, isAnyExpanded, toggleAll, tocSections } =
     :provider-id="providerId"
     :novel-id="novelId"
     :title-jp="novel.titleJp"
-    :title-zh="novel.titleZh"
+    :title-vi="novel.titleVi"
     :total="novel.toc.filter((it: WebNovelTocItemDto) => it.chapterId).length"
     v-model:jp="novel.jp"
     v-model:baidu="novel.baidu"

@@ -19,7 +19,7 @@ const props = defineProps<{
   providerId: string;
   novelId: string;
   titleJp: string;
-  titleZh?: string;
+  titleVi?: string;
   total: number;
   jp: number;
   baidu: number;
@@ -29,7 +29,7 @@ const props = defineProps<{
   glossary: { [key: string]: string };
 }>();
 
-const { providerId, novelId, titleJp, titleZh, total } = props;
+const { providerId, novelId, titleJp, titleVi, total } = props;
 
 const emit = defineEmits<{
   'update:jp': [number];
@@ -57,7 +57,7 @@ const startTranslateTask = (translatorId: 'baidu' | 'youdao') =>
 
 const files = computed(() => {
   const title =
-    setting.value.downloadFilenameType === 'jp' ? titleJp : titleZh ?? titleJp;
+    setting.value.downloadFilenameType === 'jp' ? titleJp : titleVi ?? titleJp;
 
   const { mode, translationsMode, translations, type } =
     setting.value.downloadFormat;
@@ -72,7 +72,7 @@ const files = computed(() => {
       type,
       title,
     }),
-    zh: WebNovelApi.createFileUrl({
+    vi: WebNovelApi.createFileUrl({
       providerId,
       novelId,
       mode: mode,
@@ -138,7 +138,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
   const results = tasks.map((task) => {
     const job = {
       task,
-      description: titleZh ?? titleJp,
+      description: titleVi ?? titleJp,
       createAt: Date.now(),
     };
     const success = workspace.addJob(job);
@@ -217,8 +217,8 @@ const submitJob = (id: 'gpt' | 'sakura') => {
         :label="t('novel.translate.downloadMachine')"
         :round="false"
         tag="a"
-        :href="files.zh.url"
-        :download="files.zh.filename"
+        :href="files.vi.url"
+        :download="files.vi.filename"
         target="_blank"
       />
       <c-button
@@ -231,10 +231,10 @@ const submitJob = (id: 'gpt' | 'sakura') => {
 
   <TranslateTask
     ref="translateTask"
-    @update:jp="(zh) => emit('update:jp', zh)"
-    @update:baidu="(zh) => emit('update:baidu', zh)"
-    @update:youdao="(zh) => emit('update:youdao', zh)"
-    @update:gpt="(zh) => emit('update:gpt', zh)"
+    @update:jp="(vi) => emit('update:jp', vi)"
+    @update:baidu="(vi) => emit('update:baidu', vi)"
+    @update:youdao="(vi) => emit('update:youdao', vi)"
+    @update:gpt="(vi) => emit('update:gpt', vi)"
     style="margin-top: 20px"
   />
 </template>

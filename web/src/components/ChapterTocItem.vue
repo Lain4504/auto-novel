@@ -76,7 +76,7 @@ const visitedColor = mixColor();
         </n-text>
         <br />
         <n-text depth="3">
-          {{ tocItem.titleZh }}
+          {{ tocItem.titleVi }}
         </n-text>
         <br />
         <n-text v-if="!isSeparator" depth="3" style="font-size: 12px">

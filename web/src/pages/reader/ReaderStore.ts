@@ -7,7 +7,7 @@ import { Ok, runCatching } from '@/util/result';
 export interface ReaderChapter {
   chapterId: string;
   titleJp: string;
-  titleZh?: string;
+  titleVi?: string;
   prevId?: string;
   nextId?: string;
   paragraphs: string[];
@@ -98,7 +98,7 @@ const getChapter = async (
     return <ReaderChapter>{
       chapterId,
       titleJp: `${volumeId} - ${chapterId}`,
-      titleZh: undefined,
+      titleVi: undefined,
       prevId: volume.toc[currIndex - 1]?.chapterId,
       nextId: volume.toc[currIndex + 1]?.chapterId,
       paragraphs: chapter.paragraphs,

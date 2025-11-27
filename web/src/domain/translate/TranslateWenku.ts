@@ -73,9 +73,9 @@ export const translateWenku = async (
         callback.log(`无需翻译`);
         callback.onChapterSuccess({});
       } else {
-        const textsZh = await translator.translate(cTask.paragraphJp, {
+        const textsVi = await translator.translate(cTask.paragraphJp, {
           glossary: cTask.glossary,
-          oldTextZh: cTask.oldParagraphZh,
+          oldTextVi: cTask.oldParagraphVi,
           oldGlossary: cTask.oldGlossary,
           force: forceSeg,
           signal,
@@ -83,9 +83,9 @@ export const translateWenku = async (
         callback.log('上传章节');
         const state = await updateChapterTranslation(chapterId, {
           glossaryId: cTask.glossaryId,
-          paragraphsZh: textsZh,
+          paragraphsVi: textsVi,
         });
-        callback.onChapterSuccess({ zh: state });
+        callback.onChapterSuccess({ vi: state });
       }
     } catch (e) {
       if (e === 'quit') {

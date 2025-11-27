@@ -90,7 +90,7 @@ const latestChapterCreateAt = computed(() => {
       {{ novel.titleJp }}
     </n-a>
     <br />
-    <n-text depth="3">{{ novel.titleZh }}</n-text>
+    <n-text depth="3">{{ novel.titleVi }}</n-text>
   </n-h3>
 
   <n-p v-if="novel.authors.length > 0">
@@ -151,8 +151,8 @@ const latestChapterCreateAt = computed(() => {
     :tooltip="false"
     style="word-break: break-all; margin-bottom: 0"
   >
-    <template v-if="novel.introductionZh !== undefined">
-      {{ novel.introductionZh }}
+    <template v-if="novel.introductionVi !== undefined">
+      {{ novel.introductionVi }}
       <br />
       <br />
     </template>

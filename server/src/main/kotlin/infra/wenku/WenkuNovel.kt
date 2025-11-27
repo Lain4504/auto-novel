@@ -38,7 +38,7 @@ enum class WenkuNovelLevel {
 data class WenkuNovelListItem(
     val id: String,
     val title: String,
-    val titleZh: String,
+    val titleVi: String,
     val cover: String?,
     val favored: String?,
 )
@@ -47,7 +47,7 @@ data class WenkuNovelListItem(
 data class WenkuNovel(
     @Contextual @SerialName("_id") val id: ObjectId,
     val title: String,
-    val titleZh: String,
+    val titleVi: String,
     val cover: String? = null,
     val authors: List<String>,
     val artists: List<String>,
@@ -73,7 +73,7 @@ data class WenkuNovel(
 data class WenkuNovelVolume(
     val asin: String,
     val title: String,
-    val titleZh: String? = null,
+    val titleVi: String? = null,
     val cover: String,
     val coverHires: String? = null,
     val publisher: String? = null,
@@ -83,7 +83,7 @@ data class WenkuNovelVolume(
 
 data class WenkuNovelVolumeList(
     val jp: List<WenkuNovelVolumeJp>,
-    val zh: List<String>,
+    val vi: List<String>,
 )
 
 @Serializable

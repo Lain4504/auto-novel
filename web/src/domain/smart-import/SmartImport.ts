@@ -240,12 +240,12 @@ export const smartImport = async (
 
     try {
       const translator = await Translator.create({ id: 'youdao' });
-      const titleZh = await translator.translatePlain(novel.title);
-      const introductionZh = await translator.translatePlain(
+      const titleVi = await translator.translatePlain(novel.title);
+      const introductionVi = await translator.translatePlain(
         novel.introduction,
       );
-      novel.titleZh = titleZh;
-      novel.introduction = introductionZh;
+      novel.titleVi = titleVi;
+      novel.introduction = introductionVi;
     } catch {}
 
     populateNovel(novel);

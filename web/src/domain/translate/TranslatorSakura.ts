@@ -194,26 +194,26 @@ export class SakuraTranslator implements SegmentTranslator {
 
     if (this.version === '1.0') {
       system(
-        '你是一个轻小说翻译模型，可以流畅通顺地以日本轻小说的风格将日文翻译成简体中文，并联系上下文正确使用人称代词，不擅自添加原文中没有的代词。',
+        '你是一个轻小说翻译模型，可以流畅通顺地以日本轻小说的风格将日文翻译成越南语，并联系上下文正确使用人称代词，不擅自添加原文中没有的代词。',
       );
       if (prevText !== '') {
         assistant(prevText);
       }
 
       if (Object.keys(glossary).length === 0) {
-        user(`将下面的日文文本翻译成中文：${text}`);
+        user(`将下面的日文文本翻译成越南语：${text}`);
       } else {
         const glossaryHint = Object.entries(glossary)
           .map(([wordJp, wordZh]) => `${wordJp}->${wordZh}`)
           .join('\n');
         user(
           `根据以下术语表（可以为空）：\n${glossaryHint}\n` +
-            `将下面的日文文本根据对应关系和备注翻译成中文：${text}`,
+            `将下面的日文文本根据对应关系和备注翻译成越南语：${text}`,
         );
       }
     } else if (this.version === '0.10') {
       system(
-        '你是一个轻小说翻译模型，可以流畅通顺地使用给定的术语表以日本轻小说的风格将日文翻译成简体中文，并联系上下文正确使用人称代词，注意不要混淆使役态和被动态的主语和宾语，不要擅自添加原文中没有的代词，也不要擅自增加或减少换行。',
+        '你是一个轻小说翻译模型，可以流畅通顺地使用给定的术语表以日本轻小说的风格将日文翻译成越南语，并联系上下文正确使用人称代词，注意不要混淆使役态和被动态的主语和宾语，不要擅自添加原文中没有的代词，也不要擅自增加或减少换行。',
       );
       if (prevText !== '') {
         assistant(prevText);
@@ -224,11 +224,11 @@ export class SakuraTranslator implements SegmentTranslator {
         .join('\n');
 
       user(
-        `根据以下术语表（可以为空）：\n${glossaryHint}\n\n将下面的日文文本根据上述术语表的对应关系和备注翻译成中文：${text}`,
+        `根据以下术语表（可以为空）：\n${glossaryHint}\n\n将下面的日文文本根据上述术语表的对应关系和备注翻译成越南语：${text}`,
       );
     } else {
       system(
-        '你是一个轻小说翻译模型，可以流畅通顺地以日本轻小说的风格将日文翻译成简体中文，并联系上下文正确使用人称代词，不擅自添加原文中没有的代词。',
+        '你是一个轻小说翻译模型，可以流畅通顺地以日本轻小说的风格将日文翻译成越南语，并联系上下文正确使用人称代词，不擅自添加原文中没有的代词。',
       );
       if (prevText !== '') {
         assistant(prevText);
@@ -242,7 +242,7 @@ export class SakuraTranslator implements SegmentTranslator {
         text = text.replaceAll(wordJp, wordZh);
       }
 
-      user(`将下面的日文文本翻译成中文：${text}`);
+      user(`将下面的日文文本翻译成越南语：${text}`);
     }
 
     const maxNewToken = Math.max(Math.ceil(text.length * 1.7), 100);

@@ -16,8 +16,8 @@ export type Operation =
   | OperationWenkuUpload;
 
 interface OperationWebEditData {
-  titleZh: string;
-  introductionZh: string;
+  titleVi: string;
+  introductionVi: string;
 }
 
 export interface OperationWebEdit {
@@ -39,7 +39,7 @@ export interface OperationWebEditGlossary {
 
 interface OperationWenkuEditData {
   title: string;
-  titleZh: string;
+  titleVi: string;
   authors: string[];
   artists: string[];
   introduction: string;
@@ -74,7 +74,7 @@ export interface OperationHistory {
 
 interface MergeHistoryData {
   titleJp: string;
-  titleZh?: string;
+  titleVi?: string;
   chapterId?: string;
   createAt?: number;
 }

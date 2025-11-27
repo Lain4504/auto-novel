@@ -189,7 +189,7 @@ fun Route.routeWenkuNovel() {
             @Serializable
             class Body(
                 val glossaryId: String? = null,
-                val paragraphsZh: List<String>,
+                val paragraphsVi: List<String>,
                 val sakuraVersion: String? = null,
             )
 
@@ -201,7 +201,7 @@ fun Route.routeWenkuNovel() {
                     volumeId = loc.parent.volumeId,
                     chapterId = loc.chapterId,
                     glossaryId = body.glossaryId,
-                    paragraphsZh = body.paragraphsZh,
+                    paragraphsVi = body.paragraphsVi,
                     sakuraVersion = body.sakuraVersion,
                 )
             }
@@ -270,7 +270,7 @@ class WenkuNovelApi(
     @Serializable
     data class WenkuNovelDto(
         val title: String,
-        val titleZh: String,
+        val titleVi: String,
         val cover: String?,
         val authors: List<String>,
         val artists: List<String>,
@@ -285,7 +285,7 @@ class WenkuNovelApi(
         val volumes: List<WenkuNovelVolume>,
         val visited: Long,
         val favored: String?,
-        val volumeZh: List<String>,
+        val volumeVi: List<String>,
         val volumeJp: List<WenkuNovelVolumeJp>,
     )
 
@@ -315,7 +315,7 @@ class WenkuNovelApi(
 
         val dto = WenkuNovelDto(
             title = metadata.title,
-            titleZh = metadata.titleZh,
+            titleVi = metadata.titleVi,
             cover = metadata.cover,
             authors = metadata.authors,
             artists = metadata.artists,
@@ -330,7 +330,7 @@ class WenkuNovelApi(
             glossary = metadata.glossary,
             visited = metadata.visited,
             favored = null,
-            volumeZh = volumes.zh,
+            volumeVi = volumes.vi,
             volumeJp = volumes.jp,
         )
 
@@ -348,7 +348,7 @@ class WenkuNovelApi(
     @Serializable
     class MetadataCreateBody(
         val title: String,
-        val titleZh: String,
+        val titleVi: String,
         val cover: String?,
         val authors: List<String>,
         val artists: List<String>,
@@ -365,7 +365,7 @@ class WenkuNovelApi(
         user.shouldBeOldAss()
         val novelId = metadataRepo.create(
             title = body.title,
-            titleZh = body.titleZh,
+            titleVi = body.titleVi,
             cover = body.cover,
             authors = body.authors,
             artists = body.artists,
@@ -381,7 +381,7 @@ class WenkuNovelApi(
                 old = null,
                 new = Operation.WenkuEdit.Data(
                     title = body.title,
-                    titleZh = body.titleZh,
+                    titleVi = body.titleVi,
                     authors = body.authors,
                     artists = body.artists,
                     introduction = body.introduction,
@@ -415,7 +415,7 @@ class WenkuNovelApi(
         metadataRepo.update(
             novelId = novelId,
             title = body.title,
-            titleZh = body.titleZh,
+            titleVi = body.titleVi,
             cover = body.cover,
             authors = body.authors,
             artists = body.artists,
@@ -431,14 +431,14 @@ class WenkuNovelApi(
                 novelId = novelId,
                 old = Operation.WenkuEdit.Data(
                     title = novel.title,
-                    titleZh = novel.titleZh,
+                    titleVi = novel.titleVi,
                     authors = novel.authors,
                     artists = novel.artists,
                     introduction = novel.introduction,
                 ),
                 new = Operation.WenkuEdit.Data(
                     title = body.title,
-                    titleZh = body.titleZh,
+                    titleVi = body.titleVi,
                     authors = body.authors,
                     artists = body.artists,
                     introduction = body.introduction,
@@ -610,7 +610,7 @@ class WenkuNovelTranslateV2Api(
     @Serializable
     data class ChapterTranslateTaskDto(
         val paragraphJp: List<String>,
-        val oldParagraphZh: List<String>?,
+        val oldParagraphVi: List<String>?,
         val glossaryId: String,
         val glossary: Map<String, String>,
         val oldGlossaryId: String?,
@@ -648,7 +648,7 @@ class WenkuNovelTranslateV2Api(
 
         return ChapterTranslateTaskDto(
             paragraphJp = chapter,
-            oldParagraphZh = oldTranslation.takeIf { !sakuraOutdated },
+            oldParagraphVi = oldTranslation.takeIf { !sakuraOutdated },
             glossaryId = novel.glossaryUuid ?: "no glossary",
             glossary = novel.glossary,
             oldGlossaryId = oldGlossaryId,
@@ -663,7 +663,7 @@ class WenkuNovelTranslateV2Api(
         volumeId: String,
         chapterId: String,
         glossaryId: String?,
-        paragraphsZh: List<String>,
+        paragraphsVi: List<String>,
         sakuraVersion: String?,
     ): Int {
         if (translatorId == TranslatorId.Sakura && sakuraVersion != "0.9") {
@@ -684,13 +684,13 @@ class WenkuNovelTranslateV2Api(
         val jpLines = volume.getChapter(chapterId)
             ?: throwNotFound("章节不存在")
 
-        if (jpLines.size != paragraphsZh.size)
+        if (jpLines.size != paragraphsVi.size)
             throwBadRequest("翻译行数不匹配")
 
         volume.setTranslation(
             translatorId = translatorId,
             chapterId = chapterId,
-            lines = paragraphsZh,
+            lines = paragraphsVi,
         )
         volume.setChapterGlossary(
             translatorId = translatorId,

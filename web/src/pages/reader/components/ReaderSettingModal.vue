@@ -241,7 +241,7 @@ const setIndentSize = (diff: number) => {
 
           <c-action-wrapper :title="t('reader.settingModal.mainOpacity')" align="center">
             <n-slider
-              v-model:value="readerSetting.mixZhOpacity"
+              v-model:value="readerSetting.mixViOpacity"
               :max="1"
               :min="0"
               :step="0.05"
@@ -251,7 +251,7 @@ const setIndentSize = (diff: number) => {
               style="flex: auto"
             />
             <n-text style="width: 6em">
-              {{ (readerSetting.mixZhOpacity * 100).toFixed(0) }}%
+              {{ (readerSetting.mixViOpacity * 100).toFixed(0) }}%
             </n-text>
           </c-action-wrapper>
 

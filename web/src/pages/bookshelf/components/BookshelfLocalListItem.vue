@@ -77,7 +77,7 @@ const startTranslateTask = (translatorId: 'baidu' | 'youdao') =>
   <TranslateTask
     ref="translateTask"
     style="margin-top: 20px"
-    @update:baidu="(zh) => (baidu = zh)"
-    @update:youdao="(zh) => (youdao = zh)"
+    @update:baidu="(vi) => (baidu = vi)"
+    @update:youdao="(vi) => (youdao = vi)"
   />
 </template>

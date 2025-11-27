@@ -24,7 +24,7 @@ const { t } = useI18n();
             {{ item.titleJp }}
           </span>
         </c-a>
-        <div class="text-2line">{{ item.titleZh }}</div>
+        <div class="text-2line">{{ item.titleVi }}</div>
         <n-text depth="3">
           {{ item.type }} / {{ t('home.panelTotal') }} {{ item.total }} /
           {{ t('home.panelBaidu') }} {{ item.baidu }}

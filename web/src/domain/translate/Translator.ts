@@ -58,38 +58,38 @@ export class Translator {
     textJp: string[],
     context?: {
       glossary?: Glossary;
-      oldTextZh?: string[] | undefined;
+      oldTextVi?: string[] | undefined;
       oldGlossary?: Glossary;
       force?: boolean;
       signal?: AbortSignal;
     },
   ): Promise<string[]> {
-    const oldTextZh = context?.oldTextZh;
-    const textZh = await emptyLineFilterWrapper(
+    const oldTextVi = context?.oldTextVi;
+    const textVi = await emptyLineFilterWrapper(
       textJp,
-      oldTextZh,
-      async (textJp, oldTextZh) => {
+      oldTextVi,
+      async (textJp, oldTextVi) => {
         if (textJp.length === 0) return [];
 
-        const segsZh: string[][] = [];
-        const segs = this.segTranslator.segmentor(textJp, oldTextZh);
+        const segsVi: string[][] = [];
+        const segs = this.segTranslator.segmentor(textJp, oldTextVi);
         const size = segs.length;
-        for (const [index, [segJp, oldSegZh]] of segs.entries()) {
-          const segZh = await this.translateSeg(segJp, {
+        for (const [index, [segJp, oldSegVi]] of segs.entries()) {
+          const segVi = await this.translateSeg(segJp, {
             logPrefix: `分段${index + 1}/${size}`,
             ...context,
-            prevSegs: segsZh,
-            oldSegZh,
+            prevSegs: segsVi,
+            oldSegVi,
           });
-          if (segJp.length !== segZh.length) {
+          if (segJp.length !== segVi.length) {
             throw new Error('翻译结果行数不匹配。不应当出现，请反馈给站长。');
           }
-          segsZh.push(segZh);
+          segsVi.push(segVi);
         }
-        return segsZh.flat();
+        return segsVi.flat();
       },
     );
-    return textZh;
+    return textVi;
   }
 
   private async translateSeg(
@@ -97,7 +97,7 @@ export class Translator {
     {
       logPrefix,
       glossary,
-      oldSegZh,
+      oldSegVi,
       oldGlossary,
       prevSegs,
       force,
@@ -105,7 +105,7 @@ export class Translator {
     }: {
       logPrefix: string;
       glossary?: Glossary;
-      oldSegZh?: string[];
+      oldSegVi?: string[];
       oldGlossary?: Glossary;
       prevSegs: string[][];
       force?: boolean;
@@ -117,11 +117,11 @@ export class Translator {
 
     // 检测分段是否需要重新翻译
     const segGlossary = filterGlossary(glossary, seg);
-    if (!force && oldSegZh !== undefined) {
+    if (!force && oldSegVi !== undefined) {
       const segOldGlossary = filterGlossary(oldGlossary, seg);
       if (isEqual(segGlossary, segOldGlossary)) {
         this.log(logPrefix + '　术语表无变化，无需翻译');
-        return oldSegZh;
+        return oldSegVi;
       }
     }
 
@@ -230,39 +230,39 @@ const filterGlossary = (glossary: Glossary, text: string[]) => {
 
 const emptyLineFilterWrapper = async (
   textJp: string[],
-  oldTextZh: string[] | undefined,
+  oldTextVi: string[] | undefined,
   callback: (
     textJp: string[],
-    oldTextZh: string[] | undefined,
+    oldTextVi: string[] | undefined,
   ) => Promise<string[]>,
 ) => {
   const textJpFiltered: string[] = [];
-  const oldTextZhFiltered: string[] = [];
+  const oldTextViFiltered: string[] = [];
   for (let i = 0; i < textJp.length; i++) {
     const lineJp = textJp[i].replace(/\r?\n|\r/g, '');
     if (!(lineJp.trim() === '' || lineJp.startsWith('<图片>'))) {
       textJpFiltered.push(lineJp);
-      if (oldTextZh !== undefined) {
-        const lineZh = oldTextZh[i];
-        oldTextZhFiltered.push(lineZh);
+      if (oldTextVi !== undefined) {
+        const lineVi = oldTextVi[i];
+        oldTextViFiltered.push(lineVi);
       }
     }
   }
 
-  const textZh = await callback(
+  const textVi = await callback(
     textJpFiltered,
-    oldTextZh === undefined ? undefined : oldTextZhFiltered,
+    oldTextVi === undefined ? undefined : oldTextViFiltered,
   );
 
-  const recoveredTextZh: string[] = [];
+  const recoveredTextVi: string[] = [];
   for (const lineJp of textJp) {
     const realLineJp = lineJp.replace(/\r?\n|\r/g, '');
     if (realLineJp.trim() === '' || realLineJp.startsWith('<图片>')) {
-      recoveredTextZh.push(lineJp);
+      recoveredTextVi.push(lineJp);
     } else {
-      const outputLine = textZh.shift();
-      recoveredTextZh.push(outputLine!);
+      const outputLine = textVi.shift();
+      recoveredTextVi.push(outputLine!);
     }
   }
-  return recoveredTextZh;
+  return recoveredTextVi;
 };

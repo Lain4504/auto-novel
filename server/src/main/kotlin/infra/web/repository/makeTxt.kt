@@ -36,7 +36,7 @@ private class TxtWriter(
 ) {
     private fun BufferedWriter.writeTitle(novel: WebNovel) {
         if (jp) write(novel.titleJp + "\n")
-        if (zh) write(novel.titleZh + "\n")
+        if (vi) write(novel.titleVi + "\n")
     }
 
     private fun BufferedWriter.writeAuthor(novel: WebNovel) {
@@ -67,15 +67,15 @@ private class TxtWriter(
             write(novel.introductionJp)
             write("\n")
         }
-        if (zh && !novel.introductionZh.isNullOrBlank()) {
-            write(novel.introductionZh)
+        if (vi && !novel.introductionVi.isNullOrBlank()) {
+            write(novel.introductionVi)
             write("\n")
         }
     }
 
     private fun BufferedWriter.writeTocItemTitle(item: WebNovelTocItem) {
         if (jp) write("# ${item.titleJp}\n")
-        if (zh) write("# ${item.titleZh ?: item.titleJp}\n")
+        if (vi) write("# ${item.titleVi ?: item.titleJp}\n")
     }
 
     private fun BufferedWriter.writeMissingChapter() {

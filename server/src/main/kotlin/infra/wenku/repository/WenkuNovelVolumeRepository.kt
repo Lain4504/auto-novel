@@ -74,7 +74,7 @@ class WenkuNovelVolumeRepository(
             return digest.fold("") { str, it -> str + "%02x".format(it) }
         }
 
-        val zhFilename = buildString {
+        val viFilename = buildString {
             append(novelId)
             append('.')
             append(mode.serialName())
@@ -94,9 +94,9 @@ class WenkuNovelVolumeRepository(
             append(volumeId.substringAfterLast('.', "txt"))
         }
 
-        val zhPath = temp.createFile(TempFileType.Wenku, zhFilename)
+        val viPath = temp.createFile(TempFileType.Wenku, viFilename)
 
-        suspend fun getZhLinesList(chapterId: String): List<List<String>> {
+        suspend fun getViLinesList(chapterId: String): List<List<String>> {
             return when (translationsMode) {
                 NovelFileTranslationsMode.Parallel ->
                     translations.mapNotNull { volume.getTranslation(it, chapterId) }
@@ -109,18 +109,18 @@ class WenkuNovelVolumeRepository(
         }
 
         if (volumeId.endsWith(".txt")) {
-            zhPath.bufferedWriter().use { bf ->
+            viPath.bufferedWriter().use { bf ->
                 volume.listChapter().sorted().forEach { chapterId ->
-                    val zhLinesList = getZhLinesList(chapterId)
-                    if (zhLinesList.isEmpty()) {
+                    val viLinesList = getViLinesList(chapterId)
+                    if (viLinesList.isEmpty()) {
                         bf.appendLine("// 该分段翻译缺失。")
                     } else {
                         val jpLines = volume.getChapter(chapterId)!!
                         val linesList = when (mode) {
                             NovelFileMode.Jp -> throw RuntimeException("文库小说不允许日语下载")
-                            NovelFileMode.Zh -> zhLinesList
-                            NovelFileMode.JpZh -> listOf(jpLines) + zhLinesList
-                            NovelFileMode.ZhJp -> zhLinesList + listOf(jpLines)
+                            NovelFileMode.Vi -> viLinesList
+                            NovelFileMode.JpVi -> listOf(jpLines) + viLinesList
+                            NovelFileMode.ViJp -> viLinesList + listOf(jpLines)
                         }
                         for (i in jpLines.indices) {
                             linesList.forEach { lines ->
@@ -130,12 +130,12 @@ class WenkuNovelVolumeRepository(
                     }
                 }
             }
-            return@withContext zhFilename
+            return@withContext viFilename
         } else {
             val jpPath = volume.volumesDir / volumeId
 
             val chapters = volume.listChapter()
-            Epub.modify(srcPath = jpPath, dstPath = zhPath) { name, bytesIn ->
+            Epub.modify(srcPath = jpPath, dstPath = viPath) { name, bytesIn ->
                 // 为了兼容ChapterId以斜杠开头的旧格式
                 val chapterId = if ("/${name}".escapePath() in chapters) {
                     "/${name}".escapePath()
@@ -147,8 +147,8 @@ class WenkuNovelVolumeRepository(
 
                 if (chapterId != null) {
                     // XHtml文件，尝试生成翻译版
-                    val zhLinesList = getZhLinesList(chapterId)
-                    if (zhLinesList.isEmpty()) {
+                    val viLinesList = getViLinesList(chapterId)
+                    if (viLinesList.isEmpty()) {
                         bytesIn
                     } else {
                         val doc = Jsoup.parse(bytesIn.decodeToString(), Parser.xmlParser())
@@ -157,22 +157,22 @@ class WenkuNovelVolumeRepository(
                             .forEachIndexed { index, el ->
                                 when (mode) {
                                     NovelFileMode.Jp -> throw RuntimeException("文库小说不允许日语下载")
-                                    NovelFileMode.Zh -> {
-                                        zhLinesList.forEach { lines ->
+                                    NovelFileMode.Vi -> {
+                                        viLinesList.forEach { lines ->
                                             el.before("<p>${lines[index]}</p>")
                                         }
                                         el.remove()
                                     }
 
-                                    NovelFileMode.JpZh -> {
-                                        zhLinesList.asReversed().forEach { lines ->
+                                    NovelFileMode.JpVi -> {
+                                        viLinesList.asReversed().forEach { lines ->
                                             el.after("<p>${lines[index]}</p>")
                                         }
                                         el.attr("style", "opacity:0.4;")
                                     }
 
-                                    NovelFileMode.ZhJp -> {
-                                        zhLinesList.forEach { lines ->
+                                    NovelFileMode.ViJp -> {
+                                        viLinesList.forEach { lines ->
                                             el.before("<p>${lines[index]}</p>")
                                         }
                                         el.attr("style", "opacity:0.4;")
@@ -188,11 +188,11 @@ class WenkuNovelVolumeRepository(
                     val metadataEl = doc.selectFirst("metadata")!!
                     val spineEl = doc.selectFirst("spine")!!
 
-                    // 修改 EPUB 语言为简体中文，让 iOS iBook 阅读器可以使用中文字体
+                    // 修改 EPUB 语言为越南语，让 iOS iBook 阅读器可以使用越南语字体
                     metadataEl.selectFirst("dc|language")
-                        ?.text("zh-CN")
+                        ?.text("vi-VN")
                         ?: metadataEl.appendChild(
-                            Element("dc:language").text("zh-CN")
+                            Element("dc:language").text("vi-VN")
                         )
 
                     // 防止阅读器使用竖排
@@ -213,7 +213,7 @@ class WenkuNovelVolumeRepository(
                     bytesIn
                 }
             }
-            return@withContext zhFilename
+            return@withContext viFilename
         }
     }
 }

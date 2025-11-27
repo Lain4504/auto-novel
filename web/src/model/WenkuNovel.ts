@@ -1,14 +1,14 @@
 export interface WenkuNovelOutlineDto {
   id: string;
   title: string;
-  titleZh: string;
+  titleVi: string;
   cover: string;
   favored?: string;
 }
 
 export interface WenkuNovelDto {
   title: string;
-  titleZh: string;
+  titleVi: string;
   cover?: string;
   authors: string[];
   artists: string[];
@@ -23,14 +23,14 @@ export interface WenkuNovelDto {
   glossary: { [key: string]: string };
   visited: number;
   favored?: string;
-  volumeZh: string[];
+  volumeVi: string[];
   volumeJp: VolumeJpDto[];
 }
 
 export interface WenkuVolumeDto {
   asin: string;
   title: string;
-  titleZh?: string;
+  titleVi?: string;
   cover: string;
   coverHires?: string;
   publisher?: string;
@@ -49,7 +49,7 @@ export interface VolumeJpDto {
 
 export interface AmazonNovel {
   title: string;
-  titleZh?: string;
+  titleVi?: string;
   r18: boolean;
   authors: string[];
   artists: string[];

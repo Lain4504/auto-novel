@@ -19,9 +19,9 @@ export interface Setting {
   //
   menuCollapsed: boolean;
   //
-  downloadFilenameType: 'jp' | 'zh';
+  downloadFilenameType: 'jp' | 'vi';
   downloadFormat: {
-    mode: 'zh' | 'zh-jp' | 'jp-zh';
+    mode: 'vi' | 'vi-jp' | 'jp-vi';
     translationsMode: 'parallel' | 'priority';
     translations: TranslatorId[];
     type: 'epub' | 'txt';
@@ -54,9 +54,9 @@ export namespace Setting {
     //
     menuCollapsed: false,
     //
-    downloadFilenameType: 'zh',
+    downloadFilenameType: 'vi',
     downloadFormat: {
-      mode: 'zh-jp',
+      mode: 'vi-jp',
       translationsMode: 'priority',
       translations: ['sakura', 'gpt', 'youdao', 'baidu'],
       type: 'epub',
@@ -83,11 +83,19 @@ export namespace Setting {
       setting.enabledTranslator = ['baidu', 'youdao', 'gpt', 'sakura'];
     }
     if ((setting.downloadFormat.mode as string) === 'mix') {
-      setting.downloadFormat.mode = 'zh-jp';
+      setting.downloadFormat.mode = 'vi-jp';
     } else if ((setting.downloadFormat.mode as string) === 'mix-reverse') {
-      setting.downloadFormat.mode = 'jp-zh';
+      setting.downloadFormat.mode = 'jp-vi';
     } else if ((setting.downloadFormat.mode as string) === 'jp') {
-      setting.downloadFormat.mode = 'zh';
+      setting.downloadFormat.mode = 'vi';
+    }
+    // Migrate old zh modes to vi
+    if ((setting.downloadFormat.mode as string) === 'zh') {
+      setting.downloadFormat.mode = 'vi';
+    } else if ((setting.downloadFormat.mode as string) === 'zh-jp') {
+      setting.downloadFormat.mode = 'vi-jp';
+    } else if ((setting.downloadFormat.mode as string) === 'jp-zh') {
+      setting.downloadFormat.mode = 'jp-vi';
     }
     // 2024-03-05
     if (setting.workspaceSound === undefined) {
@@ -104,9 +112,9 @@ export namespace Setting {
   };
 
   export const downloadModeOptions = [
-    { label: '', value: 'zh' },
-    { label: '', value: 'zh-jp' },
-    { label: '', value: 'jp-zh' },
+    { label: '', value: 'vi' },
+    { label: '', value: 'vi-jp' },
+    { label: '', value: 'jp-vi' },
   ];
   export const downloadTranslationModeOptions = [
     { label: '', value: 'priority' },
@@ -138,7 +146,7 @@ export namespace Setting {
 }
 
 export interface ReaderSetting {
-  mode: 'jp' | 'zh' | 'zh-jp' | 'jp-zh';
+  mode: 'jp' | 'vi' | 'vi-jp' | 'jp-vi';
   translationsMode: 'parallel' | 'priority';
   translations: TranslatorId[];
   clickArea: 'default' | 'left-right' | 'up-down' | 'none';
@@ -158,13 +166,13 @@ export interface ReaderSetting {
     fontColor: string;
   };
   mixJpOpacity: number;
-  mixZhOpacity: number;
+  mixViOpacity: number;
   textUnderline: 'none' | 'solid' | 'dashed' | 'dotted';
 }
 
 export namespace ReaderSetting {
   export const defaultValue: ReaderSetting = {
-    mode: 'zh-jp',
+    mode: 'vi-jp',
     translationsMode: 'priority',
     translations: ['sakura', 'gpt', 'youdao', 'baidu'],
     clickArea: 'default',
@@ -194,9 +202,17 @@ export namespace ReaderSetting {
       );
     }
     if ((setting.mode as unknown) === 'mix') {
-      setting.mode = 'zh-jp';
+      setting.mode = 'vi-jp';
     } else if ((setting.mode as unknown) === 'mix-reverse') {
-      setting.mode = 'jp-zh';
+      setting.mode = 'jp-vi';
+    }
+    // Migrate old zh modes to vi
+    if ((setting.mode as unknown) === 'zh') {
+      setting.mode = 'vi';
+    } else if ((setting.mode as unknown) === 'zh-jp') {
+      setting.mode = 'vi-jp';
+    } else if ((setting.mode as unknown) === 'jp-zh') {
+      setting.mode = 'jp-vi';
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const theme = setting.theme as any;
@@ -225,9 +241,9 @@ export namespace ReaderSetting {
 
   export const modeOptions = [
     { label: '', value: 'jp' },
-    { label: '', value: 'zh' },
-    { label: '', value: 'zh-jp' },
-    { label: '', value: 'jp-zh' },
+    { label: '', value: 'vi' },
+    { label: '', value: 'vi-jp' },
+    { label: '', value: 'jp-vi' },
   ];
   export const translationModeOptions = [
     { label: '', value: 'priority' },
@@ -242,7 +258,7 @@ export namespace ReaderSetting {
   ];
 
   export const speakLanguagesOptions = [
-    { label: '', value: 'zh' },
+    { label: '', value: 'vi' },
     { label: '', value: 'jp' },
   ];
 
@@ -283,7 +299,7 @@ export namespace ReaderSetting {
 
 const syncSettingOptionLabels = () => {
   Setting.downloadModeOptions[0].label = i18nGlobal.t(
-    'stores.setting.downloadModes.zh',
+    'stores.setting.downloadModes.vi',
   );
   Setting.downloadModeOptions[1].label = i18nGlobal.t(
     'stores.setting.downloadModes.zhJp',
@@ -319,9 +335,9 @@ const syncSettingOptionLabels = () => {
   Setting.localeOptions[1].label = i18nGlobal.t('stores.setting.locale.zh');
 
   ReaderSetting.modeOptions[0].label = i18nGlobal.t('stores.reader.mode.jp');
-  ReaderSetting.modeOptions[1].label = i18nGlobal.t('stores.reader.mode.zh');
-  ReaderSetting.modeOptions[2].label = i18nGlobal.t('stores.reader.mode.zhJp');
-  ReaderSetting.modeOptions[3].label = i18nGlobal.t('stores.reader.mode.jpZh');
+  ReaderSetting.modeOptions[1].label = i18nGlobal.t('stores.reader.mode.vi');
+  ReaderSetting.modeOptions[2].label = i18nGlobal.t('stores.reader.mode.viJp');
+  ReaderSetting.modeOptions[3].label = i18nGlobal.t('stores.reader.mode.jpVi');
   ReaderSetting.translationModeOptions[0].label = i18nGlobal.t(
     'stores.setting.translationModes.priority',
   );
@@ -341,7 +357,7 @@ const syncSettingOptionLabels = () => {
     'stores.reader.clickArea.none',
   );
   ReaderSetting.speakLanguagesOptions[0].label = i18nGlobal.t(
-    'stores.reader.speak.zh',
+    'stores.reader.speak.vi',
   );
   ReaderSetting.speakLanguagesOptions[1].label = i18nGlobal.t(
     'stores.reader.speak.jp',

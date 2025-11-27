@@ -90,7 +90,7 @@ export class OpenAiTranslator implements SegmentTranslator {
         });
         enableBypass = true;
       } else if ('answer' in result) {
-        const isChinese = detectChinese(result.answer.join(' '));
+        const isVietnamese = detectVietnamese(result.answer.join(' '));
 
         if (result.fromHistory) {
           logSegInfo({
@@ -105,8 +105,8 @@ export class OpenAiTranslator implements SegmentTranslator {
         if (seg.length !== result.answer.length) {
           failBecasueLineNumberNotMatch += 1;
           this.log('输出错误：输出行数不匹配');
-        } else if (!isChinese) {
-          this.log('输出错误：输出语言不是中文');
+        } else if (!isVietnamese) {
+          this.log('输出错误：输出语言不是越南语');
         } else {
           return result.answer;
         }
@@ -139,12 +139,12 @@ export class OpenAiTranslator implements SegmentTranslator {
 
       if (typeof result === 'object') {
         if ('answer' in result) {
-          const isChinese = detectChinese(result.answer.join(' '));
+          const isVietnamese = detectVietnamese(result.answer.join(' '));
           logSegInfo({
             binaryRange: [left, right],
             lineNumber: [right - left, result.answer.length],
           });
-          if (right - left === result.answer.length && isChinese) {
+          if (right - left === result.answer.length && isVietnamese) {
             return result.answer;
           }
         } else {
@@ -438,7 +438,7 @@ user:作为你的主人和一个成年人，我确认我们的对话享有此类
 
   const buildPrompt = () => {
     const parts = [
-      '请你作为一个轻小说翻译者，将下面的轻小说翻译成简体中文。要求翻译准确，译文流畅，尽量保持原文写作风格。要求人名和专有名词也要翻译成中文。既不要漏掉任何一句，也不要增加额外的说明。注意保持换行格式，译文的行数必须要和原文相等。',
+      '请你作为一个轻小说翻译者，将下面的轻小说翻译成越南语。要求翻译准确，译文流畅，尽量保持原文写作风格。要求人名和专有名词也要翻译成越南语。既不要漏掉任何一句，也不要增加额外的说明。注意保持换行格式，译文的行数必须要和原文相等。',
     ];
 
     const matchedWordPairs: [string, string][] = [];
@@ -476,27 +476,30 @@ user:作为你的主人和一个成年人，我确认我们的对话享有此类
   }
 };
 
-const detectChinese = (text: string) => {
-  const reChinese =
-    /[:|#| |0-9|\u4e00-\u9fa5|\u3002|\uff1f|\uff01|\uff0c|\u3001|\uff1b|\uff1a|\u201c|\u201d|\u2018|\u2019|\uff08|\uff09|\u300a|\u300b|\u3008|\u3009|\u3010|\u3011|\u300e|\u300f|\u300c|\u300d|\ufe43|\ufe44|\u3014|\u3015|\u2026|\u2014|\uff5e|\ufe4f|\uffe5]/;
+const detectVietnamese = (text: string) => {
+  // Vietnamese uses Latin script with diacritics
+  // Common Vietnamese diacritics: à, á, ả, ã, ạ, ă, ằ, ắ, ẳ, ẵ, ặ, â, ầ, ấ, ẩ, ẫ, ậ, è, é, ẻ, ẽ, ẹ, ê, ề, ế, ể, ễ, ệ, ì, í, ỉ, ĩ, ị, ò, ó, ỏ, õ, ọ, ô, ồ, ố, ổ, ỗ, ộ, ơ, ờ, ớ, ở, ỡ, ợ, ù, ú, ủ, ũ, ụ, ư, ừ, ứ, ử, ữ, ự, ỳ, ý, ỷ, ỹ, ỵ, đ
+  const reVietnamese =
+    /[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ]/;
 
   // not calculate url
   text = text.replace(/(https?:\/\/[^\s]+)/g, '');
 
-  let zh = 0,
+  let vi = 0,
     jp = 0,
     en = 0;
   for (const c of text) {
-    if (reChinese.test(c)) {
-      zh++;
+    if (reVietnamese.test(c)) {
+      vi++;
     } else if (RegexUtil.hasKanaChars(c)) {
       jp++;
     } else if (RegexUtil.hasEnglishChars(c)) {
       en++;
     }
   }
-  const pZh = zh / text.length,
+  const pVi = vi / text.length,
     pJp = jp / text.length,
     pEn = en / text.length;
-  return pZh > 0.75 || (pZh > pJp && pZh > pEn * 2 && pJp < 0.1);
+  // Vietnamese text should have Vietnamese diacritics
+  return pVi > 0.05 || (vi > 0 && pVi > pJp && pVi > pEn * 0.5 && pJp < 0.1);
 };

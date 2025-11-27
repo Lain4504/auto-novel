@@ -54,14 +54,14 @@ export const translateWeb = async (
   try {
     const createMetadataCoder = () => {
       const encoded: string[] = [];
-      if (!task.titleZh) {
+      if (!task.titleVi) {
         encoded.push(task.titleJp);
       }
-      if (!task.introductionZh) {
+      if (!task.introductionVi) {
         encoded.push(task.introductionJp);
       }
       const toc = task.toc
-        .filter((it) => forceMetadata || !it.titleZh)
+        .filter((it) => forceMetadata || !it.titleVi)
         .map((it) => it.titleJp);
 
       const tocWordsDict: { [key: string]: string } = {};
@@ -101,10 +101,10 @@ export const translateWeb = async (
           toc: { [key: string]: string };
         } = { toc: {} };
 
-        if (!task.titleZh) {
+        if (!task.titleVi) {
           obj.title = translated.shift();
         }
-        if (!task.introductionZh) {
+        if (!task.introductionVi) {
           obj.introduction = translated.shift();
         }
         for (const wordJp of tocWordsNeedTranslate) {
@@ -201,19 +201,19 @@ export const translateWeb = async (
 
         callback.onChapterSuccess({});
       } else {
-        const textsZh = await translator.translate(cTask.paragraphJp, {
+        const textsVi = await translator.translate(cTask.paragraphJp, {
           glossary: cTask.glossary,
-          oldTextZh: cTask.oldParagraphZh,
+          oldTextVi: cTask.oldParagraphVi,
           oldGlossary: cTask.oldGlossary,
           force: forceSeg,
           signal,
         });
         callback.log(`上传章节`);
-        const { jp, zh } = await updateChapterTranslation(chapterId, {
+        const { jp, vi } = await updateChapterTranslation(chapterId, {
           glossaryId: cTask.glossaryId,
-          paragraphsZh: textsZh,
+          paragraphsVi: textsVi,
         });
-        callback.onChapterSuccess({ jp, zh });
+        callback.onChapterSuccess({ jp, vi });
       }
     } catch (e) {
       if (e === 'quit') {
