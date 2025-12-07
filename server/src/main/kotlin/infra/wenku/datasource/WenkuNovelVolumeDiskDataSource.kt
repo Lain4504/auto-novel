@@ -58,7 +58,7 @@ class WenkuNovelVolumeDiskDataSource(
         }
         return@withContext WenkuNovelVolumeList(
             jp = volumesJp,
-            zh = volumesZh,
+            vi = volumesZh,
         )
     }
 

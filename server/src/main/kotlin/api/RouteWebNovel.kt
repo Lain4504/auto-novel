@@ -551,7 +551,7 @@ class WebNovelApi(
         val tocRecord = mutableListOf<Operation.WebEdit.Toc>()
         metadata.toc.forEachIndexed { index, item ->
             val newTitleZh = toc[item.titleJp]
-            if (newTitleVi != null && newTitleVi != item.titleVi) {
+            if (newTitleZh != null && newTitleZh != item.titleVi) {
                 tocZh[index] = newTitleZh
                 tocRecord.add(
                     Operation.WebEdit.Toc(

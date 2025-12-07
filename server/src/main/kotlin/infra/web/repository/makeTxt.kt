@@ -16,14 +16,14 @@ suspend fun makeTxtFile(
     metadata: WebNovel,
     chapters: Map<String, ChapterWriteData>,
     jp: Boolean,
-    zh: Boolean,
+    vi: Boolean,
 ) {
     withContext(Dispatchers.IO) {
         if (filePath.notExists()) {
             filePath.createFile()
         }
         filePath.bufferedWriter().use {
-            with(TxtWriter(jp, zh)) {
+            with(TxtWriter(jp, vi)) {
                 it.writeNovel(metadata, chapters)
             }
         }
@@ -32,7 +32,7 @@ suspend fun makeTxtFile(
 
 private class TxtWriter(
     private val jp: Boolean,
-    private val zh: Boolean,
+    private val vi: Boolean,
 ) {
     private fun BufferedWriter.writeTitle(novel: WebNovel) {
         if (jp) write(novel.titleJp + "\n")
